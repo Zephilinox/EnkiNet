@@ -35,7 +35,7 @@ private:
 template <typename T>
 Packet& Packet::operator<<(T data)
 {
-	static_assert(std::is_integral_v<T>);
+	static_assert(std::is_arithmetic_v<T>);
 	serialize(&data, sizeof(T));
 	return *this;
 }
@@ -43,7 +43,7 @@ Packet& Packet::operator<<(T data)
 template <typename T>
 Packet& Packet::operator>>(T& data)
 {
-	static_assert(std::is_integral_v<T>);
+	static_assert(std::is_arithmetic_v<T>);
 	deserialize(&data, sizeof(T));
 	return *this;
 }
