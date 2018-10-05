@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <array>
 
 class Packet
 {
@@ -12,7 +13,6 @@ public:
 
 	template <typename T>
 	Packet& operator <<(T data);
-
 	template <typename T>
 	Packet& operator >>(T& data);
 
@@ -21,9 +21,13 @@ public:
 
 	template <typename T>
 	Packet& operator <<(std::vector<T> data);
-
 	template <typename T>
 	Packet& operator >>(std::vector<T>& data);
+
+	template <typename T, std::size_t size>
+	Packet& operator <<(std::array<T, size> data);
+	template <typename T, std::size_t size>
+	Packet& operator >>(std::array<T, size>& data);
 
 private:
 	template <typename T>
@@ -39,7 +43,7 @@ private:
 
 //will need to adjust this in the future for endianess concerns
 template <typename T>
-Packet& Packet::operator<<(T data)
+Packet& Packet::operator <<(T data)
 {
 	static_assert(std::is_arithmetic_v<T>);
 	serialize(&data, sizeof(T));
@@ -47,7 +51,7 @@ Packet& Packet::operator<<(T data)
 }
 
 template <typename T>
-Packet& Packet::operator>>(T& data)
+Packet& Packet::operator >>(T& data)
 {
 	static_assert(std::is_arithmetic_v<T>);
 	deserialize(&data, sizeof(T));
@@ -55,7 +59,7 @@ Packet& Packet::operator>>(T& data)
 }
 
 template <typename T>
-Packet& Packet::operator<<(std::vector<T> data)
+Packet& Packet::operator <<(std::vector<T> data)
 {
 	*this << data.size();
 	serialize(data.data(), sizeof(T) * data.size());
@@ -63,12 +67,39 @@ Packet& Packet::operator<<(std::vector<T> data)
 }
 
 template <typename T>
-Packet& Packet::operator>>(std::vector<T>& data)
+Packet& Packet::operator >>(std::vector<T>& data)
 {
 	std::size_t size;
 	*this >> size;
 	data.resize(size);
 	deserialize(data.data(), sizeof(T) * size);
+	return *this;
+}
+
+template <typename T, std::size_t size>
+Packet& Packet::operator <<(std::array<T, size> data)
+{
+	*this << size;
+	serialize(data.data(), sizeof(T) * size);
+	return *this;
+}
+
+template <typename T, std::size_t size>
+Packet& Packet::operator >>(std::array<T, size>& data)
+{
+	std::size_t size_of_stored_array;
+	*this >> size_of_stored_array;
+
+	if (size_of_stored_array <= size)
+	{
+		deserialize(data.data(), size_of_stored_array);
+	}
+	else
+	{
+		//todo: how to handle errors
+		throw;
+	}
+
 	return *this;
 }
 
