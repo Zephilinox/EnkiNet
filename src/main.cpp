@@ -44,5 +44,20 @@ int main()
 	std::cout << v.x << " " << v.y << "\n";
 	std::cout << v2.x << " " << v2.y << "\n";
 
+	std::vector<vector2> vecs{ {1, 1}, {2, 2} };
+	p << vecs;
+	std::vector<vector2> vecs2{ {0, 0}, {0, 0}};
+	p >> vecs2;
+
+	for (auto vec : vecs)
+	{
+		std::cout << vec.x << " " << vec.y << "\n";
+	}
+
+	for (auto vec : vecs2)
+	{
+		std::cout << vec.x << " " << vec.y << "\n";
+	}
+
 	return 0;
 }

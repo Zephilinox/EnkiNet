@@ -19,6 +19,12 @@ public:
 	Packet& operator <<(std::string data);
 	Packet& operator >>(std::string& data);
 
+	template <typename T>
+	Packet& operator <<(std::vector<T> data);
+
+	template <typename T>
+	Packet& operator >>(std::vector<T>& data);
+
 private:
 	template <typename T>
 	void serialize(T* data, std::size_t size);
@@ -45,6 +51,24 @@ Packet& Packet::operator>>(T& data)
 {
 	static_assert(std::is_arithmetic_v<T>);
 	deserialize(&data, sizeof(T));
+	return *this;
+}
+
+template <typename T>
+Packet& Packet::operator<<(std::vector<T> data)
+{
+	*this << data.size();
+	serialize(data.data(), sizeof(T) * data.size());
+	return *this;
+}
+
+template <typename T>
+Packet& Packet::operator>>(std::vector<T>& data)
+{
+	std::size_t size;
+	*this >> size;
+	data.resize(size);
+	deserialize(data.data(), sizeof(T) * size);
 	return *this;
 }
 
