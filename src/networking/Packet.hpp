@@ -118,6 +118,12 @@ void Packet::serialize(T* data, std::size_t size)
 template <typename T>
 void Packet::deserialize(T* data, std::size_t size)
 {
+	if (bytes_read + size > bytes.size())
+	{
+		//todo: do I really want to use exceptions?
+		throw;
+	}
+
 	memcpy(data, bytes.data() + bytes_read, size);
 	bytes_read += size;
 }
