@@ -4,7 +4,7 @@ Cool modern name and shit innit
 
 [Trello](https://trello.com/b/vID8EWtE/enkinet)
 
-# generate solution with cmake
+# Generate solution with CMake
 ````
 cd build
 cmake ..
@@ -12,7 +12,7 @@ cmake ..
 
 if generating a visual studio solution, remember to set "EnkiNet" as the start up project.
 
-# build with cmake
+# Build with CMake
 ````
 cd build
 cmake --build .
