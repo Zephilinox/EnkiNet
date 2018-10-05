@@ -75,6 +75,11 @@ Packet& Packet::operator>>(std::vector<T>& data)
 template <typename T>
 void Packet::serialize(T* data, std::size_t size)
 {
+	if (bytes_written + size > bytes.size())
+	{
+		bytes.resize((bytes_written + size) * 2);
+	}
+
 	memcpy(bytes.data() + bytes_written, data, size);
 	bytes_written += size;
 }

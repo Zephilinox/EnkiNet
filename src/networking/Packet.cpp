@@ -1,10 +1,10 @@
 ﻿#include "Packet.hpp"
 
 Packet::Packet()
-	: bytes(1400)
-	, bytes_written(0)
+	: bytes_written(0)
 	, bytes_read(0)
 {
+	bytes.reserve(1400);
 }
 
 Packet& Packet::operator <<(std::string data)
