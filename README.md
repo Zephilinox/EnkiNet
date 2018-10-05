@@ -10,6 +10,8 @@ cd build
 cmake ..
 ````
 
+if generating a visual studio solution, remember to set "EnkiNet" as the start up project.
+
 # build with cmake
 ````
 cd build

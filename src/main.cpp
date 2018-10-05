@@ -1,4 +1,11 @@
-﻿int main()
+﻿//SELF
+#include "networking/Packet.hpp"
+
+int main()
 {
-	return 0;
+	Packet p;
+	p << 5;
+	int i;
+	p >> i;
+	return i;
 }
