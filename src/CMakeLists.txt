@@ -7,6 +7,19 @@ set_property(TARGET EnkiNet PROPERTY CXX_STANDARD 17)
 get_property(CXX_STANDARD_ TARGET EnkiNet PROPERTY CXX_STANDARD)
 message(STATUS "CXX_STANDARD " ${CXX_STANDARD_})
 
+#https://stackoverflow.com/questions/2368811/how-to-set-warning-level-in-cmake
+if (MSVC) 
+	if (CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+		string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+	else()
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+	endif()
+	
+	if (NOT CMAKE_CXX_FLAGS MATCHES "/WX")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX")
+	endif()
+endif()
+
 set_target_properties(
 	EnkiNet PROPERTIES
 	#This is visual studio specific, can't remember what it does
