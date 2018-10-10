@@ -118,8 +118,8 @@ TEST_CASE("Packet")
 		p3.write_bits(num, 8, 0);
 		int output3 = 0;
 		int output4 = 0;
-		p2.read_bits(output3, 4, 4);
-		p3.read_bits(output4, 4, 0);
+		p3.read_bits(output3, 4, 0);
+		p3.read_bits(output4, 4, 4);
 		CHECK(output3 == 0b00001111);
 		CHECK(output4 == 0b11110000);
 		CHECK(output3 + output4 == num);

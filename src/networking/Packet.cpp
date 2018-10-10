@@ -41,7 +41,7 @@ void Packet::read_bits(int& data, int bits_to_read, int offset)
 		bits_read = bits_read % 8;
 	}
 
-	for (int i = offset; i < bits_to_read + offset; ++i)
+	for (int i = 0; i < bits_to_read; ++i)
 	{
 		//If this bit is 1
 		int byte = static_cast<int>(bytes.data()[bytes_read - 1]);
@@ -49,12 +49,12 @@ void Packet::read_bits(int& data, int bits_to_read, int offset)
 		if ((byte) & (shift))
 		{
 			//set the other numbers bit to 1
-			data |= (1 << i);
+			data |= (1 << i + offset);
 		}
 		else
 		{
 			//otherwise set it to 0
-			data &= ~(1 << i);
+			data &= ~(1 << i + offset);
 		}
 	}
 
