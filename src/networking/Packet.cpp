@@ -1,10 +1,29 @@
 ﻿#include "Packet.hpp"
 
-Packet::Packet()
-	: bytes_written(0)
-	, bytes_read(0)
+Packet::Packet(PacketHeader p_header)
+	: header(p_header)
+	, bytes(sizeof(PacketHeader))
+	, bytes_written(sizeof(PacketHeader))
+	, bytes_read(sizeof(PacketHeader))
 {
 	bytes.reserve(1400);
+	memcpy(bytes.data(), &header, sizeof(PacketHeader));
+}
+
+void Packet::set_header(PacketHeader p_header)
+{
+	header = p_header;
+	memcpy(bytes.data(), &header, sizeof(PacketHeader));
+}
+
+const PacketHeader& Packet::get_header() const
+{
+	return header;
+}
+
+const std::vector<std::byte>& Packet::get_bytes() const
+{
+	return bytes;
 }
 
 Packet& Packet::operator <<(std::string data)

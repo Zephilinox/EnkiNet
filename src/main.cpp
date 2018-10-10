@@ -78,5 +78,13 @@ int main()
 		std::cout << std::boolalpha << b << " ";
 	}
 	std::cout << "\n";
+
+	std::cout << p.get_header().type << "\n";
+	std::cout << static_cast<int>(p.get_bytes().data()[0]) << "\n";
+	p.set_header({ PacketType::GLOBAL_RPC });
+	std::cout << p.get_header().type << "\n";
+	std::cout << static_cast<int>(p.get_bytes().data()[0]) << "\n";
+	while (true);
+
 	return 0;
 }

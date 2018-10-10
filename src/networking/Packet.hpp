@@ -6,10 +6,29 @@
 #include <string>
 #include <array>
 
+enum PacketType : std::uint8_t {
+	NONE,
+	COMMAND,
+	ENTITY,
+	GLOBAL_RPC,
+	ENTITY_RPC,
+};
+
+struct PacketHeader
+{
+	PacketType type = PacketType::NONE;
+	std::uint8_t version = 0;
+};
+
 class Packet
 {
 public:
-	Packet();
+
+	Packet(PacketHeader = {});
+
+	void set_header(PacketHeader header);
+	const PacketHeader& get_header() const;
+	const std::vector<std::byte>& get_bytes() const;
 
 	template <typename T>
 	Packet& operator <<(T data);
@@ -30,15 +49,17 @@ public:
 	Packet& operator >>(std::array<T, size>& data);
 
 private:
+
 	template <typename T>
 	void serialize(T* data, std::size_t size);
 
 	template <typename T>
 	void deserialize(T* data, std::size_t size);
 	
+	PacketHeader header;
 	std::vector<std::byte> bytes;
-	int bytes_written;
-	int bytes_read;
+	std::size_t bytes_written;
+	std::size_t bytes_read;
 };
 
 //will need to adjust this in the future for endianess concerns
