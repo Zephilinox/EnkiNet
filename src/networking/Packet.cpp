@@ -5,8 +5,8 @@ Packet::Packet(PacketHeader p_header)
 	, bytes(sizeof(PacketHeader))
 	, bytes_written(sizeof(PacketHeader))
 	, bytes_read(sizeof(PacketHeader))
-	, bits_written(0)
-	, bits_read(0)
+	, bits_written(8)
+	, bits_read(8)
 {
 	bytes.reserve(1400);
 	memcpy(bytes.data(), &header, sizeof(PacketHeader));
@@ -14,24 +14,51 @@ Packet::Packet(PacketHeader p_header)
 
 void Packet::write_bits(int& data, int bits_to_write, int offset)
 {
-	//pseudocode
-	/*
-		if bits_written = 8, add 1 to bytes_written
+	//ensure our bit/byte count is up to date
+	if (bits_written >= 8)
+	{
+		bytes_written += bits_written / 8;
+		bits_written = bits_written % 8;
+	}
 
-		for each bit starting from the offset amount
-			if the bit is 1
-				set the other bit to 1 after considering negative offset
-			otherwise set the other bit to 0
+	int bytes_needed = ((8 - bits_written) + bits_to_write) / 8;
 
-		increment bits_written
-	*/
+	if (bytes_written + bytes_needed > bytes.size())
+	{
+		bytes.resize(bytes_written + (bits_to_write / 8));
+	}
+
+	bytes.data()[bytes_written - 1] |= static_cast<std::byte>(data << (bits_written));
+
+	bits_written += bits_to_write;
 }
 
-void Packet::read_bits(int& data, int bits_to_write, int offset)
+void Packet::read_bits(int& data, int bits_to_read, int offset)
 {
-	//pseudocode
-	/*
-	*/
+	if (bits_read >= 8)
+	{
+		bytes_read += bits_read / 8;
+		bits_read = bits_read % 8;
+	}
+
+	for (int i = offset; i < bits_to_read + offset; ++i)
+	{
+		//If this bit is 1
+		int byte = static_cast<int>(bytes.data()[bytes_read - 1]);
+		int shift = 1 << (bits_read + i);
+		if ((byte) & (shift))
+		{
+			//set the other numbers bit to 1
+			data |= (1 << i);
+		}
+		else
+		{
+			//otherwise set it to 0
+			data &= ~(1 << i);
+		}
+	}
+
+	bits_read += bits_to_read;
 }
 
 void Packet::set_header(PacketHeader p_header)

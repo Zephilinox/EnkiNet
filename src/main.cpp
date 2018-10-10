@@ -39,7 +39,7 @@ TEST_CASE("Packet")
 		p << s;
 		std::string s2 = ".";
 		p >> s2;
-		REQUIRE(s2 == s);
+		CHECK(s2 == s);
 	}
 
 	SUBCASE("Custom Class")
@@ -48,8 +48,8 @@ TEST_CASE("Packet")
 		p << v;
 		vector2 v2;
 		p >> v2;
-		REQUIRE(v2.x == v.x);
-		REQUIRE(v2.y == v.y);
+		CHECK(v2.x == v.x);
+		CHECK(v2.y == v.y);
 	}
 
 	SUBCASE("Vector")
@@ -58,7 +58,7 @@ TEST_CASE("Packet")
 		p << vecs;
 		std::vector<int> vecs2{};
 		p >> vecs2;
-		REQUIRE(vecs2 == vecs);
+		CHECK(vecs2 == vecs);
 	}
 
 	SUBCASE("Array")
@@ -67,20 +67,62 @@ TEST_CASE("Packet")
 		p << bools;
 		std::array<bool, 10> bools2;
 		p >> bools2;
-		REQUIRE(bools2 == bools);
+		CHECK(bools2 == bools);
 	}
 
 	SUBCASE("Header")
 	{
 		int oldtype = p.get_header().type;
 		int oldtype_bytes = static_cast<int>(p.get_bytes().data()[0]);
-		REQUIRE(static_cast<int>(oldtype) == oldtype_bytes);
+		CHECK(static_cast<int>(oldtype) == oldtype_bytes);
 
 		p.set_header({ PacketType::GLOBAL_RPC });
 
 		int type = p.get_header().type;
 		int type_bytes = static_cast<int>(p.get_bytes().data()[0]);
-		REQUIRE(static_cast<int>(type) == type_bytes);
+		CHECK(static_cast<int>(type) == type_bytes);
+	}
+
+	SUBCASE("Write Bits")
+	{
+		//todo: remove new packet to check for accurate byte boundary changes
+		Packet p2;
+		int num = 0b00001111;
+		p2.write_bits(num, 8, 0);
+		int resulting_num = static_cast<int>(p2.get_bytes().data()[2]);
+		CHECK(num == resulting_num);
+
+		int num2 = 0b11001101;
+		p2.write_bits(num2, 8, 0);
+		int resulting_num2 = static_cast<int>(p2.get_bytes().data()[3]);
+		CHECK(num2 == resulting_num2);
+	}
+
+	SUBCASE("Read Bits")
+	{
+		Packet p2;
+		p2 << 0b00001111;
+		int input = static_cast<int>(p2.get_bytes().data()[2]);
+		int output = 0b00000000;
+		p2.read_bits(output, 8, 0);
+		CHECK(input == output);
+
+		p2 << 0b11110000;
+		int input2 = static_cast<int>(p2.get_bytes().data()[3]);
+		int output2 = 0b00000000;
+		p2.read_bits(output2, 8, 0);
+		CHECK(input2 == output2);
+
+		Packet p3;
+		int num = 0b11111111;
+		p3.write_bits(num, 8, 0);
+		int output3 = 0;
+		int output4 = 0;
+		p2.read_bits(output3, 4, 4);
+		p3.read_bits(output4, 4, 0);
+		CHECK(output3 == 0b00001111);
+		CHECK(output4 == 0b11110000);
+		CHECK(output3 + output4 == num);
 	}
 }
 
@@ -95,8 +137,6 @@ int main(int argc, char** argv)
 	{
 		return result;
 	}
-
-
 
 	while (true);
 

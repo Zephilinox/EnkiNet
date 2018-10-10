@@ -26,7 +26,7 @@ public:
 	Packet(PacketHeader = {});
 
 	void write_bits(int& data, int bits_to_write, int offset);
-	void read_bits(int& data, int bits_to_write, int offset);
+	void read_bits(int& data, int bits_to_read, int offset);
 
 	void set_header(PacketHeader header);
 	const PacketHeader& get_header() const;
@@ -137,6 +137,7 @@ void Packet::serialize(T* data, std::size_t size)
 
 	memcpy(bytes.data() + bytes_written, data, size);
 	bytes_written += size;
+	bits_written = 8;
 }
 
 template <typename T>
@@ -150,4 +151,5 @@ void Packet::deserialize(T* data, std::size_t size)
 
 	memcpy(data, bytes.data() + bytes_read, size);
 	bytes_read += size;
+	bits_read = 8;
 }
