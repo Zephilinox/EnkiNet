@@ -23,8 +23,10 @@ struct PacketHeader
 class Packet
 {
 public:
-
 	Packet(PacketHeader = {});
+
+	void write_bits(int& data, int bits_to_write, int offset);
+	void read_bits(int& data, int bits_to_write, int offset);
 
 	void set_header(PacketHeader header);
 	const PacketHeader& get_header() const;
@@ -49,7 +51,6 @@ public:
 	Packet& operator >>(std::array<T, size>& data);
 
 private:
-
 	template <typename T>
 	void serialize(T* data, std::size_t size);
 
@@ -60,6 +61,8 @@ private:
 	std::vector<std::byte> bytes;
 	std::size_t bytes_written;
 	std::size_t bytes_read;
+	std::size_t bits_written;
+	std::size_t bits_read;
 };
 
 //will need to adjust this in the future for endianess concerns
