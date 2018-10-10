@@ -11,20 +11,16 @@ struct vector2
 	float x = 0;
 	float y = 0;
 
-	template <class PacketHeader>
-	friend Packet<PacketHeader>& operator <<(Packet<PacketHeader>& p, const vector2& v);
-	template <class PacketHeader>
-	friend Packet<PacketHeader>& operator >>(Packet<PacketHeader>& p, vector2& v);
+	friend Packet& operator <<(Packet& p, const vector2& v);
+	friend Packet& operator >>(Packet& p, vector2& v);
 };
 
-template <class PacketHeader>
-Packet<PacketHeader>& operator <<(Packet<PacketHeader>& p, const vector2& v)
+Packet& operator <<(Packet& p, const vector2& v)
 {
 	return p << v.x << v.y;
 }
 
-template <class PacketHeader>
-Packet<PacketHeader>& operator >>(Packet<PacketHeader>& p, vector2& v)
+Packet& operator >>(Packet& p, vector2& v)
 {
 	return p >> v.x >> v.y;
 }
@@ -82,16 +78,5 @@ int main()
 		std::cout << std::boolalpha << b << " ";
 	}
 	std::cout << "\n";
-
-	std::cout << p.get_header().type << "\n";
-
-	std::cout << static_cast<int>(p.get_bytes().data()[0]) << "\n";
-
-	p.set_header({ PacketHeaderEnki::RPC });
-
-	std::cout << p.get_header().type << "\n";
-
-	std::cout << static_cast<int>(p.get_bytes().data()[0]) << "\n";
-
 	return 0;
 }
