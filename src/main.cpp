@@ -3,6 +3,10 @@
 #include <cassert>
 #include <iostream>
 
+//LIBS
+#define DOCTEST_CONFIG_IMPLEMENT
+#include <doctest.h>
+
 //SELF
 #include "networking/Packet.hpp"
 
@@ -25,66 +29,76 @@ Packet& operator >>(Packet& p, vector2& v)
 	return p >> v.x >> v.y;
 }
 
-int main()
+TEST_CASE("Packet")
 {
 	Packet p;
 
-	std::string s = "hey";
-	p << s;
-	std::string s2 = ".";
-	p >> s2;
-
-	std::cout << s << "\n" << s2 << "\n";
-
-	std::cout << "\n";
-	vector2 v{ 1, 3 };
-	p << v;
-	vector2 v2;
-	p >> v2;
-
-	std::cout << v.x << " " << v.y << "\n";
-	std::cout << v2.x << " " << v2.y << "\n";
-
-	std::vector<vector2> vecs{ {1, 1}, {2, 2} };
-	p << vecs;
-	std::vector<vector2> vecs2{ {}, {}};
-	p >> vecs2;
-
-	std::cout << "\n";
-	for (auto vec : vecs)
+	SUBCASE("Strings")
 	{
-		std::cout << vec.x << " " << vec.y << "\n";
+		std::string s = "hey";
+		p << s;
+		std::string s2 = ".";
+		p >> s2;
+		REQUIRE(s2 == s);
 	}
 
-	for (auto vec : vecs2)
+	SUBCASE("Custom Class")
 	{
-		std::cout << vec.x << " " << vec.y << "\n";
+		vector2 v{ 1, 3 };
+		p << v;
+		vector2 v2;
+		p >> v2;
+		REQUIRE(v2.x == v.x);
+		REQUIRE(v2.y == v.y);
 	}
 
-	std::cout << "\n";
-	std::array<bool, 10> bools = {true, true, false, true, true, true, true, true, true, true};
-	p << bools;
-	std::array<bool, 10> bools2;
-	p >> bools2;
-
-	for (auto b : bools)
+	SUBCASE("Vector")
 	{
-		std::cout << std::boolalpha << b << " ";
+		std::vector<int> vecs{1, 2};
+		p << vecs;
+		std::vector<int> vecs2{};
+		p >> vecs2;
+		REQUIRE(vecs2 == vecs);
 	}
-	std::cout << "\n";
 
-	for (auto b : bools2)
+	SUBCASE("Array")
 	{
-		std::cout << std::boolalpha << b << " ";
+		std::array<bool, 10> bools = { true, true, false, true, true, true, true, true, true, true };
+		p << bools;
+		std::array<bool, 10> bools2;
+		p >> bools2;
+		REQUIRE(bools2 == bools);
 	}
-	std::cout << "\n";
 
-	std::cout << p.get_header().type << "\n";
-	std::cout << static_cast<int>(p.get_bytes().data()[0]) << "\n";
-	p.set_header({ PacketType::GLOBAL_RPC });
-	std::cout << p.get_header().type << "\n";
-	std::cout << static_cast<int>(p.get_bytes().data()[0]) << "\n";
+	SUBCASE("Header")
+	{
+		int oldtype = p.get_header().type;
+		int oldtype_bytes = static_cast<int>(p.get_bytes().data()[0]);
+		REQUIRE(static_cast<int>(oldtype) == oldtype_bytes);
+
+		p.set_header({ PacketType::GLOBAL_RPC });
+
+		int type = p.get_header().type;
+		int type_bytes = static_cast<int>(p.get_bytes().data()[0]);
+		REQUIRE(static_cast<int>(type) == type_bytes);
+	}
+}
+
+int main(int argc, char** argv)
+{
+	doctest::Context context;
+	context.setOption("abort-after", 5);
+	context.applyCommandLine(argc, argv);
+	context.setOption("no-breaks", true);
+	int result = context.run();
+	if (context.shouldExit())
+	{
+		return result;
+	}
+
+
+
 	while (true);
 
-	return 0;
+	return result;
 }
