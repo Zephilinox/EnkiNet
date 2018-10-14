@@ -203,10 +203,27 @@ struct rpc<Return(Parameters...)>
 	}
 };
 
+void receive_rpc(Packet p)
+{
+	std::string name;
+	p >> name;
+	functions[name](p);
+}
+
 template <typename... Args>
 void call_rpc(std::string name, Args... args)
 {
-	functions[name](rpcPacket(args...));
+	if (functions.count(name))
+	{
+		Packet p;
+
+		//fill packet with rpc information
+		p << name;
+		rpcPacket(p, args...);
+
+		//simulate client received packet
+		receive_rpc(p);
+	}
 }
 
 void one(int i, double d, float s, int ii)
