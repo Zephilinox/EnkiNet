@@ -162,6 +162,29 @@ void RegisterRPC(std::string name, F f)
 	};
 }
 
+//https://stackoverflow.com/questions/15904288/how-to-reverse-the-order-of-arguments-of-a-variadic-template-function?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+
+template <typename T>
+void rpcPacket(Packet& p, T x)
+{
+	p << x;
+}
+
+template <typename T, typename... Args>
+void rpcPacket(Packet& p, T x, Args... args)
+{
+	rpcPacket(p, args...);
+	p << x;
+}
+
+template <typename... Args>
+Packet rpcPacket(Args... args)
+{
+	Packet p;
+	rpcPacket(p, args...);
+	return p;
+}
+
 void one(int i, double d, float s, int ii)
 {
 	std::cout << "function one(" << i << ", " << d << ", " << s << ", " << ii << ");\n";
@@ -170,9 +193,7 @@ void one(int i, double d, float s, int ii)
 TEST_CASE("RPC")
 {
 	RegisterRPC<int, double, float, int>("one", one);
-	Packet p;
-	p << 4 << 3.0f << 2.0 << 1;
-	functions["one"](p);
+	functions["one"](rpcPacket(1, 2.0, 3.0f, 4));
 }
 
 int main(int argc, char** argv)
