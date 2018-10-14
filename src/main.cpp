@@ -4,6 +4,9 @@
 #include <iostream>
 #include <map>
 #include <functional>
+#include <any>
+#include <type_traits>
+
 //LIBS
 #define DOCTEST_CONFIG_IMPLEMENT
 #include <doctest.h>
@@ -160,6 +163,7 @@ void register_rpc(std::string name, F* func)
 		"You can't register a function as an RPC if it doesn't return void");
 	rpc<F> rpc;
 	rpc.add(name, func);
+	std::cout << "rpc " << name << " registered\n";
 }
 
 
@@ -195,11 +199,52 @@ struct rpc<Return(Parameters...)>
 	using return_t = Return;
 	void add(std::string name, std::function<Return(Parameters...)> f)
 	{
+		if (functions.count(name))
+		{
+			return;
+		}
+
 		std::cout << "function '" << name << "' has " << sizeof...(Parameters) << " parameters\n";
 		functions[name] = [f](Packet p)
 		{
 			f(read<Parameters>(p)...);
 		};
+	}
+
+	template <typename... Args>
+	constexpr static bool is_correct_args()
+	{
+		return std::is_same_v<std::tuple<Parameters...>, std::tuple<Args...>>;
+	}
+
+	constexpr static int size_of_args()
+	{
+		return get_size_of_args<Parameters...>();
+	}
+
+private:
+	template <typename T>
+	constexpr static T make()
+	{
+		return T();
+	}
+
+	template <typename T>
+	constexpr static int size_of(T thing)
+	{
+		return sizeof(thing);
+	}
+
+	template <typename T, typename... Args>
+	constexpr static int size_of(T thing, Args... things)
+	{
+		return sizeof(thing) + size_of(things...);
+	}
+
+	template <typename... Args>
+	constexpr static int get_size_of_args()
+	{
+		return size_of(make<Args>()...);
 	}
 };
 
@@ -207,14 +252,16 @@ void receive_rpc(Packet p)
 {
 	std::string name;
 	p >> name;
+	std::cout << "received packet to call rpc " << name << "\n";
 	functions[name](p);
 }
 
-template <typename... Args>
-void call_rpc(std::string name, Args... args)
+template <typename F, typename... Args>
+void call_rpc([[maybe_unused]] F* f, std::string name, Args... args)
 {
 	if (functions.count(name))
 	{
+		static_assert(rpc<F>::is_correct_args<Args...>(), "You tried to call this rpc with the incorrect number or type of parameters");
 		Packet p;
 
 		//fill packet with rpc information
@@ -234,7 +281,11 @@ void one(int i, double d, float s, int ii)
 TEST_CASE("RPC")
 {
 	register_rpc("one", one);
-	call_rpc("one", 1, 2.0, 3.0f, 4);
+	//todo: use this to check that the data sent in the packet matches up in size to the data required, in case sender is malicious
+	//kinda hard to check that each type in the packet is within a valid set of values, as long as the size is correct that should be fine
+	//rpc functions will need to make sure that the data being passed to them is correct
+	std::cout << "byte size of combined args: " << rpc<decltype(one)>::size_of_args() << "\n";
+	call_rpc(one, "one", 1, 2.0, 3.0f, 4);
 }
 
 int main(int argc, char** argv)
