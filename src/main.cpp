@@ -203,6 +203,12 @@ struct rpc<Return(Parameters...)>
 	}
 };
 
+template <typename... Args>
+void call_rpc(std::string name, Args... args)
+{
+	functions[name](rpcPacket(args...));
+}
+
 void one(int i, double d, float s, int ii)
 {
 	std::cout << "called function one(" << i << ", " << d << ", " << s << ", " << ii << ");\n";
@@ -211,7 +217,7 @@ void one(int i, double d, float s, int ii)
 TEST_CASE("RPC")
 {
 	register_rpc("one", one);
-	functions["one"](rpcPacket(1, 2.0, 3.0f, 4));
+	call_rpc("one", 1, 2.0, 3.0f, 4);
 }
 
 int main(int argc, char** argv)
