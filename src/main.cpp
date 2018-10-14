@@ -2,7 +2,8 @@
 #include <string>
 #include <cassert>
 #include <iostream>
-
+#include <map>
+#include <functional>
 //LIBS
 #define DOCTEST_CONFIG_IMPLEMENT
 #include <doctest.h>
@@ -140,6 +141,38 @@ TEST_CASE("Packet")
 		p3.read_bits(num, 4);
 		REQUIRE_THROWS(p3.read_bits(num, 5););
 	}
+}
+
+/////
+template <typename T> T read(Packet& p)
+{
+	T t;
+	p >> t;
+	return t;
+}
+
+std::map<std::string, std::function<void(Packet)>> functions;
+
+template<typename... Args, class F>
+void RegisterRPC(std::string name, F f)
+{
+	functions[name] = [f](Packet p)
+	{
+		f(read<Args>(p)...);
+	};
+}
+
+void one(int i, double d, float s, int ii)
+{
+	std::cout << "function one(" << i << ", " << d << ", " << s << ", " << ii << ");\n";
+}
+
+TEST_CASE("RPC")
+{
+	RegisterRPC<int, double, float, int>("one", one);
+	Packet p;
+	p << 4 << 3.0f << 2.0 << 1;
+	functions["one"](p);
 }
 
 int main(int argc, char** argv)
