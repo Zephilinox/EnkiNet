@@ -25,8 +25,8 @@ class Packet
 public:
 	Packet(PacketHeader = {});
 
-	void write_bits(int& data, int bits_to_write, int offset);
-	void read_bits(int& data, int bits_to_read, int offset);
+	void write_bits(int& data, int bits_to_write, int offset = 0);
+	void read_bits(int& data, int bits_to_read, int offset = 0);
 
 	void set_header(PacketHeader header);
 	const PacketHeader& get_header() const;

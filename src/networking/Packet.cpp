@@ -21,6 +21,12 @@ void Packet::write_bits(int& data, int bits_to_write, int offset)
 		bits_written = bits_written % 8;
 	}
 
+	//don't support cross byte writing yet
+	if (bits_to_write + bits_written > 8)
+	{
+		throw std::exception();
+	}
+
 	int bytes_needed = ((8 - bits_written) + bits_to_write) / 8;
 
 	if (bytes_written + bytes_needed > bytes.size())
@@ -28,7 +34,18 @@ void Packet::write_bits(int& data, int bits_to_write, int offset)
 		bytes.resize(bytes_written + (bits_to_write / 8));
 	}
 
-	bytes.data()[bytes_written - 1] |= static_cast<std::byte>(data << (bits_written));
+	for (int i = 0; i < bits_to_write; ++i)
+	{
+		int shift = 1 << (i + offset);
+		if (data & (shift))
+		{
+			bytes.data()[bytes_written - 1] |= static_cast<std::byte>((1 << i + bits_written));
+		}
+		else
+		{
+			bytes.data()[bytes_written - 1] &= static_cast<std::byte>(~(1 << i + bits_written));
+		}
+	}
 
 	bits_written += bits_to_write;
 }
@@ -39,6 +56,12 @@ void Packet::read_bits(int& data, int bits_to_read, int offset)
 	{
 		bytes_read += bits_read / 8;
 		bits_read = bits_read % 8;
+	}
+
+	//don't support cross byte writing yet
+	if (bits_to_read + bits_read > 8)
+	{
+		throw std::exception();
 	}
 
 	for (int i = 0; i < bits_to_read; ++i)
