@@ -261,7 +261,29 @@ void call_rpc([[maybe_unused]] F* f, std::string name, Args... args)
 {
 	if (functions.count(name))
 	{
+		std::cout << "safe call to rpc " << name << " with the values";
+		((std::cout << " " << args), ...);
+		std::cout << "\n";
 		static_assert(rpc<F>::is_correct_args<Args...>(), "You tried to call this rpc with the incorrect number or type of parameters");
+		Packet p;
+
+		//fill packet with rpc information
+		p << name;
+		rpcPacket(p, args...);
+
+		//simulate client received packet
+		receive_rpc(p);
+	}
+}
+
+template <typename... Args>
+void call_rpc_unsafe(std::string name, Args... args)
+{
+	if (functions.count(name))
+	{
+		std::cout << "unsafe call to rpc " << name << " with the values";
+		((std::cout << " " << args), ...);
+		std::cout << "\n";
 		Packet p;
 
 		//fill packet with rpc information
@@ -286,6 +308,7 @@ TEST_CASE("RPC")
 	//rpc functions will need to make sure that the data being passed to them is correct
 	std::cout << "byte size of combined args: " << rpc<decltype(one)>::size_of_args() << "\n";
 	call_rpc(one, "one", 1, 2.0, 3.0f, 4);
+	call_rpc_unsafe("one", 1.5, -2.0f, true, true);
 }
 
 int main(int argc, char** argv)
