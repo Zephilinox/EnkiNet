@@ -39,11 +39,11 @@ void Packet::write_bits(int& data, int bits_to_write, int offset)
 		int shift = 1 << (i + offset);
 		if (data & (shift))
 		{
-			bytes.data()[bytes_written - 1] |= static_cast<std::byte>((1 << i + bits_written));
+			bytes.data()[bytes_written - 1] |= static_cast<std::byte>((1 << (i + bits_written)));
 		}
 		else
 		{
-			bytes.data()[bytes_written - 1] &= static_cast<std::byte>(~(1 << i + bits_written));
+			bytes.data()[bytes_written - 1] &= static_cast<std::byte>(~(1 << (i + bits_written)));
 		}
 	}
 
@@ -98,6 +98,11 @@ const PacketHeader& Packet::get_header() const
 const std::vector<std::byte>& Packet::get_bytes() const
 {
 	return bytes;
+}
+
+std::size_t Packet::get_bytes_read()
+{
+	return bytes_read;
 }
 
 Packet& Packet::operator <<(std::string data)

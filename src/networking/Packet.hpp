@@ -31,6 +31,7 @@ public:
 	void set_header(PacketHeader header);
 	const PacketHeader& get_header() const;
 	const std::vector<std::byte>& get_bytes() const;
+	std::size_t get_bytes_read();
 
 	template <typename T>
 	Packet& operator <<(T data);
@@ -146,7 +147,7 @@ void Packet::deserialize(T* data, std::size_t size)
 	if (bytes_read + size > bytes.size())
 	{
 		//todo: do I really want to use exceptions?
-		throw;
+		throw std::exception();
 	}
 
 	memcpy(data, bytes.data() + bytes_read, size);

@@ -155,6 +155,7 @@ template <typename T> T read(Packet& p)
 }
 
 std::map<std::string, std::function<void(Packet)>> functions;
+std::map<std::string, int> function_arguments_byte_size;
 
 template <typename F>
 void register_rpc(std::string name, F* func)
@@ -209,6 +210,7 @@ struct rpc<Return(Parameters...)>
 		{
 			f(read<Parameters>(p)...);
 		};
+		function_arguments_byte_size[name] = size_of_args();
 	}
 
 	template <typename... Args>
@@ -250,10 +252,35 @@ private:
 
 void receive_rpc(Packet p)
 {
-	std::string name;
-	p >> name;
-	std::cout << "received packet to call rpc " << name << "\n";
-	functions[name](p);
+	try
+	{
+		if (p.get_bytes().size() <= p.get_bytes_read())
+		{
+			std::cout << "Invalid RPC packet received due to being empty, ignoring\n";
+			return;
+		}
+
+		std::string name;
+		p >> name;
+
+		if (!functions.count(name))
+		{
+			std::cout << "Invalid RPC packet received due to invalid name, ignoring\n";
+			return;
+		}
+
+		//I was going to check bytes left in packet here so that it could match up with the bytes the function expects
+		//however, I realsied that deserializing each thing could lead it to change byte size (e.g. encoding a bool as a bit), so it wouldn't work here
+		//it would have to be done once the entire packet has been deserialized, but at the moment it doesn't work that way
+		//it's still safe enough though, an exception will throw and it will get caught.
+
+		std::cout << "received packet to call rpc " << name << "\n";
+		functions[name](p);
+	}
+	catch (std::exception& e)
+	{
+		std::cout << "Invalid RPC packet received that threw and exception, ignoring\n";
+	}
 }
 
 template <typename F, typename... Args>
@@ -303,12 +330,30 @@ void one(int i, double d, float s, int ii)
 TEST_CASE("RPC")
 {
 	register_rpc("one", one);
-	//todo: use this to check that the data sent in the packet matches up in size to the data required, in case sender is malicious
-	//kinda hard to check that each type in the packet is within a valid set of values, as long as the size is correct that should be fine
-	//rpc functions will need to make sure that the data being passed to them is correct
 	std::cout << "byte size of combined args: " << rpc<decltype(one)>::size_of_args() << "\n";
 	call_rpc(one, "one", 1, 2.0, 3.0f, 4);
 	call_rpc_unsafe("one", 1.5, -2.0f, true, true);
+
+	//let's try and send a fake rpc
+	call_rpc_unsafe("two", true);
+	//this checks the function is registered already, so it's fine
+
+	//let's do it manually
+	Packet p;
+	p << std::string("two") << true;
+	receive_rpc(p);
+	//this makes the client throw an exception, so we need to capture that exception rather than crash the game, now fixed
+
+	//now let's try a valid rpc, but one which has the wrong types
+	Packet p2;
+	p2 << std::string("one") << true << true << true << true;
+	receive_rpc(p2);
+	//this also causes an exception to be thrown and the client to crash, now fixed
+
+	//Now let's try sending one big arg to a valid function expecting 4 smaller args
+	Packet p3;
+	p3 << std::string("one") << 50 << 50;
+	receive_rpc(p3);
 }
 
 int main(int argc, char** argv)
