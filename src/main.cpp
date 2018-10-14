@@ -153,13 +153,19 @@ template <typename T> T read(Packet& p)
 
 std::map<std::string, std::function<void(Packet)>> functions;
 
-template<typename... Args, class F>
-void RegisterRPC(std::string name, F f)
+template<typename R, typename... Args>
+void RegisterRPC_(std::string name, void(f)(Args...))
 {
 	functions[name] = [f](Packet p)
 	{
 		f(read<Args>(p)...);
 	};
+}
+
+template <class F>
+void RegisterRPC(std::string name, F f)
+{
+	RegisterRPC_<F>(name, f);
 }
 
 //https://stackoverflow.com/questions/15904288/how-to-reverse-the-order-of-arguments-of-a-variadic-template-function?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
@@ -185,6 +191,18 @@ Packet rpcPacket(Args... args)
 	return p;
 }
 
+template <typename Signature>
+struct signature;
+
+template <typename Return, typename... Parameters>
+struct signature<Return(Parameters...)>
+{
+	void call()
+	{
+		std::cout << "Signature has " << sizeof...(Parameters) << " params\n";
+	}
+};
+
 void one(int i, double d, float s, int ii)
 {
 	std::cout << "function one(" << i << ", " << d << ", " << s << ", " << ii << ");\n";
@@ -192,8 +210,9 @@ void one(int i, double d, float s, int ii)
 
 TEST_CASE("RPC")
 {
-	RegisterRPC<int, double, float, int>("one", one);
+	RegisterRPC("one", one);
 	functions["one"](rpcPacket(1, 2.0, 3.0f, 4));
+	signature<decltype(one)>().call();
 }
 
 int main(int argc, char** argv)
