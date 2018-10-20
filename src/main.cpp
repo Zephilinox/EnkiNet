@@ -113,9 +113,6 @@ TEST_CASE("Packet")
 		p2.write_bits(num4, 4, 4);
 		int resulting_num4 = static_cast<int>(p2.get_bytes().data()[4]);
 		CHECK(0b11111111 == resulting_num4);
-
-		p2.write_bits(num4, 4);
-		REQUIRE_THROWS(p2.write_bits(num4, 5));
 	}
 
 	SUBCASE("Read Bits")

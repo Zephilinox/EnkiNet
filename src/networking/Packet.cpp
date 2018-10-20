@@ -24,30 +24,95 @@ void Packet::write_bits(int& data, int bits_to_write, int offset)
 	//don't support cross byte writing yet
 	if (bits_to_write + bits_written > 8)
 	{
-		throw std::exception();
+		//throw std::exception();
 	}
 
+	/*
+	we have 8 bits available
+	we want to write 27
+	27 - 8 = 19 bits we need to get
+	19.f / 8.f = 2.3
+	ceil(2.3) = 3
+	bytes needed is 3, on top of the 1 byte we already have
+	4 * 8 = 32, leaving 5 empty bits left over at the end
 
+	okay, so now we have the required space
+	how to write the bits across bytes?
+
+	in above example, we want to write 8 bits, 8 bits, 8 bits, 3 bits
+	that's 3 loops of a full byte and then the remainder
+	27 / 8 = 3
+	27 % 8 = 3
+
+	bits_left = 27
+	byte = 0;
+	while bits_left > 0
+		if (bits_left / 8 >= 1) //8 or more bits needed to write
+			write 8 bits
+			byte++
+		else
+			write bits_to_write % 8; //write remaining bits
+			bits_left = 0;
+
+	we have 2 bits available
+	we want to write 4 bits
+	4 - 2 = 2 bits we need to get
+	2.f / 8.f = 0.25
+	ceil(0.25) = 1
+	bytes needed is 1, on top of the 2 bits we already have
+	2 * 8 = 16, leaving (6 written + 4 to write) 6 empty bits at the end
+	*/
+
+	int bits_available = 8 - bits_written;
+	int bits_needed = bits_to_write - bits_available;
+	int bytes_needed = static_cast<int>(std::ceil(static_cast<float>(bits_needed) / 8.0f));
 
 	if (bytes_written + bytes_needed > bytes.size())
 	{
-		bytes.resize(bytes_written + (bits_to_write / 8));
+		bytes.resize(bytes_written + bytes_needed);
 	}
 
-	for (int i = 0; i < bits_to_write; ++i)
+	auto write_bits = [&](int bits, int extra_offset)
 	{
-		int shift = 1 << (i + offset);
-		if (data & (shift))
+		for (int i = 0; i < bits; ++i)
 		{
-			bytes.data()[bytes_written - 1] |= static_cast<std::byte>((1 << (i + bits_written)));
+			int shift = 1 << (i + offset + extra_offset);
+			if (data & (shift))
+			{
+				bytes.data()[bytes_written - 1] |= static_cast<std::byte>((1 << (i + bits_written)));
+			}
+			else
+			{
+				bytes.data()[bytes_written - 1] &= static_cast<std::byte>(~(1 << (i + bits_written)));
+			}
+		}
+	};
+
+	int bits_left = bits_to_write;
+	while (bits_left > 0)
+	{
+		if (bits_available < 8)
+		{
+			write_bits(bits_available, 0);
+			bytes_written++;
+			bits_written = 0;
+			bits_left -= bits_available;
+			bits_available = 8;
+		}
+		else if (bits_left / 8 >= 1)
+		{
+			write_bits(8, bits_to_write - bits_left);
+			bytes_written++;
+			bits_written = 0;
+			bits_left -= 8;
 		}
 		else
 		{
-			bytes.data()[bytes_written - 1] &= static_cast<std::byte>(~(1 << (i + bits_written)));
+			write_bits(bits_left % 8, bits_to_write - bits_left);
+			bits_written += bits_left % 8;
+			bits_left = 0;
 		}
 	}
-
-	bits_written += bits_to_write;
 }
 
 void Packet::read_bits(int& data, int bits_to_read, int offset)
