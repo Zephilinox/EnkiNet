@@ -27,7 +27,7 @@ void Packet::write_bits(int& data, int bits_to_write, int offset)
 		throw std::exception();
 	}
 
-	int bytes_needed = ((8 - bits_written) + bits_to_write) / 8;
+
 
 	if (bytes_written + bytes_needed > bytes.size())
 	{
