@@ -35,10 +35,9 @@ Packet& operator >>(Packet& p, vector2& v)
 
 TEST_CASE("Packet")
 {
-	Packet p;
-
 	SUBCASE("Strings")
 	{
+		Packet p;
 		std::string s = "hey";
 		p << s;
 		std::string s2 = ".";
@@ -48,6 +47,7 @@ TEST_CASE("Packet")
 
 	SUBCASE("Custom Class")
 	{
+		Packet p;
 		vector2 v{ 1, 3 };
 		p << v;
 		vector2 v2;
@@ -58,6 +58,7 @@ TEST_CASE("Packet")
 
 	SUBCASE("Vector")
 	{
+		Packet p;
 		std::vector<int> vecs{1, 2};
 		p << vecs;
 		std::vector<int> vecs2{};
@@ -67,6 +68,7 @@ TEST_CASE("Packet")
 
 	SUBCASE("Array")
 	{
+		Packet p;
 		std::array<bool, 10> bools = { true, true, false, true, true, true, true, true, true, true };
 		p << bools;
 		std::array<bool, 10> bools2;
@@ -76,6 +78,7 @@ TEST_CASE("Packet")
 
 	SUBCASE("Header")
 	{
+		Packet p;
 		int oldtype = p.get_header().type;
 		int oldtype_bytes = static_cast<int>(p.get_bytes().data()[0]);
 		CHECK(static_cast<int>(oldtype) == oldtype_bytes);
@@ -143,6 +146,31 @@ TEST_CASE("Packet")
 
 		p3.read_bits(num, 4);
 		REQUIRE_THROWS(p3.read_bits(num, 5););
+	}
+
+	SUBCASE("Write Bits Overflowing Bytes")
+	{
+		Packet p;
+		try
+		{
+			int num = 0b000001111;
+			p.write_bits(num, 4);
+			p.write_bits(num, 4);
+
+			p.write_bits(num, 6);
+			p.write_bits(num, 4);
+
+			p.write_bits(num, 6);
+		}
+		catch (...)
+		{
+
+		}
+
+		CHECK(p.get_bytes().size() == sizeof(PacketHeader) + 3);
+		CHECK(static_cast<int>(p.get_bytes()[sizeof(PacketHeader)]) == 0b11111111);
+		CHECK(static_cast<int>(p.get_bytes()[sizeof(PacketHeader) + 1]) == 0b11001111);
+		CHECK(static_cast<int>(p.get_bytes()[sizeof(PacketHeader) + 2]) == 0b00111111);
 	}
 }
 
@@ -279,7 +307,7 @@ void receive_rpc(Packet p)
 	}
 	catch (std::exception& e)
 	{
-		std::cout << "Invalid RPC packet received that threw and exception, ignoring\n";
+		std::cout << "Invalid RPC packet received that threw an exception, ignoring\n";
 	}
 }
 
