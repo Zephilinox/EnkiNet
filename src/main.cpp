@@ -144,6 +144,32 @@ TEST_CASE("Packet")
 		p3.read_bits(num, 4);
 		REQUIRE_THROWS(p3.read_bits(num, 5););
 	}
+
+
+	SUBCASE("Compressed Range")
+	{
+		Packet p;
+		float f1 = 0.5f;
+		p.write_compressed_float(f1, 0, 1, 0.01f);
+		float f2;
+		p.read_compressed_float(f2, 0, 1, 0.01f);
+		CHECK(f1 == f2);
+
+		//will fail due to not supporting > 8 bits on read/write
+		/*Packet p2;
+		float f3 = 5;
+		p2.write_compressed_float(f3, -10, 10, 0.01f);
+		float f4;
+		p2.read_compressed_float(f4, -10, 10, 0.01f);
+		CHECK(f3 == f4);
+
+		Packet p3;
+		float f5 = 1.0f / 60.0f;
+		p3.write_compressed_float(f5, 0, 1, 0.001f);
+		float f6;
+		p3.read_compressed_float(f6, 0, 1, 0.001f);
+		CHECK(f5 == f6);*/
+	}
 }
 
 /////
