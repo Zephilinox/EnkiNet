@@ -176,7 +176,6 @@ TEST_CASE("Packet")
 		CHECK(num == 1000000);
 	}
 
-
 	SUBCASE("Compressed Range")
 	{
 		Packet p;
@@ -200,6 +199,38 @@ TEST_CASE("Packet")
 		float f6;
 		p3.read_compressed_float(f6, 0, 1, 0.001f);
 		CHECK(f5 == f6);*/
+	}
+
+	SUBCASE("Real Test")
+	{
+		Packet p({ PacketType::ENTITY });
+		std::array<float, 2> position = { 300, 400 };
+		float rotation = 27.27f;
+		bool isplayer = true;
+		int isplayer_int = static_cast<int>(isplayer);
+
+		p.write_compressed_float(position[0], 0, 1280, 0.01f);
+		p.write_compressed_float(position[1], 0, 720, 0.01f);
+		p.write_compressed_float(rotation, 0, 360, 0.01f);
+		p.write_bits(isplayer_int, 1); //todo: write bits not just for ints
+
+		std::array<float, 2> received_pos;
+		float received_rot;
+		int received_isplayer;
+		bool actual_isplayer;
+
+		p.read_compressed_float(received_pos[0], 0, 1280, 0.01f);
+		p.read_compressed_float(received_pos[1], 0, 720, 0.01f);
+		p.read_compressed_float(received_rot, 0, 360, 0.01f);
+		p.read_bits(received_isplayer, 1);
+		actual_isplayer = static_cast<bool>(received_isplayer);
+
+		CHECK(p.get_bytes().size() < sizeof(PacketHeader) + sizeof(position) + sizeof(rotation) + sizeof(isplayer));
+		std::cout << p.get_bytes().size() << " < " << sizeof(PacketHeader) + sizeof(position) + sizeof(rotation) + sizeof(isplayer) << ", yay bytes saved!\n";
+		CHECK(position[0] == doctest::Approx(received_pos[0]));
+		CHECK(position[1] == doctest::Approx(received_pos[1]));
+		CHECK(rotation == received_rot);
+		CHECK(isplayer == actual_isplayer);
 	}
 }
 
