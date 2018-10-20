@@ -21,10 +21,9 @@ void Packet::write_bits(int& data, int bits_to_write, int offset)
 		bits_written = bits_written % 8;
 	}
 
-	//don't support cross byte writing yet
-	if (bits_to_write + bits_written > 8)
+	if (sizeof(data) * 8 < bits_to_write + offset)
 	{
-		//throw std::exception();
+		throw std::exception("Writing these bits with this offset would cause an overflow of the data passed in");
 	}
 
 	/*
@@ -123,30 +122,65 @@ void Packet::read_bits(int& data, int bits_to_read, int offset)
 		bits_read = bits_read % 8;
 	}
 
-	//don't support cross byte writing yet
-	if (bits_to_read + bits_read > 8)
+	int bits_available = 8 - bits_read;
+	int bits_needed = bits_to_read - bits_available;
+	int bytes_needed = static_cast<int>(std::ceil(static_cast<float>(bits_needed) / 8.0f));
+
+	if (sizeof(data) * 8 < bits_to_read + offset)
 	{
-		throw std::exception();
+		throw std::exception("Reading these bits with this offset would cause an overflow of the data passed in");
 	}
 
-	for (int i = 0; i < bits_to_read; ++i)
+	if (bytes_read + bytes_needed - 1 > bytes.size())
 	{
-		//If this bit is 1
-		int byte = static_cast<int>(bytes.data()[bytes_read - 1]);
-		int shift = 1 << (bits_read + i);
-		if ((byte) & (shift))
+		throw std::exception("Tried to read past the packet buffer, not enough bytes written");
+	}
+
+	auto read_bits = [&](int bits, int extra_offset)
+	{
+		for (int i = 0; i < bits; ++i)
 		{
-			//set the other numbers bit to 1
-			data |= (1 << i + offset);
+			//If this bit is 1
+			int byte = static_cast<int>(bytes.data()[bytes_read - 1]);
+			int shift = 1 << (bits_read + i);
+			if ((byte) & (shift))
+			{
+				//set the other numbers bit to 1
+				data |= (1 << i + offset + extra_offset);
+			}
+			else
+			{
+				//otherwise set it to 0
+				data &= ~(1 << i + offset + extra_offset);
+			}
+		}
+	};
+
+	int bits_left = bits_to_read;
+	while (bits_left > 0)
+	{
+		if (bits_available < 8)
+		{
+			read_bits(bits_available, 0);
+			bytes_read++;
+			bits_read = 0;
+			bits_left -= bits_available;
+			bits_available = 8;
+		}
+		else if (bits_left / 8 >= 1)
+		{
+			read_bits(8, bits_to_read - bits_left);
+			bytes_read++;
+			bits_read = 0;
+			bits_left -= 8;
 		}
 		else
 		{
-			//otherwise set it to 0
-			data &= ~(1 << i + offset);
+			read_bits(bits_left % 8, bits_to_read - bits_left);
+			bits_read += bits_left % 8;
+			bits_left = 0;
 		}
 	}
-
-	bits_read += bits_to_read;
 }
 
 void Packet::set_header(PacketHeader p_header)

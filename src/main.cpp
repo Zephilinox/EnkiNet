@@ -140,9 +140,6 @@ TEST_CASE("Packet")
 		CHECK(output3 == 0b00001111);
 		CHECK(output4 == 0b11110000);
 		CHECK(output3 + output4 == num);
-
-		p3.read_bits(num, 4);
-		REQUIRE_THROWS(p3.read_bits(num, 5););
 	}
 
 	SUBCASE("Write Bits Overflowing Bytes")
@@ -168,6 +165,15 @@ TEST_CASE("Packet")
 		CHECK(static_cast<int>(p.get_bytes()[sizeof(PacketHeader)]) == 0b11111111);
 		CHECK(static_cast<int>(p.get_bytes()[sizeof(PacketHeader) + 1]) == 0b11001111);
 		CHECK(static_cast<int>(p.get_bytes()[sizeof(PacketHeader) + 2]) == 0b00111111);
+	}
+
+	SUBCASE("Read Bits Overflowing Bytes")
+	{
+		Packet p;
+		int num = 0;
+		p << 1000000;
+		p.read_bits(num, 32);
+		CHECK(num == 1000000);
 	}
 }
 
