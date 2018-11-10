@@ -10,6 +10,8 @@
 //LIBS
 #define DOCTEST_CONFIG_IMPLEMENT
 #include <doctest.h>
+#include <spdlog/common.h>
+
 
 //SELF
 #include "networking/Packet.hpp"

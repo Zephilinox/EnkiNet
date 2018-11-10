@@ -29,3 +29,10 @@ set_target_properties(
 	#not sure, library files don't seem to go here'
 	LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/${CONFIGURATION}"
 )
+
+target_link_libraries(${PROJECT_NAME}
+	spdlog
+	enet
+	ws2_32
+	winmm
+)
