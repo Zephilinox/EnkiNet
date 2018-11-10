@@ -10,8 +10,9 @@
 //LIBS
 #define DOCTEST_CONFIG_IMPLEMENT
 #include <doctest.h>
-#include <spdlog/common.h>
-
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <enet/enet.h>
 
 //SELF
 #include "networking/Packet.hpp"
@@ -458,6 +459,8 @@ int main(int argc, char** argv)
 		return result;
 	}
 
+	auto console = spdlog::stdout_color_mt("console");
+	console->info("Hi :)");
 	while (true);
 
 	return result;

@@ -89,6 +89,11 @@ add_library(enet STATIC
     ${SOURCE_FILES}
 )
 
-if (MINGW)
+if (MINGW OR MSVC)
     target_link_libraries(enet winmm ws2_32)
 endif()
+
+target_include_directories(enet PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
+  $<INSTALL_INTERFACE:include/>
+)
