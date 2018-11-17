@@ -1,7 +1,7 @@
 ﻿cmake_minimum_required (VERSION 3.8)
 
 # Add source to this project's executable.
-add_executable (EnkiNet "main.cpp" "networking/Packet.hpp" "networking/Packet.cpp")
+add_executable (EnkiNet "main.cpp" "networking/Packet.cpp")
 
 set_property(TARGET EnkiNet PROPERTY CXX_STANDARD 17)
 get_property(CXX_STANDARD_ TARGET EnkiNet PROPERTY CXX_STANDARD)
