@@ -198,6 +198,11 @@ int main(int argc, char** argv)
 					}
 				}
 			}
+
+			std::cout << "Send: ";
+			std::cin >> buffer;
+			packet = enet_packet_create(buffer, strlen(buffer) + 1, ENET_PACKET_FLAG_RELIABLE);
+			enet_peer_send(peer, 0, packet);
 		}
 	}
 
