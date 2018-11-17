@@ -21,29 +21,18 @@
 //TESTS
 #include "networking/PacketTest.hpp"
 #include "networking/RPCTest.hpp"
+#include "networking/Benchmark.hpp"
 
-int main(int argc, char** argv)
+int enet()
 {
-	doctest::Context context;
-	context.setOption("abort-after", 5);
-	context.applyCommandLine(argc, argv);
-	context.setOption("no-breaks", true);
-	int result = context.run();
-	if (context.shouldExit())
-	{
-		return result;
-	}
-
 	auto console = spdlog::stdout_color_mt("console");
-	console->info("Hi :)");
 
 	char n;
 	do
 	{
 		std::cout << "'s' for server, 'c' for client: ";
 		std::cin >> n;
-	}
-	while (n != 's' && n != 'c');
+	} while (n != 's' && n != 'c');
 
 	bool is_server;
 	if (n == 's')
@@ -136,36 +125,36 @@ int main(int argc, char** argv)
 			{
 				switch (event.type)
 				{
-					case ENET_EVENT_TYPE_CONNECT:
-					{
-						std::cout << "server connect\n";
-						char host_name[1000];
-						enet_address_get_host(&event.peer->address, host_name, 1000);
+				case ENET_EVENT_TYPE_CONNECT:
+				{
+					std::cout << "server connect\n";
+					char host_name[1000];
+					enet_address_get_host(&event.peer->address, host_name, 1000);
 
-						console->info("Client connected from {}:{}", host_name, event.peer->address.port);
-						break;
-					}
-					case ENET_EVENT_TYPE_RECEIVE:
-					{
-						std::cout << "server received\n";
+					console->info("Client connected from {}:{}", host_name, event.peer->address.port);
+					break;
+				}
+				case ENET_EVENT_TYPE_RECEIVE:
+				{
+					std::cout << "server received\n";
 
-						//use fmt instead of the console since for some reason it doesn't like being passed a null pointer
-						fmt::print("A packet of length {} containing {} was received from {} on channel {}.\n",
-							event.packet->dataLength,
-							event.packet->data,
-							event.peer->data,
-							event.channelID);
+					//use fmt instead of the console since for some reason it doesn't like being passed a null pointer
+					fmt::print("A packet of length {} containing {} was received from {} on channel {}.\n",
+						event.packet->dataLength,
+						event.packet->data,
+						event.peer->data,
+						event.channelID);
 
-						enet_packet_destroy(event.packet);
-						break;
-					}
-					case ENET_EVENT_TYPE_DISCONNECT:
-					{
-						std::cout << "server disconnect\n";
-						console->info("{} disconnected", event.peer->data);
-						event.peer->data = 0;
-						break;
-					}
+					enet_packet_destroy(event.packet);
+					break;
+				}
+				case ENET_EVENT_TYPE_DISCONNECT:
+				{
+					std::cout << "server disconnect\n";
+					console->info("{} disconnected", event.peer->data);
+					event.peer->data = 0;
+					break;
+				}
 				}
 			}
 		}
@@ -175,27 +164,27 @@ int main(int argc, char** argv)
 			{
 				switch (event.type)
 				{
-					case ENET_EVENT_TYPE_RECEIVE:
-					{
-						std::cout << "client receive\n";
-						console->info("A packet of length {} containing {} was received from {} on channel {}.\n",
-							event.packet->dataLength,
-							event.packet->data,
-							event.peer->data,
-							event.channelID);
+				case ENET_EVENT_TYPE_RECEIVE:
+				{
+					std::cout << "client receive\n";
+					console->info("A packet of length {} containing {} was received from {} on channel {}.\n",
+						event.packet->dataLength,
+						event.packet->data,
+						event.peer->data,
+						event.channelID);
 
-						enet_packet_destroy(event.packet);
+					enet_packet_destroy(event.packet);
 
-						break;
-					}
+					break;
+				}
 
-					case ENET_EVENT_TYPE_DISCONNECT:
-					{
-						std::cout << "client disconnect\n";
-						console->info("{} disconnected.\n", event.peer->data);
-						event.peer->data = 0;
-						return 0;
-					}
+				case ENET_EVENT_TYPE_DISCONNECT:
+				{
+					std::cout << "client disconnect\n";
+					console->info("{} disconnected.\n", event.peer->data);
+					event.peer->data = 0;
+					return 0;
+				}
 				}
 			}
 
@@ -209,8 +198,24 @@ int main(int argc, char** argv)
 	enet_host_destroy(server);
 	enet_host_destroy(client);
 	enet_deinitialize();
+}
 
-	while (true);
+int main(int argc, char** argv)
+{
+	doctest::Context context;
+	context.setOption("abort-after", 5);
+	context.applyCommandLine(argc, argv);
+	context.setOption("no-breaks", true);
+	int result = context.run();
+	if (context.shouldExit())
+	{
+		return result;
+	}
+
+	benchmark();
+	//enet();
+
+	//while (true);
 
 	return 0;
 }

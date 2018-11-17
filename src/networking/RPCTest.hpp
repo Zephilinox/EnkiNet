@@ -3,30 +3,30 @@
 	void do_thing(int x, int y)
 	{
 		i = x + y;
-		std::cout << "called function do_thing(" << x << ", " << y << ")\n";
+		//std::cout << "called function do_thing(" << x << ", " << y << ")\n";
 	}
 
 	int i;
 	inline static std::map<std::string, std::function<void(Packet, Entity*)>> functions;
 };
 
-void one(int i, double d, float s, int ii)
+void test(int i, double d, float s, int ii)
 {
-	std::cout << "called function one(" << i << ", " << d << ", " << s << ", " << ii << ");\n";
+	std::cout << "called function test(" << i << ", " << d << ", " << s << ", " << ii << ");\n";
 }
 
 TEST_CASE("RPC")
 {
 	RPCManager rpcm;
-	rpcm.add("one", one);
+	rpcm.add("test", test);
 
 	std::cout << "\n";
 
-	rpcm.call(one, "one", 1, 2.0, 3.0f, 4);
+	rpcm.call(test, "test", 1, 2.0, 3.0f, 4);
 
 	std::cout << "\n";
 
-	rpcm.call_unsafe("one", 1.5, -2.0f, true, true);
+	rpcm.call_unsafe("test", 1.5, -2.0f, true, true);
 
 	std::cout << "\n";
 
@@ -46,7 +46,7 @@ TEST_CASE("RPC")
 
 	//now let's try a valid rpc, but one which has the wrong types
 	Packet p2;
-	p2 << std::string("one") << true << true << true << true;
+	p2 << std::string("test") << true << true << true << true;
 	rpcm.receive(p2);
 	//this also causes an exception to be thrown and the client to crash, now fixed
 
@@ -54,7 +54,7 @@ TEST_CASE("RPC")
 
 	//Now let's try sending one big arg to a valid function expecting 4 smaller args
 	Packet p3;
-	p3 << std::string("one") << 50 << 50;
+	p3 << std::string("test") << 50 << 50;
 	rpcm.receive(p3);
 
 	SUBCASE("Entity")
