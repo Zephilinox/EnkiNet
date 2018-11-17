@@ -185,20 +185,14 @@ void Packet::read_bits(int& data, int bits_to_read, int offset)
 
 void Packet::write_compressed_float(float& data, float min, float max, float resolution)
 {
-	//min = -10, max = 10, resolution = 0.01
-	//20
 	float delta = max - min;
-	//2000
 	float total_possible_values = delta / resolution;
-	//2000
 	int max_possible_values = static_cast<int>(std::ceil(total_possible_values));
-	//11
 	int bits_required = static_cast<int>(std::ceil(std::log(max_possible_values) / std::log(2)));
-	//data = 5, normalized = 0.75
+
 	float normalized_data = std::clamp((data - min) / delta, 0.0f, 1.0f);
-	//1500
 	int final_value = static_cast<int>(std::round(normalized_data * max_possible_values));
-	//11 bits written vs standard 32 for a float
+
 	write_bits(final_value, bits_required);
 }
 

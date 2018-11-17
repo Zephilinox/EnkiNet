@@ -35,23 +35,29 @@ public:
 	const std::vector<std::byte>& get_bytes() const;
 	std::size_t get_bytes_read();
 
-	template <typename T>
-	Packet& operator <<(T data);
-	template <typename T>
-	Packet& operator >>(T& data);
-
 	Packet& operator <<(std::string data);
 	Packet& operator >>(std::string& data);
 
 	template <typename T>
+	Packet& operator <<(T data);
+
+	template <typename T>
+	Packet& operator >>(T& data);
+
+	template <typename T>
 	Packet& operator <<(std::vector<T> data);
+
 	template <typename T>
 	Packet& operator >>(std::vector<T>& data);
 
 	template <typename T, std::size_t size>
 	Packet& operator <<(std::array<T, size> data);
+
 	template <typename T, std::size_t size>
 	Packet& operator >>(std::array<T, size>& data);
+
+	template <typename T>
+	T read();
 
 private:
 	template <typename T>
@@ -69,6 +75,7 @@ private:
 };
 
 //will need to adjust this in the future for endianess concerns
+//this could potentially be dangerous depending on platform-specific sizes, not sure.
 template <typename T>
 Packet& Packet::operator <<(T data)
 {
@@ -128,6 +135,14 @@ Packet& Packet::operator >>(std::array<T, size>& data)
 	}
 
 	return *this;
+}
+
+template <typename T>
+T Packet::read()
+{
+	T t;
+	*this >> t;
+	return t;
 }
 
 template <typename T>
