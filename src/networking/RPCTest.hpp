@@ -1,4 +1,15 @@
-﻿
+﻿struct Entity
+{
+	void do_thing(int x, int y)
+	{
+		i = x + y;
+		std::cout << "called function do_thing(" << x << ", " << y << ")\n";
+	}
+
+	int i;
+	inline static std::map<std::string, std::function<void(Packet, Entity*)>> functions;
+};
+
 void one(int i, double d, float s, int ii)
 {
 	std::cout << "called function one(" << i << ", " << d << ", " << s << ", " << ii << ");\n";
@@ -45,4 +56,13 @@ TEST_CASE("RPC")
 	Packet p3;
 	p3 << std::string("one") << 50 << 50;
 	rpcm.receive(p3);
+
+	SUBCASE("Entity")
+	{
+		Entity e;
+		rpcm.add("do_thing", &Entity::do_thing);
+		rpcm.call(&Entity::do_thing, "do_thing", &e, 1, 2);
+		std::cout << e.i << "\n";
+		REQUIRE(e.i == 3);
+	}
 }
