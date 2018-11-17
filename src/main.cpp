@@ -245,8 +245,8 @@ template <typename T> T read(Packet& p)
 	return t;
 }
 
+//move to static class?
 std::map<std::string, std::function<void(Packet)>> functions;
-std::map<std::string, int> function_arguments_byte_size;
 
 template <typename F>
 void register_rpc(std::string name, F* func)
@@ -257,9 +257,6 @@ void register_rpc(std::string name, F* func)
 	rpc.add(name, func);
 	std::cout << "rpc " << name << " registered\n";
 }
-
-
-//https://stackoverflow.com/questions/15904288/how-to-reverse-the-order-of-arguments-of-a-variadic-template-function?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
 
 template <typename T>
 void rpcPacket(Packet& p, T x)
@@ -301,43 +298,12 @@ struct rpc<Return(Parameters...)>
 		{
 			f(read<Parameters>(p)...);
 		};
-		function_arguments_byte_size[name] = size_of_args();
 	}
 
 	template <typename... Args>
-	constexpr static bool is_correct_args()
+	constexpr static bool matches_arguments()
 	{
 		return std::is_same_v<std::tuple<Parameters...>, std::tuple<Args...>>;
-	}
-
-	constexpr static int size_of_args()
-	{
-		return get_size_of_args<Parameters...>();
-	}
-
-private:
-	template <typename T>
-	constexpr static T make()
-	{
-		return T();
-	}
-
-	template <typename T>
-	constexpr static int size_of(T thing)
-	{
-		return sizeof(thing);
-	}
-
-	template <typename T, typename... Args>
-	constexpr static int size_of(T thing, Args... things)
-	{
-		return sizeof(thing) + size_of(things...);
-	}
-
-	template <typename... Args>
-	constexpr static int get_size_of_args()
-	{
-		return size_of(make<Args>()...);
 	}
 };
 
@@ -360,15 +326,10 @@ void receive_rpc(Packet p)
 			return;
 		}
 
-		//I was going to check bytes left in packet here so that it could match up with the bytes the function expects
-		//however, I realsied that deserializing each thing could lead it to change byte size (e.g. encoding a bool as a bit), so it wouldn't work here
-		//it would have to be done once the entire packet has been deserialized, but at the moment it doesn't work that way
-		//it's still safe enough though, an exception will throw and it will get caught.
-
 		std::cout << "received packet to call rpc " << name << "\n";
 		functions[name](p);
 	}
-	catch (std::exception& e)
+	catch (std::exception&)
 	{
 		std::cout << "Invalid RPC packet received that threw an exception, ignoring\n";
 	}
@@ -382,7 +343,7 @@ void call_rpc([[maybe_unused]] F* f, std::string name, Args... args)
 		std::cout << "safe call to rpc " << name << " with the values";
 		((std::cout << " " << args), ...);
 		std::cout << "\n";
-		static_assert(rpc<F>::is_correct_args<Args...>(), "You tried to call this rpc with the incorrect number or type of parameters");
+		static_assert(rpc<F>::matches_arguments<Args...>(), "You tried to call this rpc with the incorrect number or type of parameters");
 		Packet p;
 
 		//fill packet with rpc information
@@ -421,7 +382,6 @@ void one(int i, double d, float s, int ii)
 TEST_CASE("RPC")
 {
 	register_rpc("one", one);
-	std::cout << "byte size of combined args: " << rpc<decltype(one)>::size_of_args() << "\n";
 	call_rpc(one, "one", 1, 2.0, 3.0f, 4);
 	call_rpc_unsafe("one", 1.5, -2.0f, true, true);
 
@@ -461,7 +421,8 @@ int main(int argc, char** argv)
 
 	auto console = spdlog::stdout_color_mt("console");
 	console->info("Hi :)");
+	
 	while (true);
 
-	return result;
+	return 0;
 }

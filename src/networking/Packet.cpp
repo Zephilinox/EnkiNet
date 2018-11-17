@@ -146,12 +146,12 @@ void Packet::read_bits(int& data, int bits_to_read, int offset)
 			if ((byte) & (shift))
 			{
 				//set the other numbers bit to 1
-				data |= (1 << i + offset + extra_offset);
+				data |= (1 << (i + offset + extra_offset));
 			}
 			else
 			{
 				//otherwise set it to 0
-				data &= ~(1 << i + offset + extra_offset);
+				data &= ~(1 << (i + offset + extra_offset));
 			}
 		}
 	};
@@ -191,7 +191,7 @@ void Packet::write_compressed_float(float& data, float min, float max, float res
 	//2000
 	float total_possible_values = delta / resolution;
 	//2000
-	int max_possible_values = std::ceil(total_possible_values);
+	int max_possible_values = static_cast<int>(std::ceil(total_possible_values));
 	//11
 	int bits_required = static_cast<int>(std::ceil(std::log(max_possible_values) / std::log(2)));
 	//data = 5, normalized = 0.75
@@ -204,23 +204,15 @@ void Packet::write_compressed_float(float& data, float min, float max, float res
 
 void Packet::read_compressed_float(float& data, float min, float max, float resolution)
 {
-	//min = -10, max = 10, resolution = 0.01
-	//20
 	float delta = max - min;
-	//2000
 	float total_possible_values = delta / resolution;
-	//2000
-	int max_possible_values = std::ceil(total_possible_values);
-	//11
+	int max_possible_values = static_cast<int>(std::ceil(total_possible_values));
 	int bits_required = static_cast<int>(std::ceil(std::log(max_possible_values) / std::log(2)));
 
-	//1500
 	int final_value = 0;
 	read_bits(final_value, bits_required);
 
-	//final_value = 1500, normalized = 0.75
 	float normalized_data = static_cast<float>(final_value) / static_cast<float>(max_possible_values);
-	//0.75 * 20 - 10 = 15 - 10 = 5
 	data = normalized_data * delta + min;
 }
 

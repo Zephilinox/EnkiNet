@@ -123,8 +123,8 @@ Packet& Packet::operator >>(std::array<T, size>& data)
 	}
 	else
 	{
-		//todo: how to handle errors
-		throw;
+		//todo: do I really want to use exceptions?
+		throw std::exception();
 	}
 
 	return *this;
