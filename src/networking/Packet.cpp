@@ -12,6 +12,18 @@ Packet::Packet(PacketHeader p_header)
 	memcpy(bytes.data(), &header, sizeof(PacketHeader));
 }
 
+Packet::Packet(enet_uint8* data, std::size_t size)
+	: bytes(size)
+	, bytes_written(size)
+	, bytes_read(sizeof(PacketHeader))
+	, bits_written(8)
+	, bits_read(8)
+{
+	bytes.reserve(1400);
+	memcpy(bytes.data(), data, size);
+	memcpy(&header, bytes.data(), sizeof(PacketHeader));
+}
+
 void Packet::write_bits(int& data, int bits_to_write, int offset)
 {
 	//ensure our bit/byte count is up to date

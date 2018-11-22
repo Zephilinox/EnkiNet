@@ -23,9 +23,16 @@
 #include "networking/RPCTest.hpp"
 #include "networking/Benchmark.hpp"
 
+void printMessage(std::string msg)
+{
+	std::cout << msg << "\n";
+}
+
 int enet()
 {
 	auto console = spdlog::stdout_color_mt("console");
+	RPCManager rpcm;
+	rpcm.add("printMessage", &printMessage);
 
 	char n;
 	do
@@ -99,13 +106,13 @@ int enet()
 			}
 		} while (!peer);
 
-		if (enet_host_service(client, &event, 1000) > 0 &&
+		if (enet_host_service(client, &event, 100000) > 0 &&
 			event.type == ENET_EVENT_TYPE_CONNECT)
 		{
 			console->info("connected to server");
-			strncpy(buffer, "client1", 1000);
-			packet = enet_packet_create(buffer, strlen(buffer) + 1, ENET_PACKET_FLAG_RELIABLE);
-			enet_peer_send(peer, 0, packet);
+			//strncpy(buffer, "client1", 1000);
+			//packet = enet_packet_create(buffer, strlen(buffer) + 1, ENET_PACKET_FLAG_RELIABLE);
+			//enet_peer_send(peer, 0, packet);
 			success = true;
 		}
 		else
@@ -145,8 +152,18 @@ int enet()
 						event.peer->data,
 						event.channelID);
 
+					std::cout << "client receive\n";
+					console->info("A packet of length {} containing {} was received from {} on channel {}.\n",
+						event.packet->dataLength,
+						event.packet->data,
+						event.peer->data,
+						event.channelID);
+					Packet p(event.packet->data, event.packet->dataLength);
+					std::string msg;
+					p >> msg;
+					std::cout << msg << "\n";
+
 					enet_packet_destroy(event.packet);
-					break;
 				}
 				case ENET_EVENT_TYPE_DISCONNECT:
 				{
@@ -157,6 +174,19 @@ int enet()
 				}
 				}
 			}
+
+			static int i = 0;
+			i++;
+			std::string msg(std::to_string(i));
+			Packet p;
+			rpcm.rpcPacket(p, msg);
+
+			char* buffer2 = reinterpret_cast<char*>(p.bytes.data());
+
+			packet = enet_packet_create(buffer2, p.bytes.size() + 1, ENET_PACKET_FLAG_RELIABLE);
+			enet_peer_send(&server->peers[0], 0, packet);
+			enet_host_broadcast(server, 0, packet);
+			enet_host_flush(server);
 		}
 		else if (client)
 		{
@@ -172,6 +202,10 @@ int enet()
 						event.packet->data,
 						event.peer->data,
 						event.channelID);
+					Packet p(event.packet->data, event.packet->dataLength);
+					std::string msg;
+					p >> msg;
+					std::cout << msg << "\n";
 
 					enet_packet_destroy(event.packet);
 
@@ -188,9 +222,15 @@ int enet()
 				}
 			}
 
+			std::string msg;
 			std::cout << "Send: ";
-			std::cin >> buffer;
-			packet = enet_packet_create(buffer, strlen(buffer) + 1, ENET_PACKET_FLAG_RELIABLE);
+			std::cin >> msg;
+			Packet p;
+			rpcm.rpcPacket(p, msg);
+
+			char* buffer2 = reinterpret_cast<char*>(p.bytes.data());
+
+			packet = enet_packet_create(buffer2, p.bytes.size() + 1, ENET_PACKET_FLAG_RELIABLE);
 			enet_peer_send(peer, 0, packet);
 		}
 	}
@@ -212,8 +252,8 @@ int main(int argc, char** argv)
 		return result;
 	}
 
-	benchmark();
-	//enet();
+	//benchmark();
+	enet();
 
 	//while (true);
 

@@ -6,6 +6,9 @@
 #include <string>
 #include <array>
 
+//LIB
+#include "enet/enet.h"
+
 enum PacketType : std::uint8_t {
 	NONE,
 	COMMAND,
@@ -24,6 +27,7 @@ class Packet
 {
 public:
 	Packet(PacketHeader = {});
+	Packet(enet_uint8* data, std::size_t size);
 
 	void write_bits(int& data, int bits_to_write, int offset = 0);
 	void read_bits(int& data, int bits_to_read, int offset = 0);
@@ -59,6 +63,7 @@ public:
 	template <typename T>
 	T read();
 
+	std::vector<std::byte> bytes;
 private:
 	template <typename T>
 	void serialize(T* data, std::size_t size);
@@ -67,7 +72,6 @@ private:
 	void deserialize(T* data, std::size_t size);
 	
 	PacketHeader header;
-	std::vector<std::byte> bytes;
 	std::size_t bytes_written;
 	std::size_t bytes_read;
 	std::size_t bits_written;
