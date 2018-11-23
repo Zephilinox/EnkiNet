@@ -5,7 +5,7 @@ add_executable (EnkiNet "main.cpp" "networking/Packet.cpp" "Timer.cpp")
 
 set_property(TARGET EnkiNet PROPERTY CXX_STANDARD 17)
 get_property(CXX_STANDARD_ TARGET EnkiNet PROPERTY CXX_STANDARD)
-message(STATUS "CXX_STANDARD " ${CXX_STANDARD_})
+message(STATUS "CXX_STANDARD is: " ${CXX_STANDARD_})
 
 #https://stackoverflow.com/questions/2368811/how-to-set-warning-level-in-cmake
 if (MSVC) 
@@ -31,6 +31,7 @@ set_target_properties(
 )
 
 target_link_libraries(${PROJECT_NAME}
+	sfml-graphics
 	spdlog
 	enet
 	ws2_32

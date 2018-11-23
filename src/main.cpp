@@ -13,6 +13,7 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <enet/enet.h>
+#include <SFML/Graphics.hpp>
 
 //SELF
 #include "networking/Packet.hpp"
@@ -252,8 +253,25 @@ int main(int argc, char** argv)
 		return result;
 	}
 
-	//benchmark();
-	enet();
+	auto window = sf::RenderWindow(sf::VideoMode(1280, 720), "Hi");
+
+	while (window.isOpen())
+	{
+		sf::Event e;
+		while (window.pollEvent(e))
+		{
+			if (e.type == sf::Event::Closed)
+			{
+				window.close();
+			}
+		}
+
+		window.clear({100, 20, 20, 255});
+		window.display();
+	}
+
+	benchmark();
+	//enet();
 
 	//while (true);
 
