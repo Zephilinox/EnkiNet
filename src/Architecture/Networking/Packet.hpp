@@ -7,7 +7,7 @@
 #include <array>
 
 //LIB
-#include "enet/enet.h"
+#include <enet/enet.h>
 
 enum PacketType : std::uint8_t {
 	NONE,

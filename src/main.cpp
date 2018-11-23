@@ -16,13 +16,41 @@
 #include <SFML/Graphics.hpp>
 
 //SELF
-#include "networking/Packet.hpp"
-#include "networking/RPC.hpp"
+#include "Architecture/Networking/Packet.hpp"
+#include "Architecture/Networking/RPC.hpp"
+#include "Game/Game.hpp"
 
 //TESTS
-#include "networking/PacketTest.hpp"
-#include "networking/RPCTest.hpp"
-#include "networking/Benchmark.hpp"
+#include "Architecture/Networking/PacketTest.hpp"
+#include "Architecture/Networking/RPCTest.hpp"
+#include "Architecture/Networking/Benchmark.hpp"
+
+void printMessage(std::string msg);
+int enet();
+
+int main(int argc, char** argv)
+{
+#if _DEBUG
+	doctest::Context context;
+	context.setOption("abort-after", 5);
+	context.applyCommandLine(argc, argv);
+	context.setOption("no-breaks", true);
+	int result = context.run();
+	if (context.shouldExit())
+	{
+		return result;
+	}
+#endif
+
+	Game game;
+
+	//benchmark();
+	//enet();
+
+	//while (true);
+
+	return 0;
+}
 
 void printMessage(std::string msg)
 {
@@ -239,41 +267,4 @@ int enet()
 	enet_host_destroy(server);
 	enet_host_destroy(client);
 	enet_deinitialize();
-}
-
-int main(int argc, char** argv)
-{
-	doctest::Context context;
-	context.setOption("abort-after", 5);
-	context.applyCommandLine(argc, argv);
-	context.setOption("no-breaks", true);
-	int result = context.run();
-	if (context.shouldExit())
-	{
-		return result;
-	}
-
-	auto window = sf::RenderWindow(sf::VideoMode(1280, 720), "Hi");
-
-	while (window.isOpen())
-	{
-		sf::Event e;
-		while (window.pollEvent(e))
-		{
-			if (e.type == sf::Event::Closed)
-			{
-				window.close();
-			}
-		}
-
-		window.clear({100, 20, 20, 255});
-		window.display();
-	}
-
-	benchmark();
-	//enet();
-
-	//while (true);
-
-	return 0;
 }
