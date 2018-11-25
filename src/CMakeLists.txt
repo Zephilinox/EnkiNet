@@ -5,6 +5,8 @@ add_executable (EnkiNet
 	"main.cpp"
 	"Architecture/Networking/Packet.cpp"
 	"Architecture/Timer.cpp"
+	"Architecture/Scenegraph.cpp"
+	"Architecture/Entity.cpp"
 	"Game/Game.cpp"
 )
 

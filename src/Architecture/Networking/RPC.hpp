@@ -1,5 +1,11 @@
 ﻿#pragma once
 
+//STD
+#include <iostream>
+
+//SELF
+#include "Packet.hpp"
+
 class RPCManager
 {
 public:
@@ -179,7 +185,7 @@ public:
 	}
 
 private:
-	inline static std::map<std::string, std::function<void(Packet)>> functions;
+	std::map<std::string, std::function<void(Packet)>> functions;
 };
 
 template <typename not_important>

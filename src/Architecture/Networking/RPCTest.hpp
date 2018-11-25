@@ -1,4 +1,4 @@
-﻿struct Entity
+﻿struct ent
 {
 	void do_thing(int x, int y)
 	{
@@ -7,7 +7,7 @@
 	}
 
 	int i;
-	inline static std::map<std::string, std::function<void(Packet, Entity*)>> functions;
+	inline static std::map<std::string, std::function<void(Packet, ent*)>> functions;
 };
 
 void test(int i, double d, float s, int ii)
@@ -59,9 +59,9 @@ TEST_CASE("RPC")
 
 	SUBCASE("Entity")
 	{
-		Entity e;
-		rpcm.add("do_thing", &Entity::do_thing);
-		rpcm.call(&Entity::do_thing, "do_thing", &e, 1, 2);
+		ent e;
+		rpcm.add("do_thing", &ent::do_thing);
+		rpcm.call(&ent::do_thing, "do_thing", &e, 1, 2);
 		std::cout << e.i << "\n";
 		REQUIRE(e.i == 3);
 	}
