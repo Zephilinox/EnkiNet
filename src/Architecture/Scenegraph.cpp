@@ -1,5 +1,8 @@
 #include "Scenegraph.hpp"
 
+//LIBS
+#include <spdlog/fmt/fmt.h>
+
 void Scenegraph::update(float dt)
 {
 	for (auto& ent : entities)
@@ -23,6 +26,8 @@ void Scenegraph::registerBuilder(std::string type, std::function<std::unique_ptr
 
 Entity* Scenegraph::createEntity(EntityInfo info)
 {
+	static int ID = 0;
+	info.ID = ID++;
 	entities[info.ID] = builders.at(info.type)(info);
 	return entities[info.ID].get();
 }

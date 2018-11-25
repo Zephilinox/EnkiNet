@@ -1,51 +1,55 @@
 #include "Game.hpp"
 
-//LIBS
-#include <SFML/Graphics.hpp>
-
 //STD
 #include <iostream>
 
-class Thing : public Entity
-{
-public:
-	Thing(EntityInfo info)
-		: Entity(info)
-	{
-		std::cout << "hi";
-	}
+//LIBS
+#include <SFML/Graphics.hpp>
+#include <spdlog/spdlog.h>
 
-	virtual void update(float dt)
-	{
-		std::cout << "hi";
-	}
-
-	virtual void draw(sf::RenderWindow& window) const
-	{
-
-	}
-};
+//SELF
+#include "Paddle.hpp"
+#include "Ball.hpp"
 
 Game::Game()
 {
 	window = std::make_unique<sf::RenderWindow>(sf::VideoMode(1280, 720), "Hi");
 
-	scenegraph.registerBuilder("Thing", [](EntityInfo info)
+	scenegraph.registerBuilder("Paddle", [](EntityInfo info)
 	{
-		return std::make_unique<Thing>(info);
+		return std::make_unique<Paddle>(info);
 	});
 
-	scenegraph.createEntity(EntityInfo{ "Thing", "Thing 1" });
+	scenegraph.registerBuilder("Ball", [](EntityInfo info)
+	{
+		return std::make_unique<Ball>(info);
+	});
+
+	scenegraph.createEntity(EntityInfo{ "Paddle", "Paddle 1" });
+	scenegraph.createEntity(EntityInfo{ "Paddle", "Paddle 2" });
+	scenegraph.createEntity(EntityInfo{ "Ball", "Ball" });
+
 	run();
 }
 
 void Game::run()
 {
+	timer.restart();
+	input();
+	update();
+	draw();
+
+	dt = timer.getElapsedTime();
+	timer.restart();
+
 	while (window->isOpen())
 	{
 		input();
 		update();
 		draw();
+
+		dt = timer.getElapsedTime();
+		timer.restart();
 	}
 }
 
@@ -63,11 +67,12 @@ void Game::input()
 
 void Game::update()
 {
-
+	scenegraph.update(dt);
 }
 
 void Game::draw() const
 {
 	window->clear({ 100, 20, 20, 255 });
+	scenegraph.draw(*window.get());
 	window->display();
 }

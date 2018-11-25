@@ -8,6 +8,8 @@ add_executable (EnkiNet
 	"Architecture/Scenegraph.cpp"
 	"Architecture/Entity.cpp"
 	"Game/Game.cpp"
+	"Game/Paddle.cpp"
+	"Game/Ball.cpp"
 )
 
 set_property(TARGET EnkiNet PROPERTY CXX_STANDARD 17)
