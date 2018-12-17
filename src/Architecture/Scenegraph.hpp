@@ -8,15 +8,6 @@
 //SELF
 #include "Entity.hpp"
 
-//todo: rethink this stuff
-//don't want an entity to define parent and children due to potential outdated info
-//don't want to rebuild list of all children each time they're requested
-//have scene manager keep track of both?
-//struct parent
-//{
-//	std::vector<uint32_t> children;
-//};
-
 class Scenegraph
 {
 public:
@@ -28,12 +19,8 @@ public:
 	Entity* createEntity(EntityInfo info);
 
 	Entity* getEntity(uint32_t entityID);
-	//Entity* getParent(uint32_t entityID);
-	//std::vector<Entity*> getChildren(uint32_t entityID);
-	//std::vector<Entity*> getChildrenRecursively(uint32_t entityID);
 
 private:
 	std::map<uint32_t, std::unique_ptr<Entity>> entities;
 	std::map<std::string, std::function<std::unique_ptr<Entity>(EntityInfo)>> builders;
-	//std::map<uint32_t, parent> parents;
 };
