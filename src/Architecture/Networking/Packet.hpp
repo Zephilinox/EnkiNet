@@ -15,6 +15,10 @@ enum PacketType : std::uint8_t {
 	ENTITY,
 	GLOBAL_RPC,
 	ENTITY_RPC,
+	CLIENT_INITIALIZED,
+	CONNECTED,
+	DISCONNECTED,
+	ENTITY_CREATION
 };
 
 struct PacketHeader
@@ -23,20 +27,29 @@ struct PacketHeader
 	std::uint8_t version = 0;
 };
 
+struct PacketInfo
+{
+	uint32_t senderID = 0;
+};
+
 class Packet
 {
 public:
 	Packet(PacketHeader = {});
-	Packet(enet_uint8* data, std::size_t size);
+	Packet(const enet_uint8* data, std::size_t size);
 
 	void write_bits(int& data, int bits_to_write, int offset = 0);
 	void read_bits(int& data, int bits_to_read, int offset = 0);
 	void write_compressed_float(float& data, float min, float max, float resolution);
 	void read_compressed_float(float& data, float min, float max, float resolution);
 
+	void reset_read_position();
+
 	void set_header(PacketHeader header);
 	const PacketHeader& get_header() const;
 	const std::vector<std::byte>& get_bytes() const;
+	const enet_uint8* get_data();
+	size_t get_size();
 	std::size_t get_bytes_read();
 
 	Packet& operator <<(std::string data);
@@ -60,10 +73,14 @@ public:
 	template <typename T, std::size_t size>
 	Packet& operator >>(std::array<T, size>& data);
 
+	//note: this doesn't do what I want it to do with multiple calls in a function argument call, since it goes from right-to-left and therefore is reversed
+	//need to fix with variadic args, like with RPC's
 	template <typename T>
 	T read();
 
 	std::vector<std::byte> bytes;
+	PacketInfo info;
+
 private:
 	template <typename T>
 	void serialize(T* data, std::size_t size);

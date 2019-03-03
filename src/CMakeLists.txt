@@ -3,13 +3,28 @@
 # Add source to this project's executable.
 add_executable (EnkiNet
 	"main.cpp"
+	
 	"Architecture/Networking/Packet.cpp"
+	"Architecture/Networking/NetworkEnet.cpp"
+	
+	"Architecture/Networking/Networking/ClientHost.cpp"
+	"Architecture/Networking/Networking/ClientStandard.cpp"
+	"Architecture/Networking/Networking/ServerHost.cpp"
+	
+	"Architecture/Managers/NetworkManager.cpp"
+	
+	"Architecture/Signals/Connection.cpp"
+	
 	"Architecture/Timer.cpp"
 	"Architecture/Scenegraph.cpp"
 	"Architecture/Entity.cpp"
+	"Architecture/GameData.cpp"
+	
 	"Game/Game.cpp"
 	"Game/Paddle.cpp"
 	"Game/Ball.cpp"
+	"Game/Collision.cpp"
+	"Game/PlayerText.cpp"
 )
 
 set_property(TARGET EnkiNet PROPERTY CXX_STANDARD 17)

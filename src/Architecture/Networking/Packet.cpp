@@ -12,7 +12,7 @@ Packet::Packet(PacketHeader p_header)
 	memcpy(bytes.data(), &header, sizeof(PacketHeader));
 }
 
-Packet::Packet(enet_uint8* data, std::size_t size)
+Packet::Packet(const enet_uint8* data, std::size_t size)
 	: bytes(size)
 	, bytes_written(size)
 	, bytes_read(sizeof(PacketHeader))
@@ -222,6 +222,12 @@ void Packet::read_compressed_float(float& data, float min, float max, float reso
 	data = normalized_data * delta + min;
 }
 
+void Packet::reset_read_position()
+{
+	bytes_read = sizeof(PacketHeader);
+	bits_read = 8;
+}
+
 void Packet::set_header(PacketHeader p_header)
 {
 	header = p_header;
@@ -236,6 +242,16 @@ const PacketHeader& Packet::get_header() const
 const std::vector<std::byte>& Packet::get_bytes() const
 {
 	return bytes;
+}
+
+const enet_uint8* Packet::get_data()
+{
+	return reinterpret_cast<const enet_uint8*>(bytes.data());
+}
+
+size_t Packet::get_size()
+{
+	return bytes_written;
 }
 
 std::size_t Packet::get_bytes_read()

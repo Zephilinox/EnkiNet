@@ -65,7 +65,7 @@ void benchmark_entity(Timer&t, int count)
 	t.restart();
 	for (int i = 0; i < count; ++i)
 	{
-		rpcm.call(&ent::do_thing, "do_thing", &e, 1, i);
+		//rpcm.call(&ent::do_thing, "do_thing", &e, 1, i);
 	}
 	std::cout << "###[Entity::do_thing] RPC\n";
 	print_time(t, count);

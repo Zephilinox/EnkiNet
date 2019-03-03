@@ -4,6 +4,7 @@
 #include "../Architecture/Scenegraph.hpp"
 #include "../Architecture/Timer.hpp"
 #include "../Architecture/Networking/RPC.hpp"
+#include "../Architecture/GameData.hpp"
 
 class Game
 {
@@ -20,6 +21,13 @@ private:
 
 	std::unique_ptr<sf::RenderWindow> window;
 	Timer timer;
-	Scenegraph scenegraph;
+	std::unique_ptr<Scenegraph> scenegraph;
 	RPCManager rpcm;
+	std::unique_ptr<GameData> game_data;
+	sf::Font font;
+	sf::Text score1;
+	sf::Text score2;
+
+	ManagedConnection mc1;
+	ManagedConnection mc2;
 };
