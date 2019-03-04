@@ -140,6 +140,7 @@ public:
 		}
 	}
 
+	//call local global rpc
 	template <typename F, typename... Args>
 	void call([[maybe_unused]] F* f, std::string name, Args... args)
 	{
@@ -155,11 +156,12 @@ public:
 			p << name;
 			rpcPacket(p, args...);
 
-			//simulate client received packet
+			//this call is only local
 			receive(p);
 		}
 	}
 
+	//call local class rpc
 	template <typename R, typename Class, typename T, typename... Args>
 	void call([[maybe_unused]] R(Class::*f)(Args...), std::string name, T* instance, Args... args)
 	{
@@ -176,25 +178,27 @@ public:
 			p << name;
 			rpcPacket(p, args...);
 
-			//simulate client received packet
+			//this call is only local
 			receive(p, instance);
 		}
 	}
 
-	template <typename R, typename Class, typename T>
-	void call([[maybe_unused]] R(Class::*f), std::string name, T* instance, NetworkManager* net_man)
+	//call local and remote rpc
+	template <typename R, typename Class, typename T, typename... Args>
+	void call([[maybe_unused]] R(Class::*f)(Args...), std::string name, NetworkManager* net_man, T* instance, Args... args)
 	{
 		if (RPCWrapper<T>::functions.count(name))
 		{
 			//std::cout << "safe call to rpc " << name << " with the values";
 			//((std::cout << " " << args), ...);
 			//std::cout << "\n";
-			//static_assert(rpc<R(Class::*)(Args...)>::matches_arguments<Args...>(), "You tried to call this rpc with the incorrect number or type of parameters");
+			static_assert(rpc<R(Class::*)(Args...)>::matches_arguments<Args...>(), "You tried to call this rpc with the incorrect number or type of parameters");
 			Packet p({ PacketType::ENTITY_RPC });
 
 			//fill packet with rpc information
 			p << static_cast<Entity*>(instance)->info;
 			p << name;
+			rpcPacket(p, args...);
 
 			if (net_man)
 			{
@@ -206,32 +210,7 @@ public:
 		}
 	}
 
-	template <typename R, typename Class, typename T>
-	void call3([[maybe_unused]] R(Class::*f)(int, int, int), std::string name, NetworkManager* net_man, T* instance, int int1, int int2, int int3)
-	{
-		if (RPCWrapper<T>::functions.count(name))
-		{
-			//std::cout << "safe call to rpc " << name << " with the values";
-			//((std::cout << " " << args), ...);
-			//std::cout << "\n";
-			//static_assert(rpc<R(Class::*)(int1, int2, int3)>::matches_arguments<int, int, int>(), "You tried to call this rpc with the incorrect number or type of parameters");
-			Packet p({ PacketType::ENTITY_RPC });
-
-			//fill packet with rpc information
-			p << static_cast<Entity*>(instance)->info;
-			p << name;
-			rpcPacket(p, int1, int2, int3);
-
-			if (net_man)
-			{
-				if (net_man->client)
-				{
-					net_man->client->sendPacket(0, &p);
-				}
-			}
-		}
-	}
-
+	//call local global rpc unsafe
 	template <typename... Args>
 	void call_unsafe(std::string name, Args... args)
 	{
@@ -246,7 +225,7 @@ public:
 			p << name;
 			rpcPacket(p, args...);
 
-			//simulate client received packet
+			//this call is only local
 			receive(p);
 		}
 	}
