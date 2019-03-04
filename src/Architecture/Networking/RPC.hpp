@@ -9,6 +9,17 @@
 #include "Networking/ClientStandard.hpp"
 #include "../Entity.hpp"
 
+template <class Wrapee>
+class RPCWrapper
+{
+public:
+
+	static std::map<std::string, std::function<void(Packet, Wrapee*)>> functions;
+};
+
+template <class Wrapee>
+std::map<std::string, std::function<void(Packet, Wrapee*)>> RPCWrapper<Wrapee>::functions;
+
 class RPCManager
 {
 public:
@@ -22,25 +33,25 @@ public:
 		{
 			return;
 		}
-		
+
 		rpc<F> rpc;
 		functions[name] = rpc.wrap(func);
 		std::cout << "rpc " << name << " registered\n";
 	}
 
 	template <typename R, typename Class, typename... Args>
-	void add(std::string name, R (Class::*func)(Args...))
+	void add(std::string name, R(Class::*func)(Args...))
 	{
 		static_assert(std::is_void<R>::value,
 			"You can't register a function as an RPC if it doesn't return void");
 
-		if (Class::functions.count(name))
+		if (RPCWrapper<Class>::functions.count(name))
 		{
 			return;
 		}
 
 		rpc<R(Class::*)(Args...)> rpc;
-		Class::functions[name] = rpc.wrap(func);
+		RPCWrapper<Class>::functions[name] = rpc.wrap(func);
 		std::cout << "rpc " << name << " registered\n";
 	}
 
@@ -50,7 +61,7 @@ public:
 	}
 
 	template <typename T>
-		void rpcPacket(Packet& p, T x)
+	void rpcPacket(Packet& p, T x)
 	{
 		p << x;
 	}
@@ -114,14 +125,14 @@ public:
 			std::string name;
 			p >> name;
 
-			if (!T::functions.count(name))
+			if (!RPCWrapper<T>::functions.count(name))
 			{
 				std::cout << "Invalid RPC packet received due to invalid name, ignoring\n";
 				return;
 			}
 
 			//std::cout << "received packet to call rpc " << name << "\n";
-			T::functions[name](p, instance);
+			RPCWrapper<T>::functions[name](p, instance);
 		}
 		catch (std::exception&)
 		{
@@ -152,13 +163,13 @@ public:
 	template <typename R, typename Class, typename T, typename... Args>
 	void call([[maybe_unused]] R(Class::*f)(Args...), std::string name, T* instance, Args... args)
 	{
-		if (T::functions.count(name))
+		if (RPCWrapper<T>::functions.count(name))
 		{
 			//std::cout << "safe call to rpc " << name << " with the values";
 			//((std::cout << " " << args), ...);
 			//std::cout << "\n";
 			static_assert(rpc<R(Class::*)(Args...)>::matches_arguments<Args...>(), "You tried to call this rpc with the incorrect number or type of parameters");
-			Packet p({PacketType::ENTITY_RPC});
+			Packet p({ PacketType::ENTITY_RPC });
 
 			//fill packet with rpc information
 			p << EntityInfo{};
@@ -173,7 +184,7 @@ public:
 	template <typename R, typename Class, typename T>
 	void call([[maybe_unused]] R(Class::*f), std::string name, T* instance, NetworkManager* net_man)
 	{
-		if (T::functions.count(name))
+		if (RPCWrapper<T>::functions.count(name))
 		{
 			//std::cout << "safe call to rpc " << name << " with the values";
 			//((std::cout << " " << args), ...);
@@ -198,7 +209,7 @@ public:
 	template <typename R, typename Class, typename T>
 	void call3([[maybe_unused]] R(Class::*f)(int, int, int), std::string name, NetworkManager* net_man, T* instance, int int1, int int2, int int3)
 	{
-		if (T::functions.count(name))
+		if (RPCWrapper<T>::functions.count(name))
 		{
 			//std::cout << "safe call to rpc " << name << " with the values";
 			//((std::cout << " " << args), ...);

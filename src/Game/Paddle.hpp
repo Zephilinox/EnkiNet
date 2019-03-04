@@ -24,8 +24,6 @@ public:
 
 	void setColour(int r, int g, int b);
 
-	inline static std::map<std::string, std::function<void(Packet, Paddle*)>> functions;
-
 private:
 	ManagedConnection mc1;
 	bool interpolation_enabled = false;
