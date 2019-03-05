@@ -4,21 +4,41 @@
 add_executable (EnkiNet
 	"main.cpp"
 	
+	"Architecture/Networking/PacketTest.hpp"
+	"Architecture/Networking/Packet.hpp"
 	"Architecture/Networking/Packet.cpp"
-	"Architecture/Networking/NetworkEnet.cpp"
 	
+	"Architecture/Networking/RPC.hpp"
+	"Architecture/Networking/RPCTest.hpp"
+	
+	"Architecture/Networking/Benchmark.hpp"
+	
+	"Architecture/Networking/Networking/Client.hpp"
+	"Architecture/Networking/Networking/ClientHost.hpp"
 	"Architecture/Networking/Networking/ClientHost.cpp"
+	"Architecture/Networking/Networking/ClientStandard.hpp"
 	"Architecture/Networking/Networking/ClientStandard.cpp"
+	"Architecture/Networking/Networking/Server.hpp"
+	"Architecture/Networking/Networking/ServerHost.hpp"
 	"Architecture/Networking/Networking/ServerHost.cpp"
 	
 	"Architecture/Managers/NetworkManager.cpp"
+	"Architecture/Managers/NetworkManager.hpp"
 	
 	"Architecture/Signals/Connection.cpp"
+	"Architecture/Signals/Connection.hpp"
+	"Architecture/Signals/Disconnector.hpp"
+	"Architecture/Signals/Signal.hpp"
+	"Architecture/Signals/Slot.hpp"
 	
+	"Architecture/Timer.hpp"
 	"Architecture/Timer.cpp"
+	"Architecture/Scenegraph.hpp"
 	"Architecture/Scenegraph.cpp"
 	"Architecture/Entity.cpp"
+	"Architecture/Entity.hpp"
 	"Architecture/GameData.cpp"
+	"Architecture/GameData.hpp"
 	
 	"Game/Game.cpp"
 	"Game/Paddle.cpp"
