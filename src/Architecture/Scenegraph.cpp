@@ -90,15 +90,16 @@ void Scenegraph::enable_networking()
 				p >> info;
 				std::string name;
 				p >> name;
-				if (entities.count(info.ID))
+				if (entityExists(info.ID) && rpc_receivers.count(info.type))
 				{
-					if (info.type == "Paddle")
-					{
-						auto builtType = builders[info.type]({}).get();
-						auto instance = static_cast<decltype(builtType)>(getEntity(info.ID));
-						p.reset_read_position();
-						rpcs.receive(p, instance);
-					}
+					p.reset_read_position();
+					auto ent = getEntity(info.ID);
+					rpc_receivers[info.type](ent, p, &rpcs);
+				}
+				else
+				{
+					auto console = spdlog::get("console");
+					console->error("Received an RPC packet for an entity that does not exist");
 				}
 			}
 		});
@@ -134,6 +135,11 @@ void Scenegraph::draw(sf::RenderWindow& window) const
 void Scenegraph::registerBuilder(std::string type, std::function<std::unique_ptr<Entity>(EntityInfo)> builder)
 {
 	builders[type] = builder;
+}
+
+void Scenegraph::registerReceiver(std::string type, std::function<void(Entity*, Packet, RPCManager*)> receiver)
+{
+	rpc_receivers[type] = receiver;
 }
 
 Entity* Scenegraph::createEntity(EntityInfo info)
