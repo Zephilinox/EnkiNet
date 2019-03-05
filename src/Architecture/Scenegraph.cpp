@@ -94,9 +94,10 @@ void Scenegraph::enable_networking()
 				{
 					if (info.type == "Paddle")
 					{
-						Paddle* paddle = static_cast<Paddle*>(getEntity(info.ID));
+						auto builtType = builders[info.type]({}).get();
+						auto instance = static_cast<decltype(builtType)>(getEntity(info.ID));
 						p.reset_read_position();
-						rpcs.receive(p, paddle);
+						rpcs.receive(p, instance);
 					}
 				}
 			}
@@ -151,6 +152,7 @@ Entity* Scenegraph::createEntity(EntityInfo info)
 
 	//info gets assigned to the entity here through being passed to the Entity base class constructor
 	entities[info.ID] = builders.at(info.type)(info);
+	entities[info.ID]->onSpawn();
 
 	return entities[info.ID].get();
 }

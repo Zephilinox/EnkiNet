@@ -11,6 +11,10 @@
 Collision::Collision(EntityInfo info, GameData* game_data)
 	: Entity(info, game_data)
 {
+}
+
+void Collision::onSpawn()
+{
 	fmt::print("ID={} name={} owner={} parent={} type={}\n", info.ID, info.name, info.ownerID, info.parentID, info.type);
 	ball_collider.height = 32;
 	ball_collider.width = 32;
@@ -20,7 +24,6 @@ Collision::Collision(EntityInfo info, GameData* game_data)
 
 	paddle2_collider.height = 128;
 	paddle2_collider.width = 32;
-
 }
 
 void Collision::input(sf::Event& e)

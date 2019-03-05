@@ -34,6 +34,7 @@ public:
 private:
 	std::map<uint32_t, std::unique_ptr<Entity>> entities;
 	std::map<std::string, std::function<std::unique_ptr<Entity>(EntityInfo)>> builders;
+
 	int ID = 1;
 	int localID = 10000;
 	GameData* game_data;

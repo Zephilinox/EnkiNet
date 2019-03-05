@@ -11,6 +11,7 @@ class PlayerText : public Entity
 public:
 	PlayerText(EntityInfo info, GameData* game_data);
 
+	virtual void onSpawn();
 	virtual void input(sf::Event& e);
 	virtual void update(float dt);
 	virtual void draw(sf::RenderWindow& window) const;
