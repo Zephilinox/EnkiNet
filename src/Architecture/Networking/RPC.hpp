@@ -269,6 +269,7 @@ struct rpc<Return((Class::*)(Parameters...))>
 	{
 		return [f](Packet p, Class* instance)
 		{
+			instance 
 			(instance->*f)(p.read<Parameters>()...);
 		};
 	}
