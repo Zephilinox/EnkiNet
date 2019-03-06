@@ -9,6 +9,10 @@
 Paddle::Paddle(EntityInfo info, GameData* game_data)
 	: Entity(info, game_data)
 {
+}
+
+void Paddle::onSpawn()
+{
 	fmt::print("ID={} name={} owner={} parent={} type={}\n", info.ID, info.name, info.ownerID, info.parentID, info.type);
 	texture.loadFromFile("Paddle.png");
 	sprite.setTexture(texture);
@@ -42,7 +46,7 @@ Paddle::Paddle(EntityInfo info, GameData* game_data)
 		game_data->scenegraph->createNetworkedEntity({ "PlayerText", "PlayerText " + info.name, 0, info.ownerID, info.ID });
 	}
 
-	game_data->scenegraph->rpcs.add("setColour", &Paddle::setColour);
+	game_data->scenegraph->rpcs.add("Paddle", "setColour", &Paddle::setColour);
 }
 
 void Paddle::input(sf::Event& e)

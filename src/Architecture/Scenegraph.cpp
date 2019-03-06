@@ -12,6 +12,7 @@
 Scenegraph::Scenegraph(GameData* game_data)
 	: game_data(game_data)
 {
+	int i = 0;
 }
 
 void Scenegraph::enable_networking()
@@ -90,14 +91,16 @@ void Scenegraph::enable_networking()
 				p >> info;
 				std::string name;
 				p >> name;
-				if (entities.count(info.ID))
+				if (entityExists(info.ID))
 				{
-					if (info.type == "Paddle")
-					{
-						Paddle* paddle = static_cast<Paddle*>(getEntity(info.ID));
-						p.reset_read_position();
-						rpcs.receive(p, paddle);
-					}
+					p.reset_read_position();
+					auto ent = getEntity(info.ID);
+					rpcs.receive(p, ent);
+				}
+				else
+				{
+					auto console = spdlog::get("console");
+					console->error("Received an RPC packet for an entity that does not exist");
 				}
 			}
 		});
@@ -135,6 +138,11 @@ void Scenegraph::registerBuilder(std::string type, std::function<std::unique_ptr
 	builders[type] = builder;
 }
 
+void Scenegraph::registerReceiver(std::string type, std::function<void(Entity*, Packet, RPCManager*)> receiver)
+{
+	rpc_receivers[type] = receiver;
+}
+
 Entity* Scenegraph::createEntity(EntityInfo info)
 {
 	if (info.name == "" || info.type == "")
@@ -151,6 +159,7 @@ Entity* Scenegraph::createEntity(EntityInfo info)
 
 	//info gets assigned to the entity here through being passed to the Entity base class constructor
 	entities[info.ID] = builders.at(info.type)(info);
+	entities[info.ID]->onSpawn();
 
 	return entities[info.ID].get();
 }

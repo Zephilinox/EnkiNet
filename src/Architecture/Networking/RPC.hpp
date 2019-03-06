@@ -55,6 +55,22 @@ public:
 		std::cout << "rpc " << name << " registered\n";
 	}
 
+	template <typename R, typename Class, typename... Args>
+	void add(std::string type, std::string name, R(Class::*func)(Args...))
+	{
+		static_assert(std::is_void<R>::value,
+			"You can't register a function as an RPC if it doesn't return void");
+
+		if (entity_functions.count(type) && entity_functions[type].count(name))
+		{
+			return;
+		}
+
+		rpc<R(Class::*)(Args...)> rpc;
+		entity_functions[type][name] = rpc.wrapEntity(func);
+		std::cout << "rpc " << name << " registered for " + type + "\n";
+	}
+
 	void rpcPacket()
 	{
 
@@ -125,14 +141,27 @@ public:
 			std::string name;
 			p >> name;
 
-			if (!RPCWrapper<T>::functions.count(name))
+			if constexpr(std::is_same_v<T, Entity>)
 			{
-				std::cout << "Invalid RPC packet received due to invalid name, ignoring\n";
-				return;
-			}
+				if (!entity_functions.count(info.type) || !entity_functions[info.type].count(name))
+				{
+					std::cout << "Invalid RPC packet received due to invalid name, ignoring\n";
+					return;
+				}
 
-			//std::cout << "received packet to call rpc " << name << "\n";
-			RPCWrapper<T>::functions[name](p, instance);
+				entity_functions[info.type][name](p, instance);
+			}
+			else
+			{
+				if (!RPCWrapper<T>::functions.count(name))
+				{
+					std::cout << "Invalid RPC packet received due to invalid name, ignoring\n";
+					return;
+				}
+
+				//std::cout << "received packet to call rpc " << name << "\n";
+				RPCWrapper<T>::functions[name](p, instance);
+			}
 		}
 		catch (std::exception&)
 		{
@@ -187,25 +216,40 @@ public:
 	template <typename R, typename Class, typename T, typename... Args>
 	void call([[maybe_unused]] R(Class::*f)(Args...), std::string name, NetworkManager* net_man, T* instance, Args... args)
 	{
-		if (RPCWrapper<T>::functions.count(name))
+		if constexpr(std::is_base_of_v<Entity, T>)
 		{
-			//std::cout << "safe call to rpc " << name << " with the values";
-			//((std::cout << " " << args), ...);
-			//std::cout << "\n";
-			static_assert(rpc<R(Class::*)(Args...)>::matches_arguments<Args...>(), "You tried to call this rpc with the incorrect number or type of parameters");
-			Packet p({ PacketType::ENTITY_RPC });
-
-			//fill packet with rpc information
-			p << static_cast<Entity*>(instance)->info;
-			p << name;
-			rpcPacket(p, args...);
-
-			if (net_man)
+			auto type = static_cast<Entity*>(instance)->info.type;
+			if (!entity_functions.count(type) || !entity_functions[type].count(name))
 			{
-				if (net_man->client)
-				{
-					net_man->client->sendPacket(0, &p);
-				}
+				return;
+			}
+		}
+		else
+		{
+			if (!RPCWrapper<T>::functions.count(name))
+			{
+				return;
+			}
+		}
+
+		//todo, make this vary depending on if entity*, or just remove anyway
+
+		//std::cout << "safe call to rpc " << name << " with the values";
+		//((std::cout << " " << args), ...);
+		//std::cout << "\n";
+		static_assert(rpc<R(Class::*)(Args...)>::matches_arguments<Args...>(), "You tried to call this rpc with the incorrect number or type of parameters");
+		Packet p({ PacketType::ENTITY_RPC });
+
+		//fill packet with rpc information
+		p << static_cast<Entity*>(instance)->info;
+		p << name;
+		rpcPacket(p, args...);
+
+		if (net_man)
+		{
+			if (net_man->client)
+			{
+				net_man->client->sendPacket(0, &p);
 			}
 		}
 	}
@@ -232,6 +276,7 @@ public:
 
 private:
 	std::map<std::string, std::function<void(Packet)>> functions;
+	std::map<std::string, std::map<std::string, std::function<void(Packet, Entity*)>>> entity_functions;
 };
 
 template <typename not_important>
@@ -270,6 +315,18 @@ struct rpc<Return((Class::*)(Parameters...))>
 		return [f](Packet p, Class* instance)
 		{
 			(instance->*f)(p.read<Parameters>()...);
+		};
+	}
+
+	template <typename F>
+	std::function<void(Packet, Entity*)> wrapEntity(F f)
+	{
+		static_assert(!std::is_same_v<Class, Entity>);
+		
+		return [f](Packet p, Entity* instance)
+		{
+			auto derived = static_cast<Class*>(instance);
+			(derived->*f)(p.read<Parameters>()...);
 		};
 	}
 

@@ -11,6 +11,10 @@
 PlayerText::PlayerText(EntityInfo info, GameData* game_data)
 	: Entity(info, game_data)
 {
+}
+
+void PlayerText::onSpawn()
+{
 	fmt::print("ID={} name={} owner={} parent={} type={}\n", info.ID, info.name, info.ownerID, info.parentID, info.type);
 	if (!font.loadFromFile("arial.ttf"))
 	{

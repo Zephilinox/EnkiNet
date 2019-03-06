@@ -21,7 +21,8 @@ public:
 	void draw(sf::RenderWindow& window) const;
 
 	void registerBuilder(std::string type, std::function<std::unique_ptr<Entity>(EntityInfo)> builder);
-
+	void registerReceiver(std::string type, std::function<void(Entity*, Packet, RPCManager*)> receiver);
+	
 	Entity* createEntity(EntityInfo info);
 	void createNetworkedEntity(EntityInfo info);
 	void sendNetworkedEntities();
@@ -34,6 +35,8 @@ public:
 private:
 	std::map<uint32_t, std::unique_ptr<Entity>> entities;
 	std::map<std::string, std::function<std::unique_ptr<Entity>(EntityInfo)>> builders;
+	std::map<std::string, std::function<void(Entity*, Packet, RPCManager*)>> rpc_receivers;
+
 	int ID = 1;
 	int localID = 10000;
 	GameData* game_data;
