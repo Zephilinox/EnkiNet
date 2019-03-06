@@ -3,11 +3,9 @@
 	void do_thing(int x, int y)
 	{
 		i = x + y;
-		//std::cout << "called function do_thing(" << x << ", " << y << ")\n";
 	}
 
 	int i;
-	inline static std::map<std::string, std::function<void(Packet, ent*)>> functions;
 };
 
 void test(int i, double d, float s, int ii)
@@ -61,6 +59,9 @@ TEST_CASE("RPC")
 	{
 		ent e;
 		rpcm.add("do_thing", &ent::do_thing);
+		//todo: update RPCManager and make it clear what's supported and how
+		//registering member functions is doable alongside Entity derived member functions, some of the code is there, just need to make it happen
+
 		//rpcm.call(&ent::do_thing, "do_thing", &e, 1, 2);
 		//std::cout << e.i << "\n";
 		//REQUIRE(e.i == 3);
