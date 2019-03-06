@@ -23,12 +23,6 @@ Game::Game()
 	game_data = std::make_unique<GameData>();
 	scenegraph = std::make_unique<Scenegraph>(game_data.get());
 	game_data->scenegraph = scenegraph.get();
-	
-	scenegraph->registerReceiver("Paddle", [](Entity* ent, Packet p, RPCManager* rpcs)
-	{
-		auto paddle = static_cast<Paddle*>(ent);
-		rpcs->receive(p, paddle);
-	});
 
 	scenegraph->registerBuilder("Paddle", [&](EntityInfo info)
 	{

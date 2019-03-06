@@ -46,7 +46,7 @@ void Paddle::onSpawn()
 		game_data->scenegraph->createNetworkedEntity({ "PlayerText", "PlayerText " + info.name, 0, info.ownerID, info.ID });
 	}
 
-	game_data->scenegraph->rpcs.add("setColour", &Paddle::setColour);
+	game_data->scenegraph->rpcs.add("Paddle", "setColour", &Paddle::setColour);
 }
 
 void Paddle::input(sf::Event& e)

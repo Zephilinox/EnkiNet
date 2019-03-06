@@ -12,6 +12,7 @@
 Scenegraph::Scenegraph(GameData* game_data)
 	: game_data(game_data)
 {
+	int i = 0;
 }
 
 void Scenegraph::enable_networking()
@@ -90,11 +91,11 @@ void Scenegraph::enable_networking()
 				p >> info;
 				std::string name;
 				p >> name;
-				if (entityExists(info.ID) && rpc_receivers.count(info.type))
+				if (entityExists(info.ID))
 				{
 					p.reset_read_position();
 					auto ent = getEntity(info.ID);
-					rpc_receivers[info.type](ent, p, &rpcs);
+					rpcs.receive(p, ent);
 				}
 				else
 				{
