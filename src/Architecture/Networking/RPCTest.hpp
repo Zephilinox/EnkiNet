@@ -5,7 +5,7 @@
 		i = x + y;
 	}
 
-	int i;
+	int i = 0;
 };
 
 void test(int i, double d, float s, int ii)
@@ -57,8 +57,8 @@ TEST_CASE("RPC")
 
 	SUBCASE("Entity")
 	{
-		ent e;
-		rpcm.add("do_thing", &ent::do_thing);
+		//ent e;
+		//rpcm.add("do_thing", &ent::do_thing);
 		//todo: update RPCManager and make it clear what's supported and how
 		//registering member functions is doable alongside Entity derived member functions, some of the code is there, just need to make it happen
 

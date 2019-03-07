@@ -5,15 +5,15 @@ void zero()
 	
 }
 
-void one(int i)
+void one([[maybe_unused]]int i)
 {
 }
 
-void two(int x, int y)
+void two([[maybe_unused]]int x, [[maybe_unused]]int y)
 {
 }
 
-void three(int clientID, int channelID, std::string message)
+void three(int clientID, [[maybe_unused]]int channelID, std::string message)
 {
 	static volatile int i = 0;
 	i = clientID;

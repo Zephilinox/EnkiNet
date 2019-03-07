@@ -12,7 +12,6 @@
 Scenegraph::Scenegraph(GameData* game_data)
 	: game_data(game_data)
 {
-	int i = 0;
 }
 
 void Scenegraph::enable_networking()

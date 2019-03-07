@@ -95,7 +95,7 @@ void ServerHost::sendPacketToAllClients(enet_uint8 channel_id, Packet* p, enet_u
 {
 	auto console = spdlog::get("console");
 	//console->info("Server sending packet to all clients");
-	server.send_packet_to_all_if(channel_id, p->get_data(), p->get_size(), flags, [](const ClientInfo& client) {return true; });
+	server.send_packet_to_all_if(channel_id, p->get_data(), p->get_size(), flags, []([[maybe_unused]]const ClientInfo& client) {return true; });
 
 	p->reset_read_position();
 	game_data->getNetworkManager()->client->on_packet_received.emit(*p);

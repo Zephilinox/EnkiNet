@@ -23,15 +23,15 @@ void PlayerText::onSpawn()
 
 	label.setFont(font);
 	label.setString("Player " + std::to_string(info.ownerID));
-	label.setColor(sf::Color::Black);
+	label.setFillColor(sf::Color::Black);
 	label.setCharacterSize(12);
 }
 
-void PlayerText::input(sf::Event& e)
+void PlayerText::input([[maybe_unused]]sf::Event& e)
 {
 }
 
-void PlayerText::update(float dt)
+void PlayerText::update([[maybe_unused]]float dt)
 {
 	auto console = spdlog::get("console");
 	auto scenegraph = game_data->scenegraph;
@@ -46,12 +46,12 @@ void PlayerText::draw(sf::RenderWindow& window) const
 	window.draw(label);
 }
 
-void PlayerText::serialize(Packet& p)
+void PlayerText::serialize([[maybe_unused]]Packet& p)
 {
 	
 }
 
-void PlayerText::deserialize(Packet& p)
+void PlayerText::deserialize([[maybe_unused]]Packet& p)
 {
 	
 }

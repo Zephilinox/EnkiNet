@@ -88,10 +88,10 @@ int enet()
 	ENetAddress address{ ENET_HOST_ANY, 1234 };
 	ENetHost* server = nullptr;
 	ENetHost* client = nullptr;
-	ENetPeer* peer;
+	ENetPeer* peer = nullptr;
 	ENetEvent event;
 	ENetPacket* packet;
-	char buffer[1000];
+	[[maybe_unused]]char buffer[1000];
 
 	bool success = false;
 
@@ -267,4 +267,6 @@ int enet()
 	enet_host_destroy(server);
 	enet_host_destroy(client);
 	enet_deinitialize();
+
+	return 1;
 }

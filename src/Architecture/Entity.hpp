@@ -60,12 +60,15 @@ public:
 		return game_data->getNetworkManager()->client->getID() == info.ownerID;
 	}
 
-	virtual void serialize(Packet& p)
+	//not pure virtual, just so that users don't have to write out an empty function for non-networked entities
+	virtual void serialize([[maybe_unused]]Packet& p)
 	{
+
 	}
 
-	virtual void deserialize(Packet& p)
+	virtual void deserialize([[maybe_unused]]Packet& p)
 	{
+
 	}
 
 	EntityInfo info;

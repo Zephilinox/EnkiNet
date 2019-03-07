@@ -127,7 +127,7 @@ void Paddle::update(float dt)
 		{
 			float network_delay = 1.0f / 10.0f;
 			float interpolation_time = interpolation_timer.getElapsedTime();
-			float interpolation_percent = 1.0 - ((network_delay - interpolation_time) / network_delay);
+			float interpolation_percent = float(1.0 - ((network_delay - interpolation_time) / network_delay));
 
 			float interpolated_y = last_interpolation_y + interpolation_percent * (latest_network_y - last_interpolation_y);
 			sprite.setPosition(sprite.getPosition().x, interpolated_y);
@@ -171,5 +171,5 @@ void Paddle::deserialize(Packet& p)
 
 void Paddle::setColour(int r, int g, int b)
 {
-	sprite.setColor(sf::Color(r, g, b, 255));
+	sprite.setColor(sf::Color(uint8_t(r), uint8_t(g), uint8_t(b), uint8_t(255)));
 }

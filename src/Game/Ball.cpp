@@ -45,7 +45,7 @@ void Ball::onSpawn()
 	}
 }
 
-void Ball::input(sf::Event & e)
+void Ball::input([[maybe_unused]]sf::Event& e)
 {
 }
 
@@ -64,7 +64,7 @@ void Ball::update(float dt)
 			if (sprite.getPosition().x < -64)
 			{
 				sprite.setPosition(320 - 16, 180 - 16);
-				y_speed = std::rand() % 300 + 100;
+				y_speed = float(std::rand() % 300 + 100);
 				game_data->score2++;
 				moving_left = false;
 			}
@@ -75,7 +75,7 @@ void Ball::update(float dt)
 			if (sprite.getPosition().x > 640 + 32)
 			{
 				sprite.setPosition(320 - 16, 180 - 16);
-				y_speed = std::rand() % 300 + 100;
+				y_speed = float(std::rand() % 300 + 100);
 				game_data->score1++;
 				moving_left = true;
 			}
@@ -87,7 +87,7 @@ void Ball::update(float dt)
 			if (sprite.getPosition().y < 0)
 			{
 				y_dir = -1;
-				y_speed = std::rand() % 300 + 100;
+				y_speed = float(std::rand() % 300 + 100);
 			}
 		}
 		else if (y_dir == -1)
@@ -96,7 +96,7 @@ void Ball::update(float dt)
 			if (sprite.getPosition().y > 360 - 32)
 			{
 				y_dir = 1;
-				y_speed = std::rand() % 300 + 100;
+				y_speed = float(std::rand() % 300 + 100);
 			}
 		}
 	}

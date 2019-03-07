@@ -28,7 +28,7 @@ void ClientHost::deinitialize()
 	console->info("Client Deinitialized");
 }
 
-void ClientHost::sendPacket(enet_uint8 channel_id, Packet* p, enet_uint32 flags)
+void ClientHost::sendPacket([[maybe_unused]]enet_uint8 channel_id, Packet* p, [[maybe_unused]]enet_uint32 flags)
 {
 	auto console = spdlog::get("console");
 	//console->info("client sending packet");

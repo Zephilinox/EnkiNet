@@ -26,11 +26,11 @@ void Collision::onSpawn()
 	paddle2_collider.width = 32;
 }
 
-void Collision::input(sf::Event& e)
+void Collision::input([[maybe_unused]]sf::Event& e)
 {
 }
 
-void Collision::update(float dt)
+void Collision::update([[maybe_unused]]float dt)
 {
 	auto console = spdlog::get("console");
 	auto scenegraph = game_data->scenegraph;
@@ -54,11 +54,11 @@ void Collision::update(float dt)
 				{
 					if (std::rand() % 2)
 					{
-						ball->y_dir == 1;
+						ball->y_dir = 1;
 					}
 					else
 					{
-						ball->y_dir == -1;
+						ball->y_dir = -1;
 					}
 				}
 			}
@@ -78,11 +78,11 @@ void Collision::update(float dt)
 				{
 					if (std::rand() % 2)
 					{
-						ball->y_dir == 1;
+						ball->y_dir = 1;
 					}
 					else
 					{
-						ball->y_dir == -1;
+						ball->y_dir = -1;
 					}
 				}
 			}
@@ -90,17 +90,17 @@ void Collision::update(float dt)
 	}	
 }
 
-void Collision::draw(sf::RenderWindow& window) const
+void Collision::draw([[maybe_unused]]sf::RenderWindow& window) const
 {
 	
 }
 
-void Collision::serialize(Packet& p)
+void Collision::serialize([[maybe_unused]]Packet& p)
 {
 	
 }
 
-void Collision::deserialize(Packet& p)
+void Collision::deserialize([[maybe_unused]]Packet& p)
 {
 	
 }

@@ -48,7 +48,7 @@ public:
 		return server_ip.c_str();
 	}
 
-	inline uint32_t getServerPort()
+	inline uint16_t getServerPort()
 	{
 		return server_port;
 	}
@@ -66,7 +66,7 @@ private:
 	uint32_t max_clients = 2;
 	uint8_t channel_count = 1;
 	std::string server_ip = "localhost";
-	uint32_t server_port = 22222;
+	uint16_t server_port = 22222;
 
 	Timer networkTickTimer;
 
