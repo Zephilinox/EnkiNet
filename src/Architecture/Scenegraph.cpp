@@ -7,7 +7,6 @@
 #include "Networking/Networking/ServerHost.hpp"
 #include "Networking/Networking/ClientHost.hpp"
 #include "Networking/Networking/ClientStandard.hpp"
-#include "../Game/Paddle.hpp"
 
 Scenegraph::Scenegraph(GameData* game_data)
 	: game_data(game_data)

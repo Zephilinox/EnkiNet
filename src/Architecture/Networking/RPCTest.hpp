@@ -1,4 +1,8 @@
-﻿struct ent
+﻿#pragma once
+
+#include "RPC.hpp"
+
+struct ent
 {
 	void do_thing(int x, int y)
 	{

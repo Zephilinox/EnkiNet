@@ -1,7 +1,9 @@
 ﻿cmake_minimum_required (VERSION 3.8)
 
+project(src)
+
 # Add source to this project's executable.
-add_executable (EnkiNet
+add_library (src
 	"main.cpp"
 	
 	"Architecture/Networking/PacketTest.hpp"
@@ -39,16 +41,10 @@ add_executable (EnkiNet
 	"Architecture/Entity.hpp"
 	"Architecture/GameData.cpp"
 	"Architecture/GameData.hpp"
-	
-	"Game/Game.cpp"
-	"Game/Paddle.cpp"
-	"Game/Ball.cpp"
-	"Game/Collision.cpp"
-	"Game/PlayerText.cpp"
 )
 
-set_property(TARGET EnkiNet PROPERTY CXX_STANDARD 17)
-get_property(CXX_STANDARD_ TARGET EnkiNet PROPERTY CXX_STANDARD)
+set_property(TARGET src PROPERTY CXX_STANDARD 17)
+get_property(CXX_STANDARD_ TARGET src PROPERTY CXX_STANDARD)
 message(STATUS "CXX_STANDARD is: " ${CXX_STANDARD_})
 
 #https://stackoverflow.com/questions/2368811/how-to-set-warning-level-in-cmake
@@ -65,7 +61,7 @@ if (MSVC)
 endif()
 
 set_target_properties(
-	EnkiNet PROPERTIES
+	src PROPERTIES
 	#This is visual studio specific, can't remember what it does
 	VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
 	#the .exe goes in this folder
@@ -74,7 +70,7 @@ set_target_properties(
 	LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/${CONFIGURATION}"
 )
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(src
 	sfml-graphics
 	spdlog
 	enet

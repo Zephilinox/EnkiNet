@@ -1,4 +1,7 @@
-﻿
+﻿#pragma once
+
+#include "Packet.hpp"
+
 struct vector2
 {
 	float x = 0;

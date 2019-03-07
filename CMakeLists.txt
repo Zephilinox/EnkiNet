@@ -17,5 +17,6 @@ find_package(SFML 2.5 COMPONENTS graphics REQUIRED)
 
 #any directories cmake needs to care about basically
 add_subdirectory ("src")
+add_subdirectory ("demos")
 #exclude from all does something I'm pretty sure
 add_subdirectory ("third_party" EXCLUDE_FROM_ALL)

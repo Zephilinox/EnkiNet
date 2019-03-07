@@ -1,4 +1,7 @@
-﻿#include "../Timer.hpp"
+﻿#pragma once
+
+#include "../Timer.hpp"
+#include "RPC.hpp"
 
 void zero()
 {
