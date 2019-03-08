@@ -2,9 +2,7 @@
 
 //LIBS
 #include <spdlog/fmt/fmt.h>
-
-//SELF
-#include "../Architecture/Scenegraph.hpp"
+#include <EnkiNet/Scenegraph.hpp>
 
 Paddle::Paddle(EntityInfo info, GameData* game_data)
 	: Entity(info, game_data)

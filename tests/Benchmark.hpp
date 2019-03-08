@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include "../Timer.hpp"
-#include "RPC.hpp"
+#include <EnkiNet/Timer.hpp>
+#include <EnkiNet/Networking/RPC.hpp>
 
 void zero()
 {

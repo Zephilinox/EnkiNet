@@ -4,7 +4,7 @@
 #include <SFML/Graphics.hpp>
 
 //SELF
-#include "../Architecture/Entity.hpp"
+#include <EnkiNet/Entity.hpp>
 
 class Collision : public Entity
 {

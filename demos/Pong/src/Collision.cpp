@@ -2,9 +2,9 @@
 
 //LIBS
 #include <spdlog/fmt/fmt.h>
+#include <EnkiNet/Scenegraph.hpp>
 
 //SELF
-#include "../Architecture/Scenegraph.hpp"
 #include "Ball.hpp"
 #include "Paddle.hpp"
 

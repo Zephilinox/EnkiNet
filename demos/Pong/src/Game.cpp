@@ -6,13 +6,13 @@
 //LIBS
 #include <SFML/Graphics.hpp>
 #include <spdlog/spdlog.h>
+#include <EnkiNet/Networking/Networking/ServerHost.hpp>
 
 //SELF
 #include "Paddle.hpp"
 #include "Ball.hpp"
 #include "Collision.hpp"
 #include "PlayerText.hpp"
-#include "../Architecture/Networking/Networking/ServerHost.hpp"
 
 Game::Game()
 {

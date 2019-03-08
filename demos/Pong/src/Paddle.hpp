@@ -2,30 +2,34 @@
 
 //LIBS
 #include <SFML/Graphics.hpp>
+#include <EnkiNet/Entity.hpp>
+#include <EnkiNet/Timer.hpp>
 
-//SELF
-#include "../Architecture/Entity.hpp"
-
-class Ball : public Entity
+class Paddle : public Entity
 {
 public:
-	Ball(EntityInfo info, GameData* game_data);
+	Paddle(EntityInfo info, GameData* game_data);
 
 	virtual void onSpawn();
+
 	virtual void input(sf::Event& e);
 	virtual void update(float dt);
 	virtual void draw(sf::RenderWindow& window) const;
+
 	virtual void serialize(Packet& p);
 	virtual void deserialize(Packet& p);
 
 	sf::Sprite sprite;
 	sf::Texture texture;
 
-	bool moving_left = true;
-	int y_dir = 1;
-	float y_speed = 300;
+	void setColour(int r, int g, int b);
 
 private:
 	ManagedConnection mc1;
-	ManagedConnection mc2;
+	bool interpolation_enabled = false;
+	sf::Sprite latest_sprite;
+	float latest_network_y = 0;
+	float last_interpolation_y = 0;
+	float interpolation_y = 0;
+	Timer interpolation_timer;
 };

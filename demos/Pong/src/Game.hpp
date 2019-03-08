@@ -1,10 +1,10 @@
 #pragma once
 
 //SELF
-#include "../Architecture/Scenegraph.hpp"
-#include "../Architecture/Timer.hpp"
-#include "../Architecture/Networking/RPC.hpp"
-#include "../Architecture/GameData.hpp"
+#include <EnkiNet/Scenegraph.hpp>
+#include <EnkiNet/Timer.hpp>
+#include <EnkiNet/Networking/RPC.hpp>
+#include <EnkiNet/GameData.hpp>
 
 class Game
 {

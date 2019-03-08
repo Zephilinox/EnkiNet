@@ -4,8 +4,8 @@
 #include <spdlog/fmt/fmt.h>
 
 //SELF
-#include "../Architecture/Networking/Networking/ServerHost.hpp"
-#include "../Architecture/Scenegraph.hpp"
+#include <EnkiNet/Networking/Networking/ServerHost.hpp>
+#include <EnkiNet/Scenegraph.hpp>
 
 Ball::Ball(EntityInfo info, GameData* game_data)
 	: Entity(info, game_data)

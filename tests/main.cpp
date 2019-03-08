@@ -3,9 +3,9 @@
 #include <doctest.h>
 
 //TESTS
-#include "Architecture/Networking/PacketTest.hpp"
-#include "Architecture/Networking/RPCTest.hpp"
-#include "Architecture/Networking/Benchmark.hpp"
+#include "PacketTest.hpp"
+#include "RPCTest.hpp"
+#include "Benchmark.hpp"
 
 int main(int argc, char** argv)
 {
@@ -20,6 +20,8 @@ int main(int argc, char** argv)
 		return result;
 	}
 #endif
+
+	benchmark();
 
 	return 0;
 }

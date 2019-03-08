@@ -1,50 +1,43 @@
 ﻿cmake_minimum_required (VERSION 3.8)
 
-project(src)
+project(EnkiNet)
 
-# Add source to this project's executable.
-add_library (src
-	"main.cpp"
+add_library (EnkiNet
+	"EnkiNet/Networking/Packet.hpp"
+	"EnkiNet/Networking/Packet.cpp"
 	
-	"Architecture/Networking/PacketTest.hpp"
-	"Architecture/Networking/Packet.hpp"
-	"Architecture/Networking/Packet.cpp"
+	"EnkiNet/Networking/RPC.hpp"
 	
-	"Architecture/Networking/RPC.hpp"
-	"Architecture/Networking/RPCTest.hpp"
+	"EnkiNet/Networking/Networking/Client.hpp"
+	"EnkiNet/Networking/Networking/ClientHost.hpp"
+	"EnkiNet/Networking/Networking/ClientHost.cpp"
+	"EnkiNet/Networking/Networking/ClientStandard.hpp"
+	"EnkiNet/Networking/Networking/ClientStandard.cpp"
+	"EnkiNet/Networking/Networking/Server.hpp"
+	"EnkiNet/Networking/Networking/ServerHost.hpp"
+	"EnkiNet/Networking/Networking/ServerHost.cpp"
 	
-	"Architecture/Networking/Benchmark.hpp"
+	"EnkiNet/Managers/NetworkManager.cpp"
+	"EnkiNet/Managers/NetworkManager.hpp"
 	
-	"Architecture/Networking/Networking/Client.hpp"
-	"Architecture/Networking/Networking/ClientHost.hpp"
-	"Architecture/Networking/Networking/ClientHost.cpp"
-	"Architecture/Networking/Networking/ClientStandard.hpp"
-	"Architecture/Networking/Networking/ClientStandard.cpp"
-	"Architecture/Networking/Networking/Server.hpp"
-	"Architecture/Networking/Networking/ServerHost.hpp"
-	"Architecture/Networking/Networking/ServerHost.cpp"
+	"EnkiNet/Signals/Connection.cpp"
+	"EnkiNet/Signals/Connection.hpp"
+	"EnkiNet/Signals/Disconnector.hpp"
+	"EnkiNet/Signals/Signal.hpp"
+	"EnkiNet/Signals/Slot.hpp"
 	
-	"Architecture/Managers/NetworkManager.cpp"
-	"Architecture/Managers/NetworkManager.hpp"
-	
-	"Architecture/Signals/Connection.cpp"
-	"Architecture/Signals/Connection.hpp"
-	"Architecture/Signals/Disconnector.hpp"
-	"Architecture/Signals/Signal.hpp"
-	"Architecture/Signals/Slot.hpp"
-	
-	"Architecture/Timer.hpp"
-	"Architecture/Timer.cpp"
-	"Architecture/Scenegraph.hpp"
-	"Architecture/Scenegraph.cpp"
-	"Architecture/Entity.cpp"
-	"Architecture/Entity.hpp"
-	"Architecture/GameData.cpp"
-	"Architecture/GameData.hpp"
+	"EnkiNet/Timer.hpp"
+	"EnkiNet/Timer.cpp"
+	"EnkiNet/Scenegraph.hpp"
+	"EnkiNet/Scenegraph.cpp"
+	"EnkiNet/Entity.cpp"
+	"EnkiNet/Entity.hpp"
+	"EnkiNet/GameData.cpp"
+	"EnkiNet/GameData.hpp"
 )
 
-set_property(TARGET src PROPERTY CXX_STANDARD 17)
-get_property(CXX_STANDARD_ TARGET src PROPERTY CXX_STANDARD)
+set_property(TARGET EnkiNet PROPERTY CXX_STANDARD 17)
+get_property(CXX_STANDARD_ TARGET EnkiNet PROPERTY CXX_STANDARD)
 message(STATUS "CXX_STANDARD is: " ${CXX_STANDARD_})
 
 #https://stackoverflow.com/questions/2368811/how-to-set-warning-level-in-cmake
@@ -61,7 +54,7 @@ if (MSVC)
 endif()
 
 set_target_properties(
-	src PROPERTIES
+	EnkiNet PROPERTIES
 	#This is visual studio specific, can't remember what it does
 	VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
 	#the .exe goes in this folder
@@ -70,7 +63,7 @@ set_target_properties(
 	LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/${CONFIGURATION}"
 )
 
-target_link_libraries(src
+target_link_libraries(EnkiNet
 	sfml-graphics
 	spdlog
 	enet
