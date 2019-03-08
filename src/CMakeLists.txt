@@ -2,38 +2,42 @@
 
 project(EnkiNet)
 
-add_library (EnkiNet
+set(ENKI_HEADERS 
 	"EnkiNet/Networking/Packet.hpp"
-	"EnkiNet/Networking/Packet.cpp"
-	
 	"EnkiNet/Networking/RPC.hpp"
-	
 	"EnkiNet/Networking/Networking/Client.hpp"
 	"EnkiNet/Networking/Networking/ClientHost.hpp"
-	"EnkiNet/Networking/Networking/ClientHost.cpp"
 	"EnkiNet/Networking/Networking/ClientStandard.hpp"
-	"EnkiNet/Networking/Networking/ClientStandard.cpp"
 	"EnkiNet/Networking/Networking/Server.hpp"
 	"EnkiNet/Networking/Networking/ServerHost.hpp"
-	"EnkiNet/Networking/Networking/ServerHost.cpp"
-	
-	"EnkiNet/Managers/NetworkManager.cpp"
 	"EnkiNet/Managers/NetworkManager.hpp"
-	
-	"EnkiNet/Signals/Connection.cpp"
 	"EnkiNet/Signals/Connection.hpp"
 	"EnkiNet/Signals/Disconnector.hpp"
 	"EnkiNet/Signals/Signal.hpp"
 	"EnkiNet/Signals/Slot.hpp"
-	
 	"EnkiNet/Timer.hpp"
-	"EnkiNet/Timer.cpp"
 	"EnkiNet/Scenegraph.hpp"
+	"EnkiNet/Entity.hpp"
+	"EnkiNet/GameData.hpp"
+)
+
+add_library (EnkiNet
+	${ENKI_HEADERS}
+	
+	"EnkiNet/Networking/Packet.cpp"
+	
+	"EnkiNet/Networking/Networking/ClientHost.cpp"
+	"EnkiNet/Networking/Networking/ClientStandard.cpp"
+	"EnkiNet/Networking/Networking/ServerHost.cpp"
+	
+	"EnkiNet/Managers/NetworkManager.cpp"
+	
+	"EnkiNet/Signals/Connection.cpp"
+	
+	"EnkiNet/Timer.cpp"
 	"EnkiNet/Scenegraph.cpp"
 	"EnkiNet/Entity.cpp"
-	"EnkiNet/Entity.hpp"
 	"EnkiNet/GameData.cpp"
-	"EnkiNet/GameData.hpp"
 )
 
 set_property(TARGET EnkiNet PROPERTY CXX_STANDARD 17)
@@ -77,4 +81,9 @@ target_link_libraries(EnkiNet
 	enet
 	ws2_32
 	winmm
+)
+
+INSTALL(TARGETS EnkiNet
+LIBRARY DESTINATION "${CMAKE_SOURCE_DIR}/bin/EnkiNet/lib"
+ARCHIVE DESTINATION "${CMAKE_SOURCE_DIR}/bin/EnkiNet/lib"
 )
