@@ -13,7 +13,7 @@ Scenegraph::Scenegraph(GameData* game_data)
 {
 }
 
-void Scenegraph::enable_networking()
+void Scenegraph::enableNetworking()
 {
 	if (network_ready)
 	{
@@ -24,7 +24,7 @@ void Scenegraph::enable_networking()
 	{
 		mc1 = game_data->getNetworkManager()->server->on_packet_received.connect([this](Packet p)
 		{
-			if (p.get_header().type == ENTITY_CREATION)
+			if (p.getHeader().type == ENTITY_CREATION)
 			{
 				EntityInfo info;
 				p >> info;
@@ -32,18 +32,18 @@ void Scenegraph::enable_networking()
 				createNetworkedEntity(info);
 			}
 
-			if (p.get_header().type == CONNECTED)
+			if (p.getHeader().type == CONNECTED)
 			{
 				sendNetworkedEntities();
 				createNetworkedEntity(EntityInfo{ "Paddle", "Paddle 2", 0, p.info.senderID });
 			}
 
-			if (p.get_header().type == ENTITY)
+			if (p.getHeader().type == ENTITY)
 			{
 				game_data->getNetworkManager()->server->sendPacketToAllClients(0, &p);
 			}
 
-			if (p.get_header().type == ENTITY_RPC)
+			if (p.getHeader().type == ENTITY_RPC)
 			{
 				EntityInfo info;
 				p >> info;
@@ -59,14 +59,14 @@ void Scenegraph::enable_networking()
 	{
 		mc2 = game_data->getNetworkManager()->client->on_packet_received.connect([this](Packet p)
 		{
-			if (p.get_header().type == ENTITY_CREATION)
+			if (p.getHeader().type == ENTITY_CREATION)
 			{
 				EntityInfo info;
 				p >> info;
 				createEntity(info);
 			}
 
-			if (p.get_header().type == ENTITY)
+			if (p.getHeader().type == ENTITY)
 			{
 				EntityInfo info;
 				p >> info;
@@ -83,7 +83,7 @@ void Scenegraph::enable_networking()
 				}
 			}
 
-			if (p.get_header().type == ENTITY_RPC)
+			if (p.getHeader().type == ENTITY_RPC)
 			{
 				EntityInfo info;
 				p >> info;
@@ -91,7 +91,7 @@ void Scenegraph::enable_networking()
 				p >> name;
 				if (entityExists(info.ID))
 				{
-					p.reset_read_position();
+					p.resetReadPosition();
 					auto ent = getEntity(info.ID);
 					rpcs.receive(p, ent);
 				}
@@ -134,11 +134,6 @@ void Scenegraph::draw(sf::RenderWindow& window) const
 void Scenegraph::registerBuilder(std::string type, std::function<std::unique_ptr<Entity>(EntityInfo)> builder)
 {
 	builders[type] = builder;
-}
-
-void Scenegraph::registerReceiver(std::string type, std::function<void(Entity*, Packet, RPCManager*)> receiver)
-{
-	rpc_receivers[type] = receiver;
 }
 
 Entity* Scenegraph::createEntity(EntityInfo info)

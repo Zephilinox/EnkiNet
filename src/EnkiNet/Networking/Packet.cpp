@@ -1,5 +1,9 @@
 ﻿#include "Packet.hpp"
 
+//STD
+#include <cstring>
+#include <cmath>
+
 Packet::Packet(PacketHeader p_header)
 	: header(p_header)
 	, bytes(sizeof(PacketHeader))
@@ -24,7 +28,7 @@ Packet::Packet(const enet_uint8* data, std::size_t size)
 	memcpy(&header, bytes.data(), sizeof(PacketHeader));
 }
 
-void Packet::write_bits(int& data, int bits_to_write, int offset)
+void Packet::writeBits(int& data, int bits_to_write, int offset)
 {
 	//ensure our bit/byte count is up to date
 	if (bits_written >= 8)
@@ -35,7 +39,7 @@ void Packet::write_bits(int& data, int bits_to_write, int offset)
 
 	if (sizeof(data) * 8 < bits_to_write + offset)
 	{
-		throw std::exception("Writing these bits with this offset would cause an overflow of the data passed in");
+		throw std::runtime_error("Writing these bits with this offset would cause an overflow of the data passed in");
 	}
 
 	/*
@@ -83,7 +87,7 @@ void Packet::write_bits(int& data, int bits_to_write, int offset)
 		bytes.resize(bytes_written + bytes_needed);
 	}
 
-	auto write_bits = [&](int bits, int extra_offset)
+	const auto write_bits = [&](int bits, int extra_offset)
 	{
 		for (int i = 0; i < bits; ++i)
 		{
@@ -126,7 +130,7 @@ void Packet::write_bits(int& data, int bits_to_write, int offset)
 	}
 }
 
-void Packet::read_bits(int& data, int bits_to_read, int offset)
+void Packet::readBits(int& data, int bits_to_read, int offset)
 {
 	if (bits_read >= 8)
 	{
@@ -140,15 +144,15 @@ void Packet::read_bits(int& data, int bits_to_read, int offset)
 
 	if (sizeof(data) * 8 < bits_to_read + offset)
 	{
-		throw std::exception("Reading these bits with this offset would cause an overflow of the data passed in");
+		throw std::runtime_error("Reading these bits with this offset would cause an overflow of the data passed in");
 	}
 
 	if (bytes_read + bytes_needed - 1 > bytes.size())
 	{
-		throw std::exception("Tried to read past the packet buffer, not enough bytes written");
+		throw std::runtime_error("Tried to read past the packet buffer, not enough bytes written");
 	}
 
-	auto read_bits = [&](int bits, int extra_offset)
+	const auto read_bits = [&](int bits, int extra_offset)
 	{
 		for (int i = 0; i < bits; ++i)
 		{
@@ -195,7 +199,7 @@ void Packet::read_bits(int& data, int bits_to_read, int offset)
 	}
 }
 
-void Packet::write_compressed_float(float& data, float min, float max, float resolution)
+void Packet::writeCompressedFloat(float& data, float min, float max, float resolution)
 {
 	float delta = max - min;
 	float total_possible_values = delta / resolution;
@@ -205,10 +209,10 @@ void Packet::write_compressed_float(float& data, float min, float max, float res
 	float normalized_data = std::clamp((data - min) / delta, 0.0f, 1.0f);
 	int final_value = static_cast<int>(std::round(normalized_data * max_possible_values));
 
-	write_bits(final_value, bits_required);
+	writeBits(final_value, bits_required);
 }
 
-void Packet::read_compressed_float(float& data, float min, float max, float resolution)
+void Packet::readCompressedFloat(float& data, float min, float max, float resolution)
 {
 	float delta = max - min;
 	float total_possible_values = delta / resolution;
@@ -216,45 +220,45 @@ void Packet::read_compressed_float(float& data, float min, float max, float reso
 	int bits_required = static_cast<int>(std::ceil(std::log(max_possible_values) / std::log(2)));
 
 	int final_value = 0;
-	read_bits(final_value, bits_required);
+	readBits(final_value, bits_required);
 
 	float normalized_data = static_cast<float>(final_value) / static_cast<float>(max_possible_values);
 	data = normalized_data * delta + min;
 }
 
-void Packet::reset_read_position()
+void Packet::resetReadPosition()
 {
 	bytes_read = sizeof(PacketHeader);
 	bits_read = 8;
 }
 
-void Packet::set_header(PacketHeader p_header)
+void Packet::setHeader(PacketHeader p_header)
 {
 	header = p_header;
 	memcpy(bytes.data(), &header, sizeof(PacketHeader));
 }
 
-const PacketHeader& Packet::get_header() const
+const PacketHeader& Packet::getHeader() const
 {
 	return header;
 }
 
-const std::vector<std::byte>& Packet::get_bytes() const
+const std::vector<std::byte>& Packet::getBytes() const
 {
 	return bytes;
 }
 
-const enet_uint8* Packet::get_data()
+const enet_uint8* Packet::getData()
 {
 	return reinterpret_cast<const enet_uint8*>(bytes.data());
 }
 
-size_t Packet::get_size()
+size_t Packet::getSize()
 {
 	return bytes_written;
 }
 
-std::size_t Packet::get_bytes_read()
+std::size_t Packet::getBytesRead()
 {
 	return bytes_read;
 }

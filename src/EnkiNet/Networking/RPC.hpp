@@ -9,11 +9,11 @@
 #include "Networking/ClientStandard.hpp"
 #include "../Entity.hpp"
 
+//Used for storing member function RPC's for classes not derived from Entity*
 template <class Wrapee>
 class RPCWrapper
 {
 public:
-
 	static std::map<std::string, std::function<void(Packet, Wrapee*)>> functions;
 };
 
@@ -23,6 +23,7 @@ std::map<std::string, std::function<void(Packet, Wrapee*)>> RPCWrapper<Wrapee>::
 class RPCManager
 {
 public:
+	//Register a global RPC with a callable
 	template <typename F>
 	void add(std::string name, F* func)
 	{
@@ -39,6 +40,7 @@ public:
 		std::cout << "rpc " << name << " registered\n";
 	}
 
+	//Register a member RPC with a member function
 	template <typename R, typename Class, typename... Args>
 	void add(std::string name, R(Class::*func)(Args...))
 	{
@@ -55,6 +57,7 @@ public:
 		std::cout << "rpc " << name << " registered\n";
 	}
 
+	//Register a derived from Entity RPC with a member function
 	template <typename R, typename Class, typename... Args>
 	void add(std::string type, std::string name, R(Class::*func)(Args...))
 	{
@@ -71,6 +74,7 @@ public:
 		std::cout << "rpc " << name << " registered for " + type + "\n";
 	}
 
+	//Serialize variadic template args to packet in reverse (now correct) order, so as to fix right-to-left ordering
 	void rpcPacket()
 	{
 
@@ -97,11 +101,12 @@ public:
 		return p;
 	}
 
+	//Handle a global RPC packet
 	void receive(Packet p)
 	{
 		try
 		{
-			if (p.get_bytes().size() <= p.get_bytes_read())
+			if (p.getBytes().size() <= p.getBytesRead())
 			{
 				std::cout << "Invalid RPC packet received due to being empty, ignoring\n";
 				return;
@@ -125,12 +130,13 @@ public:
 		}
 	}
 
+	//Handle a member function RPC packet
 	template <typename T>
 	void receive(Packet p, T* instance)
 	{
 		try
 		{
-			if (p.get_bytes().size() <= p.get_bytes_read())
+			if (p.getBytes().size() <= p.getBytesRead())
 			{
 				std::cout << "Invalid RPC packet received due to being empty, ignoring\n";
 				return;
@@ -178,7 +184,7 @@ public:
 			//std::cout << "safe call to rpc " << name << " with the values";
 			//((std::cout << " " << args), ...);
 			//std::cout << "\n";
-			static_assert(rpc<F>::matches_arguments<Args...>(), "You tried to call this rpc with the incorrect number or type of parameters");
+			static_assert(rpc<F>::matchesArgs<Args...>(), "You tried to call this rpc with the incorrect number or type of parameters");
 			Packet p;
 
 			//fill packet with rpc information
@@ -199,7 +205,7 @@ public:
 			//std::cout << "safe call to rpc " << name << " with the values";
 			//((std::cout << " " << args), ...);
 			//std::cout << "\n";
-			static_assert(rpc<R(Class::*)(Args...)>::matches_arguments<Args...>(), "You tried to call this rpc with the incorrect number or type of parameters");
+			static_assert(rpc<R(Class::*)(Args...)>::matchesArgs<Args...>(), "You tried to call this rpc with the incorrect number or type of parameters");
 			Packet p({ PacketType::ENTITY_RPC });
 
 			//fill packet with rpc information
@@ -237,7 +243,7 @@ public:
 		//std::cout << "safe call to rpc " << name << " with the values";
 		//((std::cout << " " << args), ...);
 		//std::cout << "\n";
-		static_assert(rpc<R(Class::*)(Args...)>::matches_arguments<Args...>(), "You tried to call this rpc with the incorrect number or type of parameters");
+		static_assert(rpc<R(Class::*)(Args...)>::matchesArgs<Args...>(), "You tried to call this rpc with the incorrect number or type of parameters");
 		Packet p({ PacketType::ENTITY_RPC });
 
 		//fill packet with rpc information
@@ -256,7 +262,7 @@ public:
 
 	//call local global rpc unsafe
 	template <typename... Args>
-	void call_unsafe(std::string name, Args... args)
+	void callUnsafe(std::string name, Args... args)
 	{
 		if (functions.count(name))
 		{
@@ -275,10 +281,13 @@ public:
 	}
 
 private:
+	//Storage for all global rpc's
 	std::map<std::string, std::function<void(Packet)>> functions;
+	//Storage for all member function rpc's for derived from Entity classes
 	std::map<std::string, std::map<std::string, std::function<void(Packet, Entity*)>>> entity_functions;
 };
 
+//Used for getting type info from functions, and having that info available in the wrapped RPC functions
 template <typename not_important>
 struct rpc;
 
@@ -297,7 +306,7 @@ struct rpc<Return(Parameters...)>
 	}
 
 	template <typename... Args>
-	constexpr static bool matches_arguments()
+	constexpr static bool matchesArgs()
 	{
 		return std::is_same_v<std::tuple<Parameters...>, std::tuple<Args...>>;
 	}
@@ -331,7 +340,7 @@ struct rpc<Return((Class::*)(Parameters...))>
 	}
 
 	template <typename... Args>
-	constexpr static bool matches_arguments()
+	constexpr static bool matchesArgs()
 	{
 		return std::is_same_v<std::tuple<Parameters...>, std::tuple<Args...>>;
 	}

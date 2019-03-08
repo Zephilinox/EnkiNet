@@ -11,7 +11,7 @@ void ClientHost::initialize()
 	
 	mc1 = on_packet_received.connect([](Packet p)
 	{
-		if (p.get_header().type == PacketType::ENTITY)
+		if (p.getHeader().type == PacketType::ENTITY)
 		{
 			auto console = spdlog::get("console");
 			EntityInfo info;
