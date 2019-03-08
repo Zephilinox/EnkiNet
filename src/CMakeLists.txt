@@ -58,9 +58,17 @@ set_target_properties(
 	#This is visual studio specific, can't remember what it does
 	VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
 	#the .exe goes in this folder
-	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/${CONFIGURATION}"
-	#not sure, library files don't seem to go here'
-	LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/${CONFIGURATION}"
+	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/EnkiNet/${CONFIGURATION}"
+	#for shared libraries, should this be different to static?
+	LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/EnkiNet/lib"
+	LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/bin/EnkiNet/lib"
+	LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/bin/EnkiNet/lib"
+	#for static libraries
+	ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/EnkiNet/lib"
+	ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/bin/EnkiNet/lib"
+	ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/bin/EnkiNet/lib"
+	#for debug lib suffix
+	DEBUG_POSTFIX "-d"
 )
 
 target_link_libraries(EnkiNet
