@@ -4,10 +4,13 @@ cmake_minimum_required (VERSION 3.8)
 #Includes library and demos and stuff
 project ("EnkiNetProject")
 
-set(SFML_STATIC_LIBRARIES TRUE)
 	
 if (WIN32)
+	set(SFML_STATIC_LIBRARIES TRUE)
 	set(SFML_DIR "${CMAKE_SOURCE_DIR}/../SFML-2.5.1/lib/cmake/SFML")
+else()
+	set(SFML_STATIC_LIBRARIES FALSE)
+	set(SFML_DIR "/usr/lib/x86_64-linux-gnu/cmake/SFML")
 endif()
 
 message(STATUS "Make sure SFML is installed and SFML_DIR is set")
