@@ -10,9 +10,7 @@ add_executable(Tests
 "RPCTest.hpp"
 )
 
-set_property(TARGET Tests PROPERTY CXX_STANDARD 17)
-get_property(CXX_STANDARD_ TARGET Tests PROPERTY CXX_STANDARD)
-message(STATUS "CXX_STANDARD is: " ${CXX_STANDARD_})
+include(Settings)
 
 set_target_properties(
 	Tests PROPERTIES

@@ -18,9 +18,7 @@ add_executable(Pong
 "src/PlayerText.cpp"
 )
 
-set_property(TARGET Pong PROPERTY CXX_STANDARD 17)
-get_property(CXX_STANDARD_ TARGET Pong PROPERTY CXX_STANDARD)
-message(STATUS "CXX_STANDARD is: " ${CXX_STANDARD_})
+include(Settings)
 
 set_target_properties(
 	Pong PROPERTIES
