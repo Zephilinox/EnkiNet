@@ -75,10 +75,15 @@ set_target_properties(
 	DEBUG_POSTFIX "-d"
 )
 
+if (UNIX)
+	set(UNIX_LIBS pthread)
+endif()
+
 target_link_libraries(EnkiNet
 	sfml-graphics
 	spdlog
 	enet
+	"${UNIX_LIBS}"
 )
 
 INSTALL(TARGETS EnkiNet
