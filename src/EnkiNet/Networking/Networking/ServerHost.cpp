@@ -20,7 +20,7 @@ void ServerHost::initialize()
 
 	mc1 = on_packet_received.connect([this](Packet p)
 	{
-		if (p.get_header().type == PacketType::DISCONNECTED)
+		if (p.getHeader().type == PacketType::DISCONNECTED)
 		{
 			free_ids.push(p.info.senderID);
 			auto console = spdlog::get("console");
@@ -82,11 +82,11 @@ void ServerHost::sendPacketToOneClient(uint32_t client_id, enet_uint8 channel_id
 	//console->info("Server sending packet to client {}", client_id);
 	if (client_id != 1)
 	{
-		server.send_packet_to(client_id, channel_id, p->get_data(), p->get_size(), flags);
+		server.send_packet_to(client_id, channel_id, p->getData(), p->getSize(), flags);
 	}
 	else
 	{
-		p->reset_read_position();
+		p->resetReadPosition();
 		game_data->getNetworkManager()->client->on_packet_received.emit(*p);
 	}
 }
@@ -95,9 +95,9 @@ void ServerHost::sendPacketToAllClients(enet_uint8 channel_id, Packet* p, enet_u
 {
 	auto console = spdlog::get("console");
 	//console->info("Server sending packet to all clients");
-	server.send_packet_to_all_if(channel_id, p->get_data(), p->get_size(), flags, []([[maybe_unused]]const ClientInfo& client) {return true; });
+	server.send_packet_to_all_if(channel_id, p->getData(), p->getSize(), flags, []([[maybe_unused]]const ClientInfo& client) {return true; });
 
-	p->reset_read_position();
+	p->resetReadPosition();
 	game_data->getNetworkManager()->client->on_packet_received.emit(*p);
 }
 
@@ -105,11 +105,11 @@ void ServerHost::sendPacketToSomeClients(enet_uint8 channel_id, Packet* p, enet_
 {
 	auto console = spdlog::get("console");
 	//console->info("Server sending packet to some clients\n");
-	server.send_packet_to_all_if(channel_id, p->get_data(), p->get_size(), flags, predicate);
+	server.send_packet_to_all_if(channel_id, p->getData(), p->getSize(), flags, predicate);
 
 	if (predicate({ 1 }))
 	{
-		p->reset_read_position();
+		p->resetReadPosition();
 		game_data->getNetworkManager()->client->on_packet_received.emit(*p);
 	}
 }

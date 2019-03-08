@@ -38,19 +38,19 @@ public:
 	Packet(PacketHeader = {});
 	Packet(const enet_uint8* data, std::size_t size);
 
-	void write_bits(int& data, int bits_to_write, int offset = 0);
-	void read_bits(int& data, int bits_to_read, int offset = 0);
-	void write_compressed_float(float& data, float min, float max, float resolution);
-	void read_compressed_float(float& data, float min, float max, float resolution);
+	void writeBits(int& data, int bits_to_write, int offset = 0);
+	void readBits(int& data, int bits_to_read, int offset = 0);
+	void writeCompressedFloat(float& data, float min, float max, float resolution);
+	void readCompressedFloat(float& data, float min, float max, float resolution);
 
-	void reset_read_position();
+	void resetReadPosition();
 
-	void set_header(PacketHeader header);
-	const PacketHeader& get_header() const;
-	const std::vector<std::byte>& get_bytes() const;
-	const enet_uint8* get_data();
-	size_t get_size();
-	std::size_t get_bytes_read();
+	void setHeader(PacketHeader header);
+	const PacketHeader& getHeader() const;
+	const std::vector<std::byte>& getBytes() const;
+	const enet_uint8* getData();
+	size_t getSize();
+	std::size_t getBytesRead();
 
 	Packet& operator <<(std::string data);
 	Packet& operator >>(std::string& data);

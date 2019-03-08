@@ -18,17 +18,17 @@ void ClientStandard::initialize()
 	mc1 = on_packet_received.connect([](Packet p)
 	{
 		auto console = spdlog::get("console");
-		//console->info("Received Packet {}", p.get_header().type);
+		//console->info("Received Packet {}", p.getHeader().type);
 
-		if (p.get_header().type == PacketType::CLIENT_INITIALIZED)
+		if (p.getHeader().type == PacketType::CLIENT_INITIALIZED)
 		{
-			p.reset_read_position();
+			p.resetReadPosition();
 			uint32_t id;
 			p >> id;
 			console->info("Our ID is {}", id);
 		}
 
-		if (p.get_header().type == PacketType::ENTITY)
+		if (p.getHeader().type == PacketType::ENTITY)
 		{
 			EntityInfo info;
 			p >> info;
@@ -72,13 +72,13 @@ void ClientStandard::processPackets()
 		auto console = spdlog::get("console");
 		Packet p(data, data_size);
 
-		if (p.get_header().type == PacketType::CLIENT_INITIALIZED)
+		if (p.getHeader().type == PacketType::CLIENT_INITIALIZED)
 		{
 			p >> id;
 			console->info("Our ID is {} ", id);
 		}
 
-		p.reset_read_position();
+		p.resetReadPosition();
 		p.info.senderID = 1;
 		pushPacket(std::move(p));
 	};
@@ -92,6 +92,6 @@ void ClientStandard::sendPacket(enet_uint8 channel_id, Packet* p, enet_uint32 fl
 {
 	auto console = spdlog::get("console");
 	//console->info("Client sending packet");
-	client.send_packet(channel_id, p->get_data(), p->get_size(), flags);
+	client.send_packet(channel_id, p->getData(), p->getSize(), flags);
 }
 
