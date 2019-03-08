@@ -28,12 +28,12 @@ TEST_CASE("RPC")
 
 	std::cout << "\n";
 
-	rpcm.call_unsafe("test", 1.5, -2.0f, true, true);
+	rpcm.callUnsafe("test", 1.5, -2.0f, true, true);
 
 	std::cout << "\n";
 
 	//let's try and send a fake rpc
-	rpcm.call_unsafe("two", true);
+	rpcm.callUnsafe("two", true);
 	//this checks the function is registered already, so it's fine
 
 	std::cout << "\n";
