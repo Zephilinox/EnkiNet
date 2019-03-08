@@ -30,4 +30,5 @@ private:
 
 	ManagedConnection mc1;
 	ManagedConnection mc2;
+	ManagedConnection mc3;
 };

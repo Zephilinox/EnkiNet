@@ -24,6 +24,7 @@ Game::Game()
 	scenegraph = std::make_unique<Scenegraph>(game_data.get());
 	game_data->scenegraph = scenegraph.get();
 
+
 	scenegraph->registerBuilder("Paddle", [&](EntityInfo info)
 	{
 		return std::make_unique<Paddle>(info, game_data.get());
@@ -146,6 +147,14 @@ void Game::update()
 				p << game_data_ptr->score1;
 				p << game_data_ptr->score2;
 				game_data_ptr->getNetworkManager()->server->sendPacketToAllClients(0, &p);
+			});
+
+			mc3 = game_data->getNetworkManager()->server->on_packet_received.connect([game_data_ptr](Packet p)
+			{
+				if (p.getHeader().type == PacketType::CONNECTED)
+				{
+					game_data_ptr->scenegraph->createNetworkedEntity(EntityInfo{ "Paddle", "Paddle 2", 0, p.info.senderID });
+				}
 			});
 		}
 

@@ -35,7 +35,6 @@ void Scenegraph::enableNetworking()
 			if (p.getHeader().type == CONNECTED)
 			{
 				sendNetworkedEntities();
-				createNetworkedEntity(EntityInfo{ "Paddle", "Paddle 2", 0, p.info.senderID });
 			}
 
 			if (p.getHeader().type == ENTITY)
