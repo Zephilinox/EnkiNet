@@ -85,7 +85,7 @@ public:
 	template <typename F>
 	void add(std::string name, F* func)
 	{
-		static_assert(std::is_void<rpc<F>::return_t>::value,
+		static_assert(std::is_void<typename rpc<F>::return_t>::value,
 			"You can't register a function as an RPC if it doesn't return void");
 
 		if (functions.count(name))
@@ -242,7 +242,7 @@ public:
 			//std::cout << "safe call to rpc " << name << " with the values";
 			//((std::cout << " " << args), ...);
 			//std::cout << "\n";
-			static_assert(rpc<F>::matchesArgs<Args...>(), "You tried to call this rpc with the incorrect number or type of parameters");
+			static_assert(rpc<F>::template matchesArgs<Args...>(), "You tried to call this rpc with the incorrect number or type of parameters");
 			Packet p;
 
 			//fill packet with rpc information
@@ -263,7 +263,7 @@ public:
 			//std::cout << "safe call to rpc " << name << " with the values";
 			//((std::cout << " " << args), ...);
 			//std::cout << "\n";
-			static_assert(rpc<R(Class::*)(Args...)>::matchesArgs<Args...>(), "You tried to call this rpc with the incorrect number or type of parameters");
+			static_assert(rpc<R(Class::*)(Args...)>::template matchesArgs<Args...>(), "You tried to call this rpc with the incorrect number or type of parameters");
 			Packet p({ PacketType::ENTITY_RPC });
 
 			//fill packet with rpc information
@@ -301,7 +301,7 @@ public:
 		//std::cout << "safe call to rpc " << name << " with the values";
 		//((std::cout << " " << args), ...);
 		//std::cout << "\n";
-		static_assert(rpc<R(Class::*)(Args...)>::matchesArgs<Args...>(), "You tried to call this rpc with the incorrect number or type of parameters");
+		static_assert(rpc<R(Class::*)(Args...)>::template matchesArgs<Args...>(), "You tried to call this rpc with the incorrect number or type of parameters");
 		Packet p({ PacketType::ENTITY_RPC });
 
 		//fill packet with rpc information
