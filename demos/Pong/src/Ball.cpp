@@ -21,22 +21,11 @@ void Ball::onSpawn()
 
 	if (isOwner())
 	{
-		if (true)
-		{
-			mc1 = game_data->getNetworkManager()->on_network_tick.connect([this]()
-			{
-				Packet p({ PacketType::ENTITY });
-				p << this->info;
-				serialize(p);
-				this->game_data->getNetworkManager()->client->sendPacket(0, &p);
-			});
-		}
-
 		if (game_data->getNetworkManager()->server)
 		{
 			mc2 = game_data->getNetworkManager()->server->on_packet_received.connect([this](Packet p)
 			{
-				if (p.get_header().type == PacketType::CONNECTED)
+				if (p.getHeader().type == PacketType::CONNECTED)
 				{
 					sprite.setPosition(320, 180);
 				}

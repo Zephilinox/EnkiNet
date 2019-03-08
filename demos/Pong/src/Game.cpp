@@ -135,7 +135,7 @@ void Game::update()
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
 		{
 			game_data->getNetworkManager()->startHost();
-			scenegraph->enable_networking();
+			scenegraph->enableNetworking();
 			scenegraph->createNetworkedEntity(EntityInfo{ "Paddle", "Paddle 1" });
 			scenegraph->createNetworkedEntity(EntityInfo{ "Ball", "Ball" });
 			GameData* game_data_ptr = game_data.get();
@@ -152,11 +152,11 @@ void Game::update()
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::C))
 		{
 			game_data->getNetworkManager()->startClient();
-			scenegraph->enable_networking();
+			scenegraph->enableNetworking();
 			GameData* game_data_ptr = game_data.get();
 			mc2 = game_data->getNetworkManager()->client->on_packet_received.connect([game_data_ptr](Packet p)
 			{
-				if (p.get_header().type == PacketType::COMMAND)
+				if (p.getHeader().type == PacketType::COMMAND)
 				{
 					std::string id;
 					p >> id;
