@@ -20,6 +20,64 @@ public:
 template <class Wrapee>
 std::map<std::string, std::function<void(Packet, Wrapee*)>> RPCWrapper<Wrapee>::functions;
 
+//Used for getting type info from functions, and having that info available in the wrapped RPC functions
+template <typename not_important>
+struct rpc;
+
+template <typename Return, typename... Parameters>
+struct rpc<Return(Parameters...)>
+{
+	using return_t = Return;
+
+	template <typename F>
+	std::function<void(Packet)> wrap(F f)
+	{
+		return [f](Packet p)
+		{
+			f(p.read<Parameters>()...);
+		};
+	}
+
+	template <typename... Args>
+	constexpr static bool matchesArgs()
+	{
+		return std::is_same_v<std::tuple<Parameters...>, std::tuple<Args...>>;
+	}
+};
+
+template <typename Return, typename Class, typename... Parameters>
+struct rpc<Return((Class::*)(Parameters...))>
+{
+	using return_t = Return;
+
+	template <typename F>
+	std::function<void(Packet, Class*)> wrap(F f)
+	{
+		return [f](Packet p, Class* instance)
+		{
+			(instance->*f)(p.read<Parameters>()...);
+		};
+	}
+
+	template <typename F>
+	std::function<void(Packet, Entity*)> wrapEntity(F f)
+	{
+		static_assert(!std::is_same_v<Class, Entity>);
+		
+		return [f](Packet p, Entity* instance)
+		{
+			auto derived = static_cast<Class*>(instance);
+			(derived->*f)(p.read<Parameters>()...);
+		};
+	}
+
+	template <typename... Args>
+	constexpr static bool matchesArgs()
+	{
+		return std::is_same_v<std::tuple<Parameters...>, std::tuple<Args...>>;
+	}
+};
+
 class RPCManager
 {
 public:
@@ -285,63 +343,4 @@ private:
 	std::map<std::string, std::function<void(Packet)>> functions;
 	//Storage for all member function rpc's for derived from Entity classes
 	std::map<std::string, std::map<std::string, std::function<void(Packet, Entity*)>>> entity_functions;
-};
-
-//Used for getting type info from functions, and having that info available in the wrapped RPC functions
-template <typename not_important>
-struct rpc;
-
-template <typename Return, typename... Parameters>
-struct rpc<Return(Parameters...)>
-{
-	using return_t = Return;
-
-	template <typename F>
-	std::function<void(Packet)> wrap(F f)
-	{
-		return [f](Packet p)
-		{
-			f(p.read<Parameters>()...);
-		};
-	}
-
-	template <typename... Args>
-	constexpr static bool matchesArgs()
-	{
-		return std::is_same_v<std::tuple<Parameters...>, std::tuple<Args...>>;
-	}
-};
-
-
-template <typename Return, typename Class, typename... Parameters>
-struct rpc<Return((Class::*)(Parameters...))>
-{
-	using return_t = Return;
-
-	template <typename F>
-	std::function<void(Packet, Class*)> wrap(F f)
-	{
-		return [f](Packet p, Class* instance)
-		{
-			(instance->*f)(p.read<Parameters>()...);
-		};
-	}
-
-	template <typename F>
-	std::function<void(Packet, Entity*)> wrapEntity(F f)
-	{
-		static_assert(!std::is_same_v<Class, Entity>);
-		
-		return [f](Packet p, Entity* instance)
-		{
-			auto derived = static_cast<Class*>(instance);
-			(derived->*f)(p.read<Parameters>()...);
-		};
-	}
-
-	template <typename... Args>
-	constexpr static bool matchesArgs()
-	{
-		return std::is_same_v<std::tuple<Parameters...>, std::tuple<Args...>>;
-	}
 };

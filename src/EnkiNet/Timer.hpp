@@ -38,5 +38,5 @@ private:
 template <class T>
 float Timer::getElapsedTime() const
 {
-	return std::chrono::duration<float, T::period>(clock::now() - start_time).count();
+	return std::chrono::duration<float, typename T::period>(clock::now() - start_time).count();
 }

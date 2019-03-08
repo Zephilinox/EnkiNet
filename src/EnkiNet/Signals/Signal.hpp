@@ -4,8 +4,8 @@
 #include <experimental/vector>
 
 //SELF
-#include "Slot.hpp"
 #include "Connection.hpp"
+#include "Slot.hpp"
 #include "Disconnector.hpp"
 
 //todo: fix signal implementation to be r-values?
@@ -129,11 +129,11 @@ private:
 	If the signal is destroyed so is the SignalDisconnector
 	thus invalidating all weak_ptr's held in any Connections for the signal
 	*/
-	template <typename... Args>
+	template <typename... Args2>
 	class SignalDisconnector : public Disconnector
 	{
 	public:
-		SignalDisconnector(Signal<Args...>* signal) noexcept
+		SignalDisconnector(Signal<Args2...>* signal) noexcept
 			: signal(signal)
 		{}
 
@@ -147,7 +147,7 @@ private:
 			return false;
 		}
 
-		Signal<Args...>* signal;
+		Signal<Args2...>* signal;
 	};
 
 	//0 is invalid(like a nullptr), anything higher is fine.

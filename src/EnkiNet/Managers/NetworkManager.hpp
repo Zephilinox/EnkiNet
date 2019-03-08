@@ -30,9 +30,6 @@ public:
 
 	void update();
 
-	std::unique_ptr<Server> server = nullptr;
-	std::unique_ptr<Client> client = nullptr;
-
 	inline uint32_t getMaxClients()
 	{
 		return max_clients;
@@ -53,9 +50,12 @@ public:
 		return server_port;
 	}
 
-	Signal<> on_network_tick;
 
+	std::unique_ptr<Server> server;
+	std::unique_ptr<Client> client;
+	Signal<> on_network_tick;
 	int networkTickRate = 60;
+
 private:
 	void runThreadedNetwork();
 
