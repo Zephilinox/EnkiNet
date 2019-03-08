@@ -47,9 +47,16 @@ void Scenegraph::enableNetworking()
 			{
 				EntityInfo info;
 				p >> info;
-				if (info.ownerID == p.info.senderID)
+				if (entityExists(info.ID))
 				{
-					game_data->getNetworkManager()->server->sendPacketToAllClients(0, &p);
+					auto ent = getEntity(info.ID);
+					if (ent->info.type == info.type &&
+						ent->info.name == info.name &&
+						ent->info.ownerID == info.ownerID &&
+						info.ownerID == p.info.senderID)
+					{
+						game_data->getNetworkManager()->server->sendPacketToAllClients(0, &p);
+					}
 				}
 			}
 		});
@@ -65,25 +72,26 @@ void Scenegraph::enableNetworking()
 				p >> info;
 				createEntity(info);
 			}
-
-			if (p.getHeader().type == ENTITY)
+			else if (p.getHeader().type == ENTITY)
 			{
 				EntityInfo info;
 				p >> info;
-				if (entities.count(info.ID))
+				if (entityExists(info.ID))
 				{
 					auto ent = getEntity(info.ID);
-					//when a listen server client sends a fake packet to the server, the server will send it back to the client.
+					//when a listen server client sends a "fake" packet to the server, the server will send it back to the client.
 					//Probably no harm if we didn't exclude it since there should be no delay, but we will anyway.
-					if (info.ownerID == p.info.senderID &&
+					if (ent->info.type == info.type &&
+						ent->info.name == info.name &&
+						ent->info.ownerID == info.ownerID &&
+						info.ownerID == p.info.senderID &&
 						game_data->getNetworkManager()->client->getID() != p.info.senderID)
 					{
 						ent->deserialize(p);
 					}
 				}
 			}
-
-			if (p.getHeader().type == ENTITY_RPC)
+			else if (p.getHeader().type == ENTITY_RPC)
 			{
 				EntityInfo info;
 				p >> info;
@@ -91,9 +99,15 @@ void Scenegraph::enableNetworking()
 				p >> name;
 				if (entityExists(info.ID))
 				{
-					p.resetReadPosition();
 					auto ent = getEntity(info.ID);
-					rpcs.receive(p, ent);
+					if (ent->info.type == info.type &&
+						ent->info.name == info.name &&
+						ent->info.ownerID == info.ownerID &&
+						info.ownerID == p.info.senderID)
+					{
+						p.resetReadPosition();
+						rpcs.receive(p, ent);
+					}
 				}
 				else
 				{
