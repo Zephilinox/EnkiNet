@@ -79,8 +79,6 @@ target_link_libraries(EnkiNet
 	sfml-graphics
 	spdlog
 	enet
-	ws2_32
-	winmm
 )
 
 INSTALL(TARGETS EnkiNet
