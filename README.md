@@ -40,3 +40,7 @@ if generating a visual studio solution, remember to set up the start-up project.
 cd build
 cmake --build .
 ````
+
+# Running demos
+
+Demos will be built automatically. You may need to find the appropriate resources used in the demo and move them to the executable location (I will look in to doing this automatically at some point)
