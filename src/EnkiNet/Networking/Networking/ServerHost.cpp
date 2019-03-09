@@ -82,7 +82,8 @@ void ServerHost::sendPacketToOneClient(uint32_t client_id, enet_uint8 channel_id
 	//console->info("Server sending packet to client {}", client_id);
 	if (client_id != 1)
 	{
-		server.send_packet_to(client_id, channel_id, p->getData(), p->getSize(), flags);
+		auto data = reinterpret_cast<const enet_uint8*>(p->getBytes().data());
+		server.send_packet_to(client_id, channel_id, data, p->getSize(), flags);
 	}
 	else
 	{
@@ -95,7 +96,8 @@ void ServerHost::sendPacketToAllClients(enet_uint8 channel_id, Packet* p, enet_u
 {
 	auto console = spdlog::get("console");
 	//console->info("Server sending packet to all clients");
-	server.send_packet_to_all_if(channel_id, p->getData(), p->getSize(), flags, []([[maybe_unused]]const ClientInfo& client) {return true; });
+	auto data = reinterpret_cast<const enet_uint8*>(p->getBytes().data());
+	server.send_packet_to_all_if(channel_id, data, p->getSize(), flags, []([[maybe_unused]]const ClientInfo& client) {return true; });
 
 	p->resetReadPosition();
 	game_data->getNetworkManager()->client->on_packet_received.emit(*p);
@@ -105,7 +107,8 @@ void ServerHost::sendPacketToSomeClients(enet_uint8 channel_id, Packet* p, enet_
 {
 	auto console = spdlog::get("console");
 	//console->info("Server sending packet to some clients\n");
-	server.send_packet_to_all_if(channel_id, p->getData(), p->getSize(), flags, predicate);
+	auto data = reinterpret_cast<const enet_uint8*>(p->getBytes().data());
+	server.send_packet_to_all_if(channel_id, data, p->getSize(), flags, predicate);
 
 	if (predicate({ 1 }))
 	{

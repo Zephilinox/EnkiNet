@@ -6,9 +6,6 @@
 #include <string>
 #include <array>
 
-//LIB
-#include <enet/enet.h>
-
 enum PacketType : std::uint8_t {
 	NONE,
 	COMMAND,
@@ -36,7 +33,7 @@ class Packet
 {
 public:
 	Packet(PacketHeader = {});
-	Packet(const enet_uint8* data, std::size_t size);
+	Packet(const unsigned char* data, std::size_t size);
 
 	void writeBits(int& data, int bits_to_write, int offset = 0);
 	void readBits(int& data, int bits_to_read, int offset = 0);
@@ -48,9 +45,8 @@ public:
 	void setHeader(PacketHeader header);
 	const PacketHeader& getHeader() const;
 	const std::vector<std::byte>& getBytes() const;
-	const enet_uint8* getData();
-	size_t getSize();
-	std::size_t getBytesRead();
+	std::size_t getSize() const;
+	std::size_t getBytesRead() const;
 
 	Packet& operator <<(std::string data);
 	Packet& operator >>(std::string& data);
@@ -73,8 +69,6 @@ public:
 	template <typename T, std::size_t size>
 	Packet& operator >>(std::array<T, size>& data);
 
-	//note: this doesn't do what I want it to do with multiple calls in a function argument call, since it goes from right-to-left and therefore is reversed
-	//need to fix with variadic args, like with RPC's
 	template <typename T>
 	T read();
 

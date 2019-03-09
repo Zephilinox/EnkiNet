@@ -89,7 +89,6 @@ void Scenegraph::enableNetworking()
 			else if (p.getHeader().type == ENTITY_RPC)
 			{
 				auto info = p.read<EntityInfo>();
-				auto name = p.read<std::string>();
 				if (entityExists(info.ID))
 				{
 					auto ent = getEntity(info.ID);

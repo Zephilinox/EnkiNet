@@ -30,7 +30,7 @@ struct rpc<Return(Parameters...)>
 	using return_t = Return;
 
 	template <typename F>
-	std::function<void(Packet)> wrap(F f)
+	static std::function<void(Packet)> wrap(F f)
 	{
 		return [f](Packet p)
 		{
@@ -51,7 +51,7 @@ struct rpc<Return((Class::*)(Parameters...))>
 	using return_t = Return;
 
 	template <typename F>
-	std::function<void(Packet, Class*)> wrap(F f)
+	static std::function<void(Packet, Class*)> wrap(F f)
 	{
 		return [f](Packet p, Class* instance)
 		{
@@ -60,7 +60,7 @@ struct rpc<Return((Class::*)(Parameters...))>
 	}
 
 	template <typename F>
-	std::function<void(Packet, Entity*)> wrapEntity(F f)
+	static std::function<void(Packet, Entity*)> wrapEntity(F f)
 	{
 		static_assert(!std::is_same_v<Class, Entity>);
 		
@@ -93,8 +93,7 @@ public:
 			return;
 		}
 
-		rpc<F> rpc;
-		functions[name] = rpc.wrap(func);
+		functions[name] = rpc<F>.wrap(func);
 		std::cout << "rpc " << name << " registered\n";
 	}
 
@@ -110,8 +109,7 @@ public:
 			return;
 		}
 
-		rpc<R(Class::*)(Args...)> rpc;
-		RPCWrapper<Class>::functions[name] = rpc.wrap(func);
+		RPCWrapper<Class>::functions[name] = rpc<R(Class::*)(Args...)>::wrap(func);
 		std::cout << "rpc " << name << " registered\n";
 	}
 
@@ -127,35 +125,34 @@ public:
 			return;
 		}
 
-		rpc<R(Class::*)(Args...)> rpc;
-		entity_functions[type][name] = rpc.wrapEntity(func);
+		entity_functions[type][name] = rpc<R(Class::*)(Args...)>::wrapEntity(func);
 		std::cout << "rpc " << name << " registered for " + type + "\n";
 	}
 
 	//Serialize variadic template args to packet in reverse (now correct) order, so as to fix right-to-left ordering
-	void rpcPacket()
+	void fillPacket()
 	{
 
 	}
 
 	template <typename T>
-	void rpcPacket(Packet& p, T x)
+	void fillPacket(Packet& p, T x)
 	{
 		p << x;
 	}
 
 	template <typename T, typename... Args>
-	void rpcPacket(Packet& p, T x, Args... args)
+	void fillPacket(Packet& p, T x, Args... args)
 	{
-		rpcPacket(p, args...);
+		fillPacket(p, args...);
 		p << x;
 	}
 
 	template <typename... Args>
-	Packet rpcPacket(Args... args)
+	Packet fillPacket(Args... args)
 	{
 		Packet p;
-		rpcPacket(p, args...);
+		fillPacket(p, args...);
 		return p;
 	}
 
@@ -244,7 +241,7 @@ public:
 
 			//fill packet with rpc information
 			p << name;
-			rpcPacket(p, args...);
+			fillPacket(p, args...);
 
 			//this call is only local
 			receive(p);
@@ -266,7 +263,7 @@ public:
 			//fill packet with rpc information
 			p << EntityInfo{};
 			p << name;
-			rpcPacket(p, args...);
+			fillPacket(p, args...);
 
 			//this call is only local
 			receive(p, instance);
@@ -304,7 +301,7 @@ public:
 		//fill packet with rpc information
 		p << static_cast<Entity*>(instance)->info;
 		p << name;
-		rpcPacket(p, args...);
+		fillPacket(p, args...);
 
 		if (net_man)
 		{
@@ -328,7 +325,7 @@ public:
 
 			//fill packet with rpc information
 			p << name;
-			rpcPacket(p, args...);
+			fillPacket(p, args...);
 
 			//this call is only local
 			receive(p);

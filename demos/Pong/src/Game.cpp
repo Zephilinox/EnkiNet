@@ -69,14 +69,10 @@ Game::Game()
 
 void Game::run()
 {
-	timer.restart();
-	input();
-	update();
-	draw();
+	//start delta time at a sane value
+	dt = 1.0f / 60.0f;
 
-	dt = timer.getElapsedTime();
-	timer.restart();
-
+	window->setFramerateLimit(120);
 	while (window->isOpen())
 	{
 		game_data->getNetworkManager()->update();

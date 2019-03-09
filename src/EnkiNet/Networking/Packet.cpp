@@ -17,7 +17,7 @@ Packet::Packet(PacketHeader p_header)
 	memcpy(bytes.data(), &header, sizeof(PacketHeader));
 }
 
-Packet::Packet(const enet_uint8* data, std::size_t size)
+Packet::Packet(const unsigned char* data, std::size_t size)
 	: bytes(size)
 	, bytes_written(size)
 	, bytes_read(sizeof(PacketHeader))
@@ -249,17 +249,12 @@ const std::vector<std::byte>& Packet::getBytes() const
 	return bytes;
 }
 
-const enet_uint8* Packet::getData()
-{
-	return reinterpret_cast<const enet_uint8*>(bytes.data());
-}
-
-size_t Packet::getSize()
+std::size_t Packet::getSize() const
 {
 	return bytes_written;
 }
 
-std::size_t Packet::getBytesRead()
+std::size_t Packet::getBytesRead() const
 {
 	return bytes_read;
 }

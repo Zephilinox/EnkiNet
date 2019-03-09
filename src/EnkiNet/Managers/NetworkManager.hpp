@@ -30,22 +30,22 @@ public:
 
 	void update();
 
-	inline uint32_t getMaxClients()
+	inline uint32_t getMaxClients() const
 	{
 		return max_clients;
 	}
 
-	inline uint8_t getChannelCount()
+	inline uint8_t getChannelCount() const
 	{
 		return channel_count;
 	}
 
-	inline const char* getServerIP()
+	inline const char* getServerIP() const
 	{
 		return server_ip.c_str();
 	}
 
-	inline uint16_t getServerPort()
+	inline uint16_t getServerPort() const
 	{
 		return server_port;
 	}

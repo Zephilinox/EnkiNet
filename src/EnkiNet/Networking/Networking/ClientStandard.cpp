@@ -14,25 +14,6 @@ void ClientStandard::initialize()
 	client.connect(enetpp::client_connect_params()
 		.set_channel_count(game_data->getNetworkManager()->getChannelCount())
 		.set_server_host_name_and_port(game_data->getNetworkManager()->getServerIP(), game_data->getNetworkManager()->getServerPort()));
-
-	mc1 = on_packet_received.connect([](Packet p)
-	{
-		auto console = spdlog::get("console");
-		//console->info("Received Packet {}", p.getHeader().type);
-
-		if (p.getHeader().type == PacketType::CLIENT_INITIALIZED)
-		{
-			p.resetReadPosition();
-			uint32_t id = p.read<uint32_t>();
-			console->info("Our ID is {}", id);
-		}
-
-		if (p.getHeader().type == PacketType::ENTITY)
-		{
-			auto info = p.read<EntityInfo>();
-			//console->info("EntityPacket for {} owned by {} of type {}", info.ID, info.ownerID, info.type);
-		}
-	});
 }
 
 void ClientStandard::deinitialize()
@@ -90,6 +71,7 @@ void ClientStandard::sendPacket(enet_uint8 channel_id, Packet* p, enet_uint32 fl
 {
 	auto console = spdlog::get("console");
 	//console->info("Client sending packet");
-	client.send_packet(channel_id, p->getData(), p->getSize(), flags);
+	auto data = reinterpret_cast<const enet_uint8*>(p->getBytes().data());
+	client.send_packet(channel_id, data, p->getSize(), flags);
 }
 

@@ -36,6 +36,4 @@ public:
 private:
 	enetpp::client client;
 	bool connected_to_server = false;
-
-	ManagedConnection mc1;
 };
