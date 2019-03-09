@@ -45,7 +45,7 @@ public:
 
 		if (packetsTimer.getElapsedTime() > 10)
 		{
-			auto console = spdlog::get("console");
+			auto console = spdlog::get("EnkiNet");
 			packetsTimer.restart();
 			console->info("server received {} packets in the last 10 seconds", packetsReceived);
 			packetsReceived = 0;

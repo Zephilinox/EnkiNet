@@ -4,6 +4,9 @@ project(Shooter)
 
 add_executable(Shooter
 "main.cpp"
+
+"src/Game.hpp"
+"src/Game.cpp"
 )
 
 include(Settings)
@@ -21,3 +24,16 @@ set_target_properties(
 target_link_libraries(Shooter EnkiNet)
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
+
+#remove old resources
+file(REMOVE_RECURSE "${CMAKE_SOURCE_DIR}/bin/Shooter/Debug/resources/")
+file(REMOVE_RECURSE "${CMAKE_SOURCE_DIR}/bin/Shooter/Release/resources/")
+
+#copy current ones
+file(COPY "${CMAKE_SOURCE_DIR}/demos/Shooter/resources/"
+    DESTINATION "${CMAKE_SOURCE_DIR}/bin/Shooter/Debug/resources/"
+)
+
+file(COPY "${CMAKE_SOURCE_DIR}/demos/Shooter/resources/"
+    DESTINATION "${CMAKE_SOURCE_DIR}/bin/Shooter/Release/resources/"
+)

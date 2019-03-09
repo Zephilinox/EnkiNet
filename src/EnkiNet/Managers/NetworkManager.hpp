@@ -30,31 +30,16 @@ public:
 
 	void update();
 
-	inline uint32_t getMaxClients() const
-	{
-		return max_clients;
-	}
-
-	inline uint8_t getChannelCount() const
-	{
-		return channel_count;
-	}
-
-	inline const char* getServerIP() const
-	{
-		return server_ip.c_str();
-	}
-
-	inline uint16_t getServerPort() const
-	{
-		return server_port;
-	}
-
-
 	std::unique_ptr<Server> server;
 	std::unique_ptr<Client> client;
 	Signal<> on_network_tick;
-	int networkTickRate = 60;
+	int network_send_rate = 60;
+	int network_process_rate = 120;
+
+	uint32_t max_clients = 2;
+	uint8_t channel_count = 1;
+	std::string server_ip = "localhost";
+	uint16_t server_port = 22222;
 
 private:
 	void runThreadedNetwork();
@@ -63,12 +48,5 @@ private:
 	std::thread network_thread;
 	bool exit_thread = false;
 
-	uint32_t max_clients = 2;
-	uint8_t channel_count = 1;
-	std::string server_ip = "localhost";
-	uint16_t server_port = 22222;
-
-	Timer networkTickTimer;
-
-	int networkServerTickRate = 120;
+	Timer network_process_timer;
 };

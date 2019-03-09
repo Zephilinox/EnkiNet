@@ -4,6 +4,9 @@
 #include <iostream>
 #include <chrono>
 
+//LIBS
+#include <spdlog/spdlog.h>
+
 //SELF
 #include "../Networking/Networking/ServerHost.hpp"
 #include "../Networking/Networking/ClientHost.hpp"
@@ -14,14 +17,15 @@ using namespace std::chrono_literals;
 NetworkManager::NetworkManager(GameData* game_data)
 	: game_data(game_data)
 {
-	auto console = spdlog::get("console");
+	spdlog::stdout_color_mt("EnkiNet");
+	auto console = spdlog::get("EnkiNet");
 	//todo
 	std::cout << "Max Clients: " << max_clients << "\n";
 	std::cout << "Max Channels: " << std::to_string(channel_count) << "\n";
 	std::cout << "Server IP: " << server_ip << "\n";
 	std::cout << "Server Port: " << server_port << "\n";
-	std::cout << "Network Send Rate: " << networkTickRate << "\n";
-	std::cout << "Network Tick Rate: " << networkServerTickRate << "\n";
+	std::cout << "Network Send Rate: " << network_send_rate << "\n";
+	std::cout << "Network Tick Rate: " << network_process_rate << "\n";
 
 	console->info("Initializing enet global state");
 	enetpp::global_state::get().initialize();
@@ -31,7 +35,7 @@ NetworkManager::NetworkManager(GameData* game_data)
 
 NetworkManager::~NetworkManager()
 {
-	auto console = spdlog::get("console");
+	auto console = spdlog::get("EnkiNet");
 	console->info("Deinitializing global state");
 	exit_thread = true;	
 	network_thread.join();
@@ -44,7 +48,7 @@ NetworkManager::~NetworkManager()
 
 void NetworkManager::startHost()
 {
-	auto console = spdlog::get("console");
+	auto console = spdlog::get("EnkiNet");
 	console->info("Starting Listen Server Hosting");
 	server = std::move(std::make_unique<ServerHost>(game_data));
 	client = std::move(std::make_unique<ClientHost>(game_data));
@@ -57,7 +61,7 @@ void NetworkManager::startClient()
 {
 	assert(!server);
 
-	auto console = spdlog::get("console");
+	auto console = spdlog::get("EnkiNet");
 	console->info("Starting Client");
 	client = std::move(std::make_unique<ClientStandard>(game_data));
 	client->initialize();
@@ -65,7 +69,7 @@ void NetworkManager::startClient()
 
 void NetworkManager::stopServer()
 {
-	auto console = spdlog::get("console");
+	auto console = spdlog::get("EnkiNet");
 	console->info("Stopping Server");
 	if (server)
 	{
@@ -83,7 +87,7 @@ void NetworkManager::stopServer()
 
 void NetworkManager::stopClient()
 {
-	auto console = spdlog::get("console");
+	auto console = spdlog::get("EnkiNet");
 	console->info("Stopping Client");
 	if (client)
 	{
@@ -111,12 +115,12 @@ void NetworkManager::update()
 		client->update();
 	}
 
-	if (networkTickTimer.getElapsedTime() > 1.0f / float(networkTickRate))
+	if (network_process_timer.getElapsedTime() > 1.0f / float(network_send_rate))
 	{
 		if ((server && client && server->isConnected()) ||
 			!server && client && client->isConnected())
 		{
-			networkTickTimer.restart();
+			network_process_timer.restart();
 			on_network_tick.emit();
 		}
 	}
@@ -124,7 +128,7 @@ void NetworkManager::update()
 
 void NetworkManager::runThreadedNetwork()
 {
-	auto console = spdlog::get("console");
+	auto console = spdlog::get("EnkiNet");
 	console->info("Network thread started");
 	while (!exit_thread)
 	{
@@ -138,7 +142,7 @@ void NetworkManager::runThreadedNetwork()
 			client->processPackets();
 		}
 
-		std::this_thread::sleep_for(1s / float(networkServerTickRate));
+		std::this_thread::sleep_for(1s / float(network_process_rate));
 	}
 
 	console->info("Network thread stopped");

@@ -34,7 +34,7 @@ target_link_libraries(Pong EnkiNet)
 
 include_directories(${CMAKE_SOURCE_DIR}/src "src")
 
-#remove old headers
+#remove old resources
 file(REMOVE_RECURSE "${CMAKE_SOURCE_DIR}/bin/Pong/Debug/resources/")
 file(REMOVE_RECURSE "${CMAKE_SOURCE_DIR}/bin/Pong/Release/resources/")
 

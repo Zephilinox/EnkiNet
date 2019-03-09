@@ -103,7 +103,7 @@ void Scenegraph::enableNetworking()
 				}
 				else
 				{
-					auto console = spdlog::get("console");
+					auto console = spdlog::get("EnkiNet");
 					console->error("Received an RPC packet for an entity that does not exist");
 				}
 			}
@@ -146,7 +146,7 @@ Entity* Scenegraph::createEntity(EntityInfo info)
 {
 	if (info.name == "" || info.type == "")
 	{
-		auto console = spdlog::get("console");
+		auto console = spdlog::get("EnkiNet");
 		console->error("No name or type for this entity info");
 		console->error("name {} type {} ID {} ownerID {} parentID {}", info.name, info.type, info.ID, info.ownerID, info.parentID);
 	}
@@ -165,7 +165,7 @@ Entity* Scenegraph::createEntity(EntityInfo info)
 
 void Scenegraph::createNetworkedEntity(EntityInfo info)
 {
-	auto console = spdlog::get("console");
+	auto console = spdlog::get("EnkiNet");
 	auto net_man = game_data->getNetworkManager();
 
 	if (info.name == "" || info.type == "")
@@ -238,7 +238,7 @@ void Scenegraph::sendNetworkedEntities()
 {
 	if (network_ready && game_data->getNetworkManager()->server)
 	{
-		auto console = spdlog::get("console");
+		auto console = spdlog::get("EnkiNet");
 		for (auto& ent : entities)
 		{
 			EntityInfo info = ent.second->info;

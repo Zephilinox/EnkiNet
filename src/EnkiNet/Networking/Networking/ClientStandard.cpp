@@ -9,16 +9,16 @@
 void ClientStandard::initialize()
 {
 	initialized = true;
-	auto console = spdlog::get("console");
+	auto console = spdlog::get("EnkiNet");
 	console->info("Client Initialized");
 	client.connect(enetpp::client_connect_params()
-		.set_channel_count(game_data->getNetworkManager()->getChannelCount())
-		.set_server_host_name_and_port(game_data->getNetworkManager()->getServerIP(), game_data->getNetworkManager()->getServerPort()));
+		.set_channel_count(game_data->getNetworkManager()->channel_count)
+		.set_server_host_name_and_port(game_data->getNetworkManager()->server_ip.c_str(), game_data->getNetworkManager()->server_port));
 }
 
 void ClientStandard::deinitialize()
 {
-	auto console = spdlog::get("console");
+	auto console = spdlog::get("EnkiNet");
 	initialized = false;
 	console->info("Client Deinitialized");
 	client.disconnect();
@@ -28,7 +28,7 @@ void ClientStandard::processPackets()
 {
 	auto on_connected = [this]()
 	{
-		auto console = spdlog::get("console");
+		auto console = spdlog::get("EnkiNet");
 		connected_to_server = true;
 		console->info("Connected");
 		Packet p({PacketType::CONNECTED, 0});
@@ -38,7 +38,7 @@ void ClientStandard::processPackets()
 
 	auto on_disconnected = [this]()
 	{
-		auto console = spdlog::get("console");
+		auto console = spdlog::get("EnkiNet");
 		connected_to_server = false;
 		console->info("Disconnected");
 		Packet p({ PacketType::DISCONNECTED, 0 });
@@ -48,7 +48,7 @@ void ClientStandard::processPackets()
 
 	auto on_data_received = [this](const enet_uint8* data, size_t data_size)
 	{
-		auto console = spdlog::get("console");
+		auto console = spdlog::get("EnkiNet");
 		Packet p(data, data_size);
 
 		if (p.getHeader().type == PacketType::CLIENT_INITIALIZED)
@@ -69,7 +69,7 @@ void ClientStandard::processPackets()
 
 void ClientStandard::sendPacket(enet_uint8 channel_id, Packet* p, enet_uint32 flags)
 {
-	auto console = spdlog::get("console");
+	auto console = spdlog::get("EnkiNet");
 	//console->info("Client sending packet");
 	auto data = reinterpret_cast<const enet_uint8*>(p->getBytes().data());
 	client.send_packet(channel_id, data, p->getSize(), flags);

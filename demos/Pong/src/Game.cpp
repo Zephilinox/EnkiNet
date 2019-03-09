@@ -110,13 +110,13 @@ void Game::input()
 		{
 			if (e.key.code == sf::Keyboard::F1)
 			{
-				if (game_data->getNetworkManager()->networkTickRate == 10)
+				if (game_data->getNetworkManager()->network_send_rate == 10)
 				{
-					game_data->getNetworkManager()->networkTickRate = 60;
+					game_data->getNetworkManager()->network_send_rate = 60;
 				}
 				else
 				{
-					game_data->getNetworkManager()->networkTickRate = 10;
+					game_data->getNetworkManager()->network_send_rate = 10;
 				}
 			}
 		}
