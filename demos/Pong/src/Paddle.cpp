@@ -150,8 +150,7 @@ void Paddle::serialize(Packet& p)
 
 void Paddle::deserialize(Packet& p)
 {
-	float x;
-	p >> x;
+	float x = p.read<float>();
 
 	last_interpolation_y = sprite.getPosition().y;
 	p >> latest_network_y;

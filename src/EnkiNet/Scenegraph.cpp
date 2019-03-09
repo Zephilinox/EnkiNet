@@ -26,8 +26,7 @@ void Scenegraph::enableNetworking()
 		{
 			if (p.getHeader().type == ENTITY_CREATION)
 			{
-				EntityInfo info;
-				p >> info;
+				auto info = p.read<EntityInfo>();
 				info.ownerID = p.info.senderID;
 				createNetworkedEntity(info);
 			}
@@ -44,8 +43,7 @@ void Scenegraph::enableNetworking()
 
 			if (p.getHeader().type == ENTITY_RPC)
 			{
-				EntityInfo info;
-				p >> info;
+				auto info = p.read<EntityInfo>();
 				if (entityExists(info.ID))
 				{
 					auto ent = getEntity(info.ID);
@@ -67,14 +65,12 @@ void Scenegraph::enableNetworking()
 		{
 			if (p.getHeader().type == ENTITY_CREATION)
 			{
-				EntityInfo info;
-				p >> info;
+				auto info = p.read<EntityInfo>();
 				createEntity(info);
 			}
 			else if (p.getHeader().type == ENTITY)
 			{
-				EntityInfo info;
-				p >> info;
+				auto info = p.read<EntityInfo>();
 				if (entityExists(info.ID))
 				{
 					auto ent = getEntity(info.ID);
@@ -92,10 +88,8 @@ void Scenegraph::enableNetworking()
 			}
 			else if (p.getHeader().type == ENTITY_RPC)
 			{
-				EntityInfo info;
-				p >> info;
-				std::string name;
-				p >> name;
+				auto info = p.read<EntityInfo>();
+				auto name = p.read<std::string>();
 				if (entityExists(info.ID))
 				{
 					auto ent = getEntity(info.ID);

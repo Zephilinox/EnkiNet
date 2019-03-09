@@ -28,7 +28,9 @@ TEST_CASE("Packet")
 		Packet p;
 		std::string s = "hey";
 		p << s;
-		std::string s2 = ".";
+		auto s2 = p.read<std::string>();
+		CHECK(s2 == s);
+		p.resetReadPosition();
 		p >> s2;
 		CHECK(s2 == s);
 	}

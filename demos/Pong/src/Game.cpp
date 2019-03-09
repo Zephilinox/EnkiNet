@@ -167,8 +167,7 @@ void Game::update()
 			{
 				if (p.getHeader().type == PacketType::COMMAND)
 				{
-					std::string id;
-					p >> id;
+					std::string id = p.read<std::string>();
 					if (id == "Scores")
 					{
 						game_data_ptr->score1 = p.read<int>();

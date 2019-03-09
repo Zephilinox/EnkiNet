@@ -14,8 +14,7 @@ void ClientHost::initialize()
 		if (p.getHeader().type == PacketType::ENTITY)
 		{
 			auto console = spdlog::get("console");
-			EntityInfo info;
-			p >> info;
+			auto info = p.read<EntityInfo>();
 			//console->info("EntityPacket for {} owned by {} of type {}", info.ID, info.ownerID, info.type);
 		}
 	});

@@ -23,15 +23,13 @@ void ClientStandard::initialize()
 		if (p.getHeader().type == PacketType::CLIENT_INITIALIZED)
 		{
 			p.resetReadPosition();
-			uint32_t id;
-			p >> id;
+			uint32_t id = p.read<uint32_t>();
 			console->info("Our ID is {}", id);
 		}
 
 		if (p.getHeader().type == PacketType::ENTITY)
 		{
-			EntityInfo info;
-			p >> info;
+			auto info = p.read<EntityInfo>();
 			//console->info("EntityPacket for {} owned by {} of type {}", info.ID, info.ownerID, info.type);
 		}
 	});

@@ -111,9 +111,7 @@ void Ball::serialize(Packet& p)
 
 void Ball::deserialize(Packet& p)
 {
-	float x;
-	float y;
-	p >> x;
-	p >> y;
+	float x = p.read<float>();
+	float y = p.read<float>();
 	sprite.setPosition(x, y);
 }

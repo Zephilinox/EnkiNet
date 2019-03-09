@@ -170,8 +170,7 @@ public:
 				return;
 			}
 
-			std::string name;
-			p >> name;
+			std::string name = p.read<std::string>();
 
 			if (!functions.count(name))
 			{
@@ -200,10 +199,8 @@ public:
 				return;
 			}
 
-			EntityInfo info;
-			p >> info;
-			std::string name;
-			p >> name;
+			auto info = p.read<EntityInfo>();
+			auto name = p.read<std::string>();
 
 			if constexpr(std::is_same_v<T, Entity>)
 			{

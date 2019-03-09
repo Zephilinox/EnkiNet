@@ -30,6 +30,7 @@ inline Packet& operator <<(Packet& p, EntityInfo& e)
 
 inline Packet& operator >>(Packet& p, EntityInfo& e)
 {
+	
 	p >> e.ID
 		>> e.ownerID
 		>> e.type
