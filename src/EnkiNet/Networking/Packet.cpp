@@ -29,7 +29,7 @@ Packet::Packet(const unsigned char* data, std::size_t size)
 	memcpy(&header, bytes.data(), sizeof(PacketHeader));
 }
 
-void Packet::writeBits(int& data, int bits_to_write, int offset)
+void Packet::writeBits(int data, int bits_to_write, int offset)
 {
 	//ensure our bit/byte count is up to date
 	if (bits_written >= 8)
@@ -200,7 +200,7 @@ void Packet::readBits(int& data, int bits_to_read, int offset)
 	}
 }
 
-void Packet::writeCompressedFloat(float& data, float min, float max, float resolution)
+void Packet::writeCompressedFloat(float data, float min, float max, float resolution)
 {
 	float delta = max - min;
 	float total_possible_values = delta / resolution;

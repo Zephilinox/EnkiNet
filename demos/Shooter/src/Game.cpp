@@ -8,6 +8,9 @@
 #include <spdlog/spdlog.h>
 #include <EnkiNet/Networking/Networking/ServerHost.hpp>
 
+//SELF
+#include "Player.hpp"
+
 Game::Game()
 {
 	spdlog::stdout_color_mt("console");
@@ -15,13 +18,14 @@ Game::Game()
 	window = std::make_unique<sf::RenderWindow>(sf::VideoMode(640, 360), "EnkiNet");
 
 	game_data = std::make_unique<GameData>();
+	game_data->window = window.get();
 	scenegraph = std::make_unique<Scenegraph>(game_data.get());
 	game_data->scenegraph = scenegraph.get();
 
-	if (!font.loadFromFile("resources/arial.ttf"))
+	scenegraph->registerBuilder("Player", [&](EntityInfo info)
 	{
-		console->error("Failed to load font");
-	}
+		return std::make_unique<Player>(info, game_data.get());
+	});
 
 	run();
 }
@@ -73,12 +77,14 @@ void Game::update()
 		{
 			game_data->getNetworkManager()->startHost();
 			scenegraph->enableNetworking();
-			mc1 = game_data->getNetworkManager()->on_network_tick.connect([gd = game_data.get()]()
-			{
-			});
+			scenegraph->createNetworkedEntity({ "Player", "Player 1" });
 
-			mc3 = game_data->getNetworkManager()->server->on_packet_received.connect([gd = game_data.get()](Packet p)
+			mc1 = game_data->getNetworkManager()->server->on_packet_received.connect([gd = game_data.get(), this](Packet p)
 			{
+				if (p.getHeader().type == PacketType::CONNECTED)
+				{
+					scenegraph->createNetworkedEntity({ "Player", "Player 2", 0, p.info.senderID });
+				}
 			});
 		}
 
@@ -86,9 +92,6 @@ void Game::update()
 		{
 			game_data->getNetworkManager()->startClient();
 			scenegraph->enableNetworking();
-			mc2 = game_data->getNetworkManager()->client->on_packet_received.connect([gd = game_data.get()](Packet p)
-			{
-			});
 		}
 	}
 

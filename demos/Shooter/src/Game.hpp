@@ -23,9 +23,6 @@ private:
 	std::unique_ptr<sf::RenderWindow> window;
 	std::unique_ptr<Scenegraph> scenegraph;
 	std::unique_ptr<GameData> game_data;
-	sf::Font font;
 
 	ManagedConnection mc1;
-	ManagedConnection mc2;
-	ManagedConnection mc3;
 };

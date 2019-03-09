@@ -18,12 +18,10 @@ Game::Game()
 {
 	spdlog::stdout_color_mt("console");
 	auto console = spdlog::get("console");
-	window = std::make_unique<sf::RenderWindow>(sf::VideoMode(640, 360), "EnkiNet");
-
 	game_data = std::make_unique<GameData>();
+	window = std::make_unique<sf::RenderWindow>(sf::VideoMode(640, 360), "EnkiNet");
 	scenegraph = std::make_unique<Scenegraph>(game_data.get());
 	game_data->scenegraph = scenegraph.get();
-
 
 	scenegraph->registerBuilder("Paddle", [&](EntityInfo info)
 	{

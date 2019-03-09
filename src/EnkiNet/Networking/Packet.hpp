@@ -35,9 +35,9 @@ public:
 	Packet(PacketHeader = {});
 	Packet(const unsigned char* data, std::size_t size);
 
-	void writeBits(int& data, int bits_to_write, int offset = 0);
+	void writeBits(int data, int bits_to_write, int offset = 0);
 	void readBits(int& data, int bits_to_read, int offset = 0);
-	void writeCompressedFloat(float& data, float min, float max, float resolution);
+	void writeCompressedFloat(float data, float min, float max, float resolution);
 	void readCompressedFloat(float& data, float min, float max, float resolution);
 
 	void resetReadPosition();

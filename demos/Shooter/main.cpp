@@ -1,12 +1,11 @@
 ﻿//STD
 #include <iostream>
 
-//LIBS
-#include <EnkiNet/Timer.hpp>
+//SELF
+#include "src/Game.hpp"
 
 int main(int argc, char** argv)
 {
-	Timer timer;
-	std::cout << timer.getElapsedTime() << "\n";
+	Game game;
 	return 0;
 }

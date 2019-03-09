@@ -7,6 +7,9 @@ add_executable(Shooter
 
 "src/Game.hpp"
 "src/Game.cpp"
+
+"src/Player.hpp"
+"src/Player.cpp"
 )
 
 include(Settings)
