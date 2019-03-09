@@ -23,7 +23,7 @@ include(Settings)
 set_target_properties(
 	Pong PROPERTIES
 	#This is visual studio specific, can't remember what it does
-	VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+	VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/demos/Pong/"
 	#the .exe goes in this folder
 	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/Pong/${CONFIGURATION}"
 	#not sure, library files don't seem to go here'
@@ -33,3 +33,16 @@ set_target_properties(
 target_link_libraries(Pong EnkiNet)
 
 include_directories(${CMAKE_SOURCE_DIR}/src "src")
+
+#remove old headers
+file(REMOVE_RECURSE "${CMAKE_SOURCE_DIR}/bin/Pong/Debug/resources/")
+file(REMOVE_RECURSE "${CMAKE_SOURCE_DIR}/bin/Pong/Release/resources/")
+
+#copy current ones
+file(COPY "${CMAKE_SOURCE_DIR}/demos/Pong/resources/"
+    DESTINATION "${CMAKE_SOURCE_DIR}/bin/Pong/Debug/resources/"
+)
+
+file(COPY "${CMAKE_SOURCE_DIR}/demos/Pong/resources/"
+    DESTINATION "${CMAKE_SOURCE_DIR}/bin/Pong/Release/resources/"
+)

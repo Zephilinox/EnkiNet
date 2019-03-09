@@ -79,7 +79,12 @@ target_link_libraries(EnkiNet
 	${UNIX_LIBS}
 )
 
-INSTALL(TARGETS EnkiNet
-	LIBRARY DESTINATION "${CMAKE_SOURCE_DIR}/bin/EnkiNet/lib"
-	ARCHIVE DESTINATION "${CMAKE_SOURCE_DIR}/bin/EnkiNet/lib"
+#couldn't figure out a better way to do this, don't really want to use install targets
+#remove old headers
+file(REMOVE_RECURSE "${CMAKE_SOURCE_DIR}/bin/EnkiNet/include")
+
+#copy current ones
+file(COPY "${CMAKE_SOURCE_DIR}/src/EnkiNet"
+    DESTINATION "${CMAKE_SOURCE_DIR}/bin/EnkiNet/include"
+    FILES_MATCHING PATTERN "*.hpp"
 )

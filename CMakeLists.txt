@@ -7,23 +7,32 @@ project ("EnkiNetProject")
 	
 if (WIN32)
 	set(SFML_STATIC_LIBRARIES TRUE)
-	if("${SFML_DIR}" STREQUAL "SFML_DIR-NOTFOUND")
+	if ("${SFML_DIR}" STREQUAL "SFML_DIR-NOTFOUND")
 		set(SFML_DIR "${CMAKE_SOURCE_DIR}/../SFML-2.5.1/lib/cmake/SFML")
 		message(STATUS "Make sure SFML is installed and SFML_DIR is set")
 		message(STATUS "SFML_DIR set to " ${SFML_DIR})
 	endif()
 else()
+	#SFML isn't built statically for distros or something?
 	message(STATUS "Make sure SFML is installed")
 	set(SFML_STATIC_LIBRARIES FALSE)
 endif()
 
 find_package(SFML 2.5 COMPONENTS graphics REQUIRED)
 
-#any directories cmake needs to care about basically
 add_subdirectory ("src")
+
 #all the demo projects
-add_subdirectory ("demos")
+if (DEMOS)
+	message(STATUS "Building Demos")
+	add_subdirectory ("demos")
+endif()
+
 #the enkinet library tests
-add_subdirectory("tests")
+if (TESTS)
+	message(STATUS "Building Tests")
+	add_subdirectory("tests")
+endif()
+
 #exclude from all does something I'm pretty sure
 add_subdirectory ("third_party" EXCLUDE_FROM_ALL)

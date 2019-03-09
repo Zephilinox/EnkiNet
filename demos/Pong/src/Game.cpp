@@ -47,7 +47,7 @@ Game::Game()
 
 	scenegraph->createEntity(EntityInfo{ "Collision", "Collision"});
 
-	if (!font.loadFromFile("arial.ttf"))
+	if (!font.loadFromFile("resources/arial.ttf"))
 	{
 		console->error("Failed to load font");
 	}

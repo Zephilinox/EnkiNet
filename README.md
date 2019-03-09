@@ -41,6 +41,18 @@ cd build
 cmake --build .
 ````
 
-# Running demos
+# Demos and Tests
 
-Demos will be built automatically. You may need to find the appropriate resources used in the demo and move them to the executable location (I will look in to doing this automatically at some point)
+`cd build`
+
+then
+
+`cmake -D DEMOS=TRUE ..`
+
+or
+
+`cmake -D TESTS=TRUR ..`
+
+or
+
+`cmake -D DEMOS=TRUE -D TESTS=TRUE ..`

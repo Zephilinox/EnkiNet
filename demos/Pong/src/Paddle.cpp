@@ -12,7 +12,7 @@ Paddle::Paddle(EntityInfo info, GameData* game_data)
 void Paddle::onSpawn()
 {
 	fmt::print("ID={} name={} owner={} parent={} type={}\n", info.ID, info.name, info.ownerID, info.parentID, info.type);
-	texture.loadFromFile("Paddle.png");
+	texture.loadFromFile("resources/Paddle.png");
 	sprite.setTexture(texture);
 
 	if (info.name == "Paddle 1")
