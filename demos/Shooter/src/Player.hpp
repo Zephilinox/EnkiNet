@@ -8,7 +8,7 @@
 class Player : public Entity
 {
 public:
-	Player(EntityInfo info, GameData* data);
+	Player(EntityInfo info, GameData* data, sf::RenderWindow* window);
 
 	void onSpawn();
 
@@ -28,4 +28,5 @@ private:
 	ManagedConnection mc1;
 	ManagedConnection mc2;
 	ManagedConnection mc3;
+	sf::RenderWindow* window = nullptr;
 };

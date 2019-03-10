@@ -18,13 +18,12 @@ Game::Game()
 	window = std::make_unique<sf::RenderWindow>(sf::VideoMode(640, 360), "EnkiNet");
 
 	game_data = std::make_unique<GameData>();
-	game_data->window = window.get();
 	scenegraph = std::make_unique<Scenegraph>(game_data.get());
 	game_data->scenegraph = scenegraph.get();
 
 	scenegraph->registerBuilder("Player", [&](EntityInfo info)
 	{
-		return std::make_unique<Player>(info, game_data.get());
+		return std::make_unique<Player>(info, game_data.get(), window.get());
 	});
 
 	run();

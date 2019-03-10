@@ -22,8 +22,6 @@ public:
 	int score1 = 0;
 	int score2 = 0;
 
-	sf::RenderWindow* window = nullptr;
-
 private:
 	NetworkManager network_manager;
 };

@@ -1,7 +1,8 @@
 #include "Player.hpp"
 
-Player::Player(EntityInfo info, GameData* data)
+Player::Player(EntityInfo info, GameData* data, sf::RenderWindow* window)
 	: Entity(info, data)
+	, window(window)
 {
 }
 
@@ -77,7 +78,7 @@ void Player::update(float dt)
 		sprite.move(dir * speed * dt);
 	}
 
-	auto mousePos = sf::Mouse::getPosition(*(game_data->window));
+	auto mousePos = sf::Mouse::getPosition(*window);
 	auto distance = static_cast<sf::Vector2f>(mousePos) - sprite.getPosition();
 	float length = std::sqrtf((distance.x * distance.x) + (distance.y * distance.y));
 	distance /= length;
