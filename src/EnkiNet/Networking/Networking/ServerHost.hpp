@@ -33,7 +33,7 @@ public:
 		return server.is_listening();
 	}
 
-	inline const std::vector<ClientInfo*>& getConnectedClients() const final;
+	inline const std::vector<ClientInfo*>& getConnectedClients() const final
 	{
 		return server.get_connected_clients();
 	}
