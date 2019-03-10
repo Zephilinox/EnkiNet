@@ -28,14 +28,14 @@ public:
 	void sendPacketToAllClients(enet_uint8 channel_id, Packet* p, enet_uint32 flags = ENET_PACKET_FLAG_RELIABLE) final;
 	void sendPacketToSomeClients(enet_uint8 channel_id, Packet* p, enet_uint32 flags, std::function<bool(const ClientInfo& client)> predicate) final;
 
-	inline bool isConnected() const final
-	{
-		return !server.get_connected_clients().empty();
-	}
-
 	inline bool isListening() const final
 	{
 		return server.is_listening();
+	}
+
+	inline const std::vector<ClientInfo*>& getConnectedClients() const final;
+	{
+		return server.get_connected_clients();
 	}
 
 private:
