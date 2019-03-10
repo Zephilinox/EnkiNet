@@ -15,10 +15,9 @@ PlayerText::PlayerText(EntityInfo info, GameData* game_data)
 
 void PlayerText::onSpawn()
 {
-	fmt::print("ID={} name={} owner={} parent={} type={}\n", info.ID, info.name, info.ownerID, info.parentID, info.type);
 	if (!font.loadFromFile("resources/arial.ttf"))
 	{
-		fmt::print("ERRORERRORERRORERRORERRORERRORERRORERRORERRORERRORERRORERRORERRORERRORERRORERRORERRORERRORERROR");
+		fmt::print("Failed to load resources/arial.ttf");
 	}
 
 	label.setFont(font);

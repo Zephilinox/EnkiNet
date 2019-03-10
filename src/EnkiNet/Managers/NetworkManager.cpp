@@ -117,7 +117,7 @@ void NetworkManager::update()
 
 	if (network_process_timer.getElapsedTime() > 1.0f / float(network_send_rate))
 	{
-		if ((server && client && server->isConnected()) ||
+		if ((server && !server->getConnectedClients().empty()) ||
 			!server && client && client->isConnected())
 		{
 			network_process_timer.restart();

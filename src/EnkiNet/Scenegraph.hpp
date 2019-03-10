@@ -30,13 +30,13 @@ public:
 	Entity* createEntity(EntityInfo info);
 	void createNetworkedEntity(EntityInfo info);
 
-	Entity* getEntity(uint32_t entityID);
-	bool entityExists(uint32_t entityID);
+	Entity* getEntity(EntityID entityID);
+	bool entityExists(EntityID entityID);
 
 	RPCManager rpcs;
 
 private:
-	void sendAllNetworkedEntitiesToClient(uint32_t client_id);
+	void sendAllNetworkedEntitiesToClient(ClientID client_id);
 
 	std::map<uint32_t, std::unique_ptr<Entity>> entities;
 	std::map<std::string, BuilderFunction> builders;

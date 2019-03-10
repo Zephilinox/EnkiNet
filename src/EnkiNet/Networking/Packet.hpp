@@ -6,6 +6,10 @@
 #include <string>
 #include <array>
 
+//enetpp is expecting this type. todo: change it to std::uint8_t and fix enetpp to stop warnings
+using ClientID = unsigned int;
+using EntityID = std::int32_t;
+
 enum PacketType : std::uint8_t {
 	NONE,
 	COMMAND,
@@ -26,7 +30,7 @@ struct PacketHeader
 
 struct PacketInfo
 {
-	uint32_t senderID = 0;
+	ClientID senderID = 0;
 };
 
 class Packet

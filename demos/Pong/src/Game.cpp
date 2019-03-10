@@ -23,22 +23,22 @@ Game::Game()
 	scenegraph = std::make_unique<Scenegraph>(game_data.get());
 	game_data->scenegraph = scenegraph.get();
 
-	scenegraph->registerBuilder("Paddle", [&](EntityInfo info)
+	scenegraph->registerEntity("Paddle", [&](EntityInfo info)
 	{
 		return std::make_unique<Paddle>(info, game_data.get());
 	});
 
-	scenegraph->registerBuilder("Ball", [&](EntityInfo info)
+	scenegraph->registerEntity("Ball", [&](EntityInfo info)
 	{
 		return std::make_unique<Ball>(info, game_data.get());
 	});
 
-	scenegraph->registerBuilder("Collision", [&](EntityInfo info)
+	scenegraph->registerEntity("Collision", [&](EntityInfo info)
 	{
 		return std::make_unique<Collision>(info, game_data.get());
 	});
 
-	scenegraph->registerBuilder("PlayerText", [&](EntityInfo info)
+	scenegraph->registerEntity("PlayerText", [&](EntityInfo info)
 	{
 		return std::make_unique<PlayerText>(info, game_data.get());
 	});

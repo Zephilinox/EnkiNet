@@ -11,7 +11,6 @@ Paddle::Paddle(EntityInfo info, GameData* game_data)
 
 void Paddle::onSpawn()
 {
-	fmt::print("ID={} name={} owner={} parent={} type={}\n", info.ID, info.name, info.ownerID, info.parentID, info.type);
 	texture.loadFromFile("resources/Paddle.png");
 	sprite.setTexture(texture);
 
@@ -40,7 +39,7 @@ void Paddle::onSpawn()
 		});
 
 		auto console = spdlog::get("console");
-		console->info("paddle creating net entity. name {} type {} ID {} ownerID {} parentID {}", info.name, info.type, info.ID, info.ownerID, info.parentID);
+		console->info("paddle creating net entity.\n\t{}", info);
 		game_data->scenegraph->createNetworkedEntity({ "PlayerText", "PlayerText " + info.name, 0, info.ownerID, info.ID });
 	}
 

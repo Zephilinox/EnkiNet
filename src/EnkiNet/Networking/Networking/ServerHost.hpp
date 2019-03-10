@@ -24,7 +24,7 @@ public:
 
 	void processPackets() final;
 
-	void sendPacketToOneClient(uint32_t client_id, enet_uint8 channel_id, Packet* p, enet_uint32 flags = ENET_PACKET_FLAG_RELIABLE) final;
+	void sendPacketToOneClient(ClientID client_id, enet_uint8 channel_id, Packet* p, enet_uint32 flags = ENET_PACKET_FLAG_RELIABLE) final;
 	void sendPacketToAllClients(enet_uint8 channel_id, Packet* p, enet_uint32 flags = ENET_PACKET_FLAG_RELIABLE) final;
 	void sendPacketToSomeClients(enet_uint8 channel_id, Packet* p, enet_uint32 flags, std::function<bool(const ClientInfo& client)> predicate) final;
 
@@ -39,11 +39,11 @@ public:
 	}
 
 private:
-	uint32_t getNextUID();
+	ClientID getNextUID();
 
 	enetpp::server<ClientInfo> server;
-	uint32_t next_uid = 2;
-	std::queue<uint32_t> free_ids;
+	ClientID next_uid = 2;
+	std::queue<ClientID> free_ids;
 
 	ManagedConnection mc1;
 };

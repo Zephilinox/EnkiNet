@@ -218,7 +218,7 @@ void Scenegraph::createNetworkedEntity(EntityInfo info)
 	}
 }
 
-void Scenegraph::sendAllNetworkedEntitiesToClient(uint32_t client_id)
+void Scenegraph::sendAllNetworkedEntitiesToClient(ClientID client_id)
 {
 	if (network_ready && game_data->getNetworkManager()->server)
 	{
@@ -251,12 +251,12 @@ void Scenegraph::sendAllNetworkedEntitiesToClient(uint32_t client_id)
 	}
 }
 
-Entity* Scenegraph::getEntity(uint32_t entityID)
+Entity* Scenegraph::getEntity(EntityID entityID)
 {
 	return entities.at(entityID).get();
 }
 
-bool Scenegraph::entityExists(uint32_t entityID)
+bool Scenegraph::entityExists(EntityID entityID)
 {
 	return entities.count(entityID);
 }

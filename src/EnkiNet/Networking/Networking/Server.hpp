@@ -12,8 +12,8 @@
 class ClientInfo
 {
 public:
-	uint32_t id;
-	uint32_t get_id() const noexcept
+	ClientID id;
+	ClientID get_id() const noexcept
 	{
 		return id;
 	}
@@ -32,7 +32,7 @@ public:
 	virtual void deinitialize() = 0;
 	virtual void processPackets() = 0;
 
-	virtual void sendPacketToOneClient(uint32_t client_id, enet_uint8 channel_id, Packet* p, enet_uint32 flags = ENET_PACKET_FLAG_RELIABLE) = 0;
+	virtual void sendPacketToOneClient(ClientID client_id, enet_uint8 channel_id, Packet* p, enet_uint32 flags = ENET_PACKET_FLAG_RELIABLE) = 0;
 	virtual void sendPacketToAllClients(enet_uint8 channel_id, Packet* p, enet_uint32 flags = ENET_PACKET_FLAG_RELIABLE) = 0;
 	virtual void sendPacketToSomeClients(enet_uint8 channel_id, Packet* p, enet_uint32 flags, std::function<bool(const ClientInfo& client)> predicate) = 0;
 

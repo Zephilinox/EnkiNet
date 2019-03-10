@@ -284,7 +284,7 @@ namespace enetpp {
 
 			{
 				std::lock_guard<std::mutex> lock(_event_queue_mutex);
-				_event_queue.emplace(ENET_EVENT_TYPE_CONNECT, 0, nullptr, client);
+				_event_queue.emplace(ENET_EVENT_TYPE_CONNECT, (enet_uint8)0, nullptr, client);
 			}
 		}
 
@@ -298,7 +298,7 @@ namespace enetpp {
 				_thread_peer_map.erase(iter);
 
 				std::lock_guard<std::mutex> lock(_event_queue_mutex);
-				_event_queue.emplace(ENET_EVENT_TYPE_DISCONNECT, 0, nullptr, client);
+				_event_queue.emplace(ENET_EVENT_TYPE_DISCONNECT, (enet_uint8)0, nullptr, client);
 			}
 		}
 

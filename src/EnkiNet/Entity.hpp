@@ -15,9 +15,9 @@ struct EntityInfo
 	std::string type = "";
 	std::string name = "";
 
-	uint32_t ID = 0;
-	uint32_t ownerID = 0;
-	uint32_t parentID = 0;
+	EntityID ID = 0;
+	ClientID ownerID = 0;
+	EntityID parentID = 0;
 };
 
 inline bool operator ==(const EntityInfo& lhs, const EntityInfo& rhs)

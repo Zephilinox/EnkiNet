@@ -53,7 +53,7 @@ void ServerHost::processPackets()
 		pushPacket(std::move(p));
 	};
 
-	auto on_client_disconnected = [&](uint32_t client_uid)
+	auto on_client_disconnected = [&](ClientID client_uid)
 	{
 		auto console = spdlog::get("EnkiNet");
 		console->info("Client {} Disconnected", client_uid);
@@ -76,7 +76,7 @@ void ServerHost::processPackets()
 		std::move(on_client_data_received));
 }
 
-void ServerHost::sendPacketToOneClient(uint32_t client_id, enet_uint8 channel_id, Packet* p, enet_uint32 flags)
+void ServerHost::sendPacketToOneClient(ClientID client_id, enet_uint8 channel_id, Packet* p, enet_uint32 flags)
 {
 	auto console = spdlog::get("EnkiNet");
 	//console->info("Server sending packet to client {}", client_id);
@@ -117,7 +117,7 @@ void ServerHost::sendPacketToSomeClients(enet_uint8 channel_id, Packet* p, enet_
 	}
 }
 
-uint32_t ServerHost::getNextUID()
+ClientID ServerHost::getNextUID()
 {
 	auto console = spdlog::get("EnkiNet");
 	if (free_ids.empty())

@@ -57,7 +57,7 @@ public:
 		packets.push(std::move(p));
 	}
 	
-	inline uint32_t getID() const
+	inline ClientID getID() const
 	{
 		return id;
 	}
@@ -72,7 +72,7 @@ public:
 protected:
 	GameData* game_data;
 
-	uint32_t id = 0;
+	ClientID id = 0;
 	bool initialized = false;
 
 private:
