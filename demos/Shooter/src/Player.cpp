@@ -38,10 +38,6 @@ void Player::onSpawn()
 	}
 }
 
-void Player::input(sf::Event& e)
-{
-}
-
 void Player::update(float dt)
 {
 	if (!isOwner() || !game_data->window_active)
@@ -86,9 +82,9 @@ void Player::update(float dt)
 	sprite.setRotation((rads * 180.0f) / 3.1415f);
 }
 
-void Player::draw(sf::RenderWindow& window) const
+void Player::draw(sf::RenderWindow& window_) const
 {
-	window.draw(sprite);
+	window_.draw(sprite);
 }
 
 void Player::serialize(Packet& p)

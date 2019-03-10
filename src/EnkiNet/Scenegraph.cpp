@@ -1,8 +1,5 @@
 #include "Scenegraph.hpp"
 
-//LIBS
-#include <spdlog/fmt/fmt.h>
-
 //SELF
 #include "Networking/Networking/ServerHost.hpp"
 #include "Networking/Networking/ClientHost.hpp"
@@ -11,6 +8,7 @@
 Scenegraph::Scenegraph(GameData* game_data)
 	: game_data(game_data)
 {
+	console = spdlog::get("EnkiNet");
 }
 
 void Scenegraph::enableNetworking()
@@ -19,6 +17,8 @@ void Scenegraph::enableNetworking()
 	{
 		return;
 	}
+
+	network_ready = true;
 
 	if (game_data->getNetworkManager()->server)
 	{
@@ -30,29 +30,32 @@ void Scenegraph::enableNetworking()
 				info.ownerID = p.info.senderID;
 				createNetworkedEntity(info);
 			}
-
-			if (p.getHeader().type == CONNECTED)
+			else if (p.getHeader().type == CONNECTED)
 			{
-				sendNetworkedEntities();
+				sendAllNetworkedEntitiesToClient(p.info.senderID);
 			}
-
-			if (p.getHeader().type == ENTITY)
+			else if (p.getHeader().type == ENTITY)
 			{
-				game_data->getNetworkManager()->server->sendPacketToAllClients(0, &p);
+				//Don't send entity updates back to the sender
+				game_data->getNetworkManager()->server->sendPacketToSomeClients(0, &p, ENET_PACKET_FLAG_RELIABLE, [sender=p.info.senderID](const ClientInfo& client)
+				{
+					return sender != client.id;
+				});
 			}
-
-			if (p.getHeader().type == ENTITY_RPC)
+			else if (p.getHeader().type == ENTITY_RPC)
 			{
 				auto info = p.read<EntityInfo>();
 				if (entityExists(info.ID))
 				{
 					auto ent = getEntity(info.ID);
-					if (ent->info.type == info.type &&
-						ent->info.name == info.name &&
-						ent->info.ownerID == info.ownerID &&
+					if (info == ent->info &&
 						info.ownerID == p.info.senderID)
 					{
-						game_data->getNetworkManager()->server->sendPacketToAllClients(0, &p);
+						//Don't send entity updates back to the sender
+						game_data->getNetworkManager()->server->sendPacketToSomeClients(0, &p, ENET_PACKET_FLAG_RELIABLE, [sender = p.info.senderID](const ClientInfo& client)
+						{
+							return sender != client.id;
+						});
 					}
 				}
 			}
@@ -67,6 +70,7 @@ void Scenegraph::enableNetworking()
 			{
 				auto info = p.read<EntityInfo>();
 				createEntity(info);
+				//todo on ent creation also serialize all its stuff?
 			}
 			else if (p.getHeader().type == ENTITY)
 			{
@@ -74,16 +78,18 @@ void Scenegraph::enableNetworking()
 				if (entityExists(info.ID))
 				{
 					auto ent = getEntity(info.ID);
-					//when a listen server client sends a "fake" packet to the server, the server will send it back to the client.
-					//Probably no harm if we didn't exclude it since there should be no delay, but we will anyway.
-					if (ent->info.type == info.type &&
-						ent->info.name == info.name &&
-						ent->info.ownerID == info.ownerID &&
-						info.ownerID == p.info.senderID &&
-						game_data->getNetworkManager()->client->getID() != p.info.senderID)
+					if (info == ent->info)
 					{
 						ent->deserialize(p);
 					}
+					else
+					{
+						console->error("Received entity update with invalid info.\n\t{}\n\tVS\n\t{}\n\tSender ID = {}, Client ID = {}", info, ent->info, p.info.senderID, game_data->getNetworkManager()->client->getID());
+					}
+				}
+				else
+				{
+					console->error("Received entity update for nonexistant entity.\n\t{}", info);
 				}
 			}
 			else if (p.getHeader().type == ENTITY_RPC)
@@ -92,9 +98,7 @@ void Scenegraph::enableNetworking()
 				if (entityExists(info.ID))
 				{
 					auto ent = getEntity(info.ID);
-					if (ent->info.type == info.type &&
-						ent->info.name == info.name &&
-						ent->info.ownerID == info.ownerID &&
+					if (info == ent->info &&
 						info.ownerID == p.info.senderID)
 					{
 						p.resetReadPosition();
@@ -103,14 +107,11 @@ void Scenegraph::enableNetworking()
 				}
 				else
 				{
-					auto console = spdlog::get("EnkiNet");
-					console->error("Received an RPC packet for an entity that does not exist");
+					console->error("Received an RPC packet for an entity that does not exist.\n\t{}", info);
 				}
 			}
 		});
 	}
-
-	network_ready = true;
 }
 
 void Scenegraph::input(sf::Event& e)
@@ -137,7 +138,7 @@ void Scenegraph::draw(sf::RenderWindow& window) const
 	}
 }
 
-void Scenegraph::registerBuilder(std::string type, std::function<std::unique_ptr<Entity>(EntityInfo)> builder)
+void Scenegraph::registerEntity(std::string type, BuilderFunction builder)
 {
 	builders[type] = builder;
 }
@@ -146,14 +147,12 @@ Entity* Scenegraph::createEntity(EntityInfo info)
 {
 	if (info.name == "" || info.type == "")
 	{
-		auto console = spdlog::get("EnkiNet");
-		console->error("No name or type for this entity info");
-		console->error("name {} type {} ID {} ownerID {} parentID {}", info.name, info.type, info.ID, info.ownerID, info.parentID);
+		console->error("Invalid info when creating entity.\n\t{}", info);
 	}
 
 	if (info.ID == 0)
 	{
-		info.ID = localID++;
+		info.ID = localID--;
 	}
 
 	//info gets assigned to the entity here through being passed to the Entity base class constructor
@@ -165,122 +164,88 @@ Entity* Scenegraph::createEntity(EntityInfo info)
 
 void Scenegraph::createNetworkedEntity(EntityInfo info)
 {
-	auto console = spdlog::get("EnkiNet");
 	auto net_man = game_data->getNetworkManager();
 
 	if (info.name == "" || info.type == "")
 	{
-		console->error("No name or type for this networked entity info");
-		console->error("name {} type {} ID {} ownerID {} parentID {}", info.name, info.type, info.ID, info.ownerID, info.parentID);
+		console->error("Invalid info when creating networked entity.\n\t{}", info);
 	}
 	else
 	{
-		console->info("Creating networked. name {} type {} ID {} ownerID {} parentID {}", info.name, info.type, info.ID, info.ownerID, info.parentID);
+		console->info("Creating networked entity.\n\t{}", info);
 	}
 
-	if (game_data->getNetworkManager()->server)
+	if (net_man->server && info.ID == 0)
 	{
-		if (info.ID == 0)
-		{
-			info.ID = ID++;
-		}
+		info.ID = ID++;
 	}
 
-	if (info.ownerID == 0)
+	if (info.ownerID == 0 && network_ready)
 	{
-		if (network_ready && net_man->client)
+		if (net_man->client)
 		{
 			info.ownerID = net_man->client->getID();
 		}
-		else if (network_ready)
+		else
 		{
 			info.ownerID = 1;
 		}
 	}
 
-	if (network_ready && net_man->server)
+	if (network_ready)
 	{
 		Packet p({ PacketType::ENTITY_CREATION });
 		p << info;
-		if (info.type == "")
+
+		if (net_man->server)
 		{
-			console->error("No type1");
-			console->error("name {} type {} ID {} ownerID {} parentID {} senderID {}", info.name, info.type, info.ID, info.ownerID, info.parentID, p.info.senderID);
+			console->info("Creating networked entity as the server to all clients.\n\t{}", info);
+			net_man->server->sendPacketToAllClients(0, &p);
+		}
+		else if (net_man->client)
+		{
+			console->info("Creating networked entity as the client to the server.\n\t{}", info);
+			net_man->client->sendPacket(0, &p);
 		}
 		else
 		{
-			console->info("Creating networked as server to all clients. name {} type {} ID {} ownerID {} parentID {}", info.name, info.type, info.ID, info.ownerID, info.parentID);
+			console->error("Tried to create networked entity when network isn't running");
 		}
-		net_man->server->sendPacketToAllClients(0, &p);
-	}
-	else if (network_ready && net_man->client)
-	{
-		Packet p({ PacketType::ENTITY_CREATION });
-		p << info;
-		if (info.type == "")
-		{
-			console->error("No type2");
-			console->error("name {} type {} ID {} ownerID {} parentID {} senderID {}", info.name, info.type, info.ID, info.ownerID, info.parentID, p.info.senderID);
-		}
-		else
-		{
-			console->info("Creating networked as client to server. name {} type {} ID {} ownerID {} parentID {}", info.name, info.type, info.ID, info.ownerID, info.parentID);
-		}
-		net_man->client->sendPacket(0, &p);
 	}
 	else
 	{
-		console->error("Tried to create networked entity when network is not running or scenegraph isn't network ready");
+		console->error("Tried to create networked entity when scenegraph isn't network ready");
 	}
 }
 
-void Scenegraph::sendNetworkedEntities()
+void Scenegraph::sendAllNetworkedEntitiesToClient(uint32_t client_id)
 {
 	if (network_ready && game_data->getNetworkManager()->server)
 	{
-		auto console = spdlog::get("EnkiNet");
 		for (auto& ent : entities)
 		{
 			EntityInfo info = ent.second->info;
 
-			if (info.type == "")
+			if (info.name == "" || info.type == "")
 			{
-				console->error("No type3");
-				console->error("name {} type {} ID {} ownerID {} parentID {}", info.name, info.type, info.ID, info.ownerID, info.parentID);
+				console->error("Invalid info when sending on connection of client {} for entity.\n\t{}", client_id, info);
 			}
 			else
 			{
-				console->info("sending networked. name {} type {} ID {} ownerID {} parentID {}", info.name, info.type, info.ID, info.ownerID, info.parentID);
+				console->info("Sending networked entity to client {}.\n\t{}", client_id, info);
 			}
 
 			{
 				Packet p({ PacketType::ENTITY_CREATION });
 				p << info;
-				game_data->getNetworkManager()->server->sendPacketToSomeClients(0, &p, ENET_PACKET_FLAG_RELIABLE, [](const ClientInfo& client)
-				{
-					if (client.id == 1)
-					{
-						return false;
-					}
-
-					return true;
-				});
+				game_data->getNetworkManager()->server->sendPacketToOneClient(client_id, 0, &p);
 			}
 
 			{
 				Packet p({ PacketType::ENTITY });
 				p << info;
 				ent.second->serialize(p);
-
-				game_data->getNetworkManager()->server->sendPacketToSomeClients(0, &p, ENET_PACKET_FLAG_RELIABLE, [](const ClientInfo& client)
-				{
-					if (client.id == 1)
-					{
-						return false;
-					}
-
-					return true;
-				});
+				game_data->getNetworkManager()->server->sendPacketToOneClient(client_id, 0, &p);
 			}
 		}
 	}

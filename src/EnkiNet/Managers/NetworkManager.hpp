@@ -36,7 +36,7 @@ public:
 	int network_send_rate = 60;
 	int network_process_rate = 120;
 
-	uint32_t max_clients = 2;
+	uint32_t max_clients = 3;
 	uint8_t channel_count = 1;
 	std::string server_ip = "localhost";
 	uint16_t server_port = 22222;

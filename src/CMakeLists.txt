@@ -36,7 +36,6 @@ set (EnkiNet_SRC
 	
 	"EnkiNet/Timer.cpp"
 	"EnkiNet/Scenegraph.cpp"
-	"EnkiNet/Entity.cpp"
 	"EnkiNet/GameData.cpp"
 )
 

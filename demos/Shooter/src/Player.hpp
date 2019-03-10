@@ -12,7 +12,6 @@ public:
 
 	void onSpawn();
 
-	void input(sf::Event& e);
 	void update(float dt);
 	void draw(sf::RenderWindow& window) const;
 

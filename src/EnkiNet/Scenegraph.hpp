@@ -5,6 +5,9 @@
 #include <map>
 #include <functional>
 
+//LIBS
+#include <spdlog/spdlog.h>
+
 //SELF
 #include "Entity.hpp"
 #include "GameData.hpp"
@@ -13,6 +16,8 @@
 class Scenegraph
 {
 public:
+	using BuilderFunction = std::function<std::unique_ptr<Entity>(EntityInfo)>;
+
 	Scenegraph(GameData* game_data);
 
 	void enableNetworking();
@@ -20,11 +25,10 @@ public:
 	void update(float dt);
 	void draw(sf::RenderWindow& window) const;
 
-	void registerBuilder(std::string type, std::function<std::unique_ptr<Entity>(EntityInfo)> builder);
+	void registerEntity(std::string type, BuilderFunction builder);
 	
 	Entity* createEntity(EntityInfo info);
 	void createNetworkedEntity(EntityInfo info);
-	void sendNetworkedEntities();
 
 	Entity* getEntity(uint32_t entityID);
 	bool entityExists(uint32_t entityID);
@@ -32,15 +36,18 @@ public:
 	RPCManager rpcs;
 
 private:
+	void sendAllNetworkedEntitiesToClient(uint32_t client_id);
+
 	std::map<uint32_t, std::unique_ptr<Entity>> entities;
-	std::map<std::string, std::function<std::unique_ptr<Entity>(EntityInfo)>> builders;
+	std::map<std::string, BuilderFunction> builders;
 
 	int ID = 1;
-	int localID = 10000;
+	int localID = -1;
 	GameData* game_data;
 	
 	ManagedConnection mc1;
 	ManagedConnection mc2;
 
 	bool network_ready = false;
+	std::shared_ptr<spdlog::logger> console;
 };

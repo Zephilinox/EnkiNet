@@ -1,7 +1,9 @@
 #pragma once
 
 //LIBS
-#include <SFML/Graphics.hpp>
+//For whatever reason fmt and enet conflict a bit because of the ordering of winsock includes, so defining this fixes that
+#define WIN32_LEAN_AND_MEAN
+#include <spdlog/fmt/ostr.h>
 
 //SELF
 #include "Networking/Packet.hpp"
@@ -17,6 +19,20 @@ struct EntityInfo
 	uint32_t ownerID = 0;
 	uint32_t parentID = 0;
 };
+
+inline bool operator ==(const EntityInfo& lhs, const EntityInfo& rhs)
+{
+	return lhs.ID == rhs.ID &&
+		lhs.name == rhs.name &&
+		lhs.type == rhs.type &&
+		lhs.ownerID == rhs.ownerID &&
+		lhs.parentID == rhs.parentID;
+}
+
+inline std::ostream& operator <<(std::ostream& os, const EntityInfo& info)
+{
+	return os << "Type: " << info.type << ", Name: " << info.name << ", ID: " << info.ID << ", ownerID: " << info.ownerID << ", parentID: " << info.parentID;
+}
 
 inline Packet& operator <<(Packet& p, EntityInfo& e)
 {
@@ -42,14 +58,21 @@ inline Packet& operator >>(Packet& p, EntityInfo& e)
 struct Entity
 {
 public:
-	Entity(EntityInfo info, GameData* game_data);
+	Entity(EntityInfo info, GameData* game_data)
+		: info(info)
+		, game_data(game_data)
+	{
+	}
+
 	virtual ~Entity() = default;
 
 	virtual void onSpawn() = 0;
 
-	virtual void input(sf::Event& e) = 0;
-	virtual void update(float dt) = 0;
-	virtual void draw(sf::RenderWindow& window) const = 0;
+	virtual void input([[maybe_unused]]sf::Event& e) {};
+	virtual void update([[maybe_unused]]float dt) {};
+	virtual void draw([[maybe_unused]]sf::RenderWindow& window) const {};
+	virtual void serialize([[maybe_unused]]Packet& p) {}
+	virtual void deserialize([[maybe_unused]]Packet& p) {}
 
 	inline bool isOwner() const
 	{
@@ -59,17 +82,6 @@ public:
 		}
 
 		return game_data->getNetworkManager()->client->getID() == info.ownerID;
-	}
-
-	//not pure virtual, just so that users don't have to write out an empty function for non-networked entities
-	virtual void serialize([[maybe_unused]]Packet& p)
-	{
-
-	}
-
-	virtual void deserialize([[maybe_unused]]Packet& p)
-	{
-
 	}
 
 	EntityInfo info;
