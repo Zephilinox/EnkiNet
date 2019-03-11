@@ -99,7 +99,6 @@ void Player::deserialize(Packet& p)
 	float x = p.read<float>();
 	float y = p.read<float>();
 	sprite.setPosition(x, y);
-	float rot;
-	p.readCompressedFloat(rot, -360, 360, 0.01f);
+	float rot = p.readCompressedFloat(-360, 360, 0.01f);
 	sprite.setRotation(rot);
 }

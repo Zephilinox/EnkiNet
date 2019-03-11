@@ -217,18 +217,17 @@ void Packet::writeCompressedFloat(float data, float min, float max, float resolu
 	writeBits(final_value, bits_required);
 }
 
-void Packet::readCompressedFloat(float& data, float min, float max, float resolution)
+float Packet::readCompressedFloat(float min, float max, float resolution)
 {
 	float delta = max - min;
 	float total_possible_values = delta / resolution;
 	int max_possible_values = static_cast<int>(std::ceil(total_possible_values));
 	int bits_required = static_cast<int>(std::ceil(std::log(max_possible_values) / std::log(2)));
 
-	int final_value = 0;
-	readBits(final_value, bits_required);
-
+	int final_value = readBits(bits_required);
 	float normalized_data = static_cast<float>(final_value) / static_cast<float>(max_possible_values);
-	data = normalized_data * delta + min;
+
+	return normalized_data * delta + min;
 }
 
 void Packet::resetReadPosition()

@@ -86,22 +86,22 @@ TEST_CASE("Packet")
 		Packet p2;
 		int num = 0b00001111;
 		p2.writeBits(num, 8);
-		int resulting_num = static_cast<int>(p2.getBytes().data()[2]);
+		int resulting_num = static_cast<int>(p2.getBytes().data()[sizeof(PacketHeader)]);
 		CHECK(num == resulting_num);
 
 		int num2 = 0b01001100;
 		p2.writeBits(num2, 8);
-		int resulting_num2 = static_cast<int>(p2.getBytes().data()[3]);
+		int resulting_num2 = static_cast<int>(p2.getBytes().data()[sizeof(PacketHeader) + 1]);
 		CHECK(num2 == resulting_num2);
 
 		int num3 = 0b00001111;
 		p2.writeBits(num3, 4);
-		int resulting_num3 = static_cast<int>(p2.getBytes().data()[4]);
+		int resulting_num3 = static_cast<int>(p2.getBytes().data()[sizeof(PacketHeader) + 2]);
 		CHECK(0b00001111 == resulting_num3);
 
 		int num4 = 0b11110000;
 		p2.writeBits(num4, 4, 4);
-		int resulting_num4 = static_cast<int>(p2.getBytes().data()[4]);
+		int resulting_num4 = static_cast<int>(p2.getBytes().data()[sizeof(PacketHeader) + 2]);
 		CHECK(0b11111111 == resulting_num4);
 	}
 
@@ -109,15 +109,13 @@ TEST_CASE("Packet")
 	{
 		Packet p2;
 		p2 << 0b00001111;
-		int input = static_cast<int>(p2.getBytes().data()[2]);
-		int output = 0b00000000;
-		p2.readBits(output, 8);
+		int input = static_cast<int>(p2.getBytes().data()[sizeof(PacketHeader)]);
+		int output = p2.readBits(8);
 		CHECK(input == output);
 
 		p2 << 0b11110000;
-		int input2 = static_cast<int>(p2.getBytes().data()[3]);
-		int output2 = 0b00000000;
-		p2.readBits(output2, 8);
+		int input2 = static_cast<int>(p2.getBytes().data()[sizeof(PacketHeader) + 1]);
+		int output2 = p2.readBits(8);
 		CHECK(input2 == output2);
 
 		Packet p3;
@@ -159,9 +157,8 @@ TEST_CASE("Packet")
 	SUBCASE("Read Bits Overflowing Bytes")
 	{
 		Packet p;
-		int num = 0;
 		p << 1000000;
-		p.readBits(num, 32);
+		int num = p.readBits(32);
 		CHECK(num == 1000000);
 	}
 
@@ -170,8 +167,7 @@ TEST_CASE("Packet")
 		Packet p;
 		float f1 = 0.5f;
 		p.writeCompressedFloat(f1, 0, 1, 0.01f);
-		float f2;
-		p.readCompressedFloat(f2, 0, 1, 0.01f);
+		float f2 = p.readCompressedFloat(0, 1, 0.01f);
 		CHECK(f1 == f2);
 
 		//will fail due to not supporting > 8 bits on read/write
@@ -204,15 +200,12 @@ TEST_CASE("Packet")
 		p.writeBits(isplayer_int, 1); //todo: write bits not just for ints
 
 		std::array<float, 2> received_pos;
-		float received_rot;
-		int received_isplayer;
-		bool actual_isplayer;
-
-		p.readCompressedFloat(received_pos[0], 0, 1280, 0.01f);
-		p.readCompressedFloat(received_pos[1], 0, 720, 0.01f);
-		p.readCompressedFloat(received_rot, 0, 360, 0.01f);
-		p.readBits(received_isplayer, 1);
-		actual_isplayer = static_cast<bool>(received_isplayer);
+		
+		received_pos[0] = p.readCompressedFloat(0, 1280, 0.01f);
+		received_pos[1] = p.readCompressedFloat(0, 720, 0.01f);
+		float received_rot = p.readCompressedFloat(0, 360, 0.01f);
+		int received_isplayer = p.readBits(1);
+		bool actual_isplayer = actual_isplayer = static_cast<bool>(received_isplayer);
 
 		CHECK(p.getBytes().size() < sizeof(PacketHeader) + sizeof(position) + sizeof(rotation) + sizeof(isplayer));
 		std::cout << p.getBytes().size() << " < " << sizeof(PacketHeader) + sizeof(position) + sizeof(rotation) + sizeof(isplayer) << ", yay bytes saved!\n";
