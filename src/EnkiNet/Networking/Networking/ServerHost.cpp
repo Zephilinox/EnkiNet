@@ -50,6 +50,7 @@ void ServerHost::processPackets()
 		console->info("Client {} Connected.", client.id);
 		Packet p({PacketType::CONNECTED});
 		p.info.senderID = client.id;
+		p.info.timeReceived = enet_time_get();
 		pushPacket(std::move(p));
 	};
 
@@ -59,15 +60,16 @@ void ServerHost::processPackets()
 		console->info("Client {} Disconnected", client_uid);
 		Packet p({ PacketType::DISCONNECTED });
 		p.info.senderID = client_uid;
+		p.info.timeReceived = enet_time_get();
 		pushPacket(std::move(p));
 	};
 
 	auto on_client_data_received = [&](ClientInfo& client, const enet_uint8* data, size_t data_size)
 	{
-		auto console = spdlog::get("EnkiNet");
 		//console->info("Data received from Client {}. Size = {}", client.get_id(), data_size);
 		Packet p(data, data_size);
 		p.info.senderID = client.id;
+		p.info.timeReceived = enet_time_get();
 		pushPacket(std::move(p));
 	};
 
@@ -78,8 +80,10 @@ void ServerHost::processPackets()
 
 void ServerHost::sendPacketToOneClient(ClientID client_id, enet_uint8 channel_id, Packet* p, enet_uint32 flags)
 {
-	auto console = spdlog::get("EnkiNet");
-	//console->info("Server sending packet to client {}", client_id);
+	auto header = p->getHeader();
+	header.timeSent = enet_time_get();
+	p->setHeader(header);
+
 	if (client_id != 1)
 	{
 		auto data = reinterpret_cast<const enet_uint8*>(p->getBytes().data());
@@ -94,8 +98,10 @@ void ServerHost::sendPacketToOneClient(ClientID client_id, enet_uint8 channel_id
 
 void ServerHost::sendPacketToAllClients(enet_uint8 channel_id, Packet* p, enet_uint32 flags)
 {
-	auto console = spdlog::get("EnkiNet");
-	//console->info("Server sending packet to all clients");
+	auto header = p->getHeader();
+	header.timeSent = enet_time_get();
+	p->setHeader(header);
+
 	auto data = reinterpret_cast<const enet_uint8*>(p->getBytes().data());
 	server.send_packet_to_all_if(channel_id, data, p->getSize(), flags, []([[maybe_unused]]const ClientInfo& client) {return true; });
 
@@ -105,8 +111,11 @@ void ServerHost::sendPacketToAllClients(enet_uint8 channel_id, Packet* p, enet_u
 
 void ServerHost::sendPacketToSomeClients(enet_uint8 channel_id, Packet* p, enet_uint32 flags, std::function<bool(const ClientInfo& client)> predicate)
 {
+	auto header = p->getHeader();
+	header.timeSent = enet_time_get();
+	p->setHeader(header);
+
 	auto console = spdlog::get("EnkiNet");
-	//console->info("Server sending packet to some clients\n");
 	auto data = reinterpret_cast<const enet_uint8*>(p->getBytes().data());
 	server.send_packet_to_all_if(channel_id, data, p->getSize(), flags, predicate);
 

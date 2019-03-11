@@ -24,6 +24,8 @@ namespace enetpp {
 		using listen_params_type = server_listen_params<ClientT>;
 		using client_ptr_vector = std::vector<ClientT*>;
 
+		ENetHost* enet_host = nullptr;
+
 	private:
 		trace_handler _trace_handler;
 
@@ -182,12 +184,14 @@ namespace enetpp {
 				trace("enet_host_create failed");
 			}
 
-			while (host != nullptr) {
+			enet_host = host;
 
+			while (host != nullptr) {
 				if (_should_exit_thread) {
 					disconnect_all_peers_in_thread();
 					enet_host_destroy(host);
 					host = nullptr;
+					enet_host = nullptr;
 				}
 
 				if (host != nullptr) {

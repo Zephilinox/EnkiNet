@@ -22,6 +22,7 @@ Game::Game()
 	window = std::make_unique<sf::RenderWindow>(sf::VideoMode(640, 360), "EnkiNet");
 	scenegraph = std::make_unique<Scenegraph>(game_data.get());
 	game_data->scenegraph = scenegraph.get();
+	game_data->getNetworkManager()->network_send_rate = 0;
 
 	scenegraph->registerEntity("Paddle", [&](EntityInfo info)
 	{
@@ -145,6 +146,9 @@ void Game::update()
 
 			mc3 = game_data->getNetworkManager()->server->on_packet_received.connect([game_data_ptr](Packet p)
 			{
+				auto console = spdlog::get("console");
+				console->info("server received {}. sent at {} and received at {}, delta of {}", p.getHeader().type, p.getHeader().timeSent, p.info.timeReceived, p.info.timeReceived - p.getHeader().timeSent);
+				
 				if (p.getHeader().type == PacketType::CONNECTED)
 				{
 					game_data_ptr->scenegraph->createNetworkedEntity(EntityInfo{ "Paddle", "Paddle 2", 0, p.info.senderID });
@@ -159,6 +163,9 @@ void Game::update()
 			GameData* game_data_ptr = game_data.get();
 			mc2 = game_data->getNetworkManager()->client->on_packet_received.connect([game_data_ptr](Packet p)
 			{
+				auto console = spdlog::get("console");
+				console->info("client received {}. sent at {} and received at {}, delta of {}", p.getHeader().type, p.getHeader().timeSent, p.info.timeReceived, p.info.timeReceived - p.getHeader().timeSent);
+
 				if (p.getHeader().type == PacketType::COMMAND)
 				{
 					std::string id = p.read<std::string>();

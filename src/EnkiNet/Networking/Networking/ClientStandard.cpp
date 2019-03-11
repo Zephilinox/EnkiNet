@@ -26,13 +26,16 @@ void ClientStandard::deinitialize()
 
 void ClientStandard::processPackets()
 {
+	auto console = spdlog::get("EnkiNet");
+	
 	auto on_connected = [this]()
 	{
 		auto console = spdlog::get("EnkiNet");
 		connected_to_server = true;
 		console->info("Connected");
-		Packet p({PacketType::CONNECTED, 0});
+		Packet p({PacketType::CONNECTED, 0, enet_time_get()});
 		p.info.senderID = 1;
+		p.info.timeReceived = enet_time_get();
 		pushPacket(std::move(p));
 	};
 
@@ -41,8 +44,9 @@ void ClientStandard::processPackets()
 		auto console = spdlog::get("EnkiNet");
 		connected_to_server = false;
 		console->info("Disconnected");
-		Packet p({ PacketType::DISCONNECTED, 0 });
+		Packet p({ PacketType::DISCONNECTED, 0, enet_time_get() });
 		p.info.senderID = 1;
+		p.info.timeReceived = enet_time_get();
 		pushPacket(std::move(p));
 	};
 
@@ -59,6 +63,7 @@ void ClientStandard::processPackets()
 
 		p.resetReadPosition();
 		p.info.senderID = 1;
+		p.info.timeReceived = enet_time_get();
 		pushPacket(std::move(p));
 	};
 
@@ -69,6 +74,10 @@ void ClientStandard::processPackets()
 
 void ClientStandard::sendPacket(enet_uint8 channel_id, Packet* p, enet_uint32 flags)
 {
+	auto header = p->getHeader();
+	header.timeSent = enet_time_get();
+	p->setHeader(header);
+
 	auto console = spdlog::get("EnkiNet");
 	//console->info("Client sending packet");
 	auto data = reinterpret_cast<const enet_uint8*>(p->getBytes().data());

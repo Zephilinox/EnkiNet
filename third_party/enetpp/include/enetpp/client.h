@@ -211,9 +211,52 @@ namespace enetpp {
 
 			_is_connected = true;
 			while (peer != nullptr) {
-
-				_statistics._round_trip_time_in_ms = peer->roundTripTime;
-				_statistics._round_trip_time_variance_in_ms = peer->roundTripTimeVariance;
+				_statistics.roundTripTime = peer->roundTripTime;
+				_statistics.roundTripTimeVariance = peer->roundTripTimeVariance;
+				_statistics.connectID = peer->connectID;
+				_statistics.channelCount = peer->channelCount;
+				_statistics.earliestTimeout = peer->earliestTimeout;
+				_statistics.highestRoundTripTimeVariance = peer->highestRoundTripTimeVariance;
+				_statistics.incomingBandwidth = peer->incomingBandwidth;
+				_statistics.incomingBandwidthThrottleEpoch = peer->incomingBandwidthThrottleEpoch;
+				_statistics.incomingDataTotal = peer->incomingDataTotal;
+				_statistics.incomingPeerID = peer->incomingPeerID;
+				_statistics.incomingSessionID = peer->incomingSessionID;
+				_statistics.incomingUnsequencedGroup = peer->incomingUnsequencedGroup;
+				_statistics.lastReceiveTime = peer->lastReceiveTime;
+				_statistics.lastRoundTripTime = peer->lastRoundTripTime;
+				_statistics.lastRoundTripTimeVariance = peer->lastRoundTripTimeVariance;
+				_statistics.lastSendTime = peer->lastSendTime;
+				_statistics.lowestRoundTripTime = peer->lowestRoundTripTime;
+				_statistics.mtu = peer->mtu;
+				_statistics.needsDispatch = peer->needsDispatch;
+				_statistics.nextTimeout = peer->nextTimeout;
+				_statistics.outgoingBandwidth = peer->outgoingBandwidth;
+				_statistics.outgoingBandwidthThrottleEpoch = peer->outgoingBandwidthThrottleEpoch;
+				_statistics.outgoingDataTotal = peer->outgoingDataTotal;
+				_statistics.outgoingPeerID = peer->outgoingPeerID;
+				_statistics.outgoingReliableSequenceNumber = peer->outgoingReliableSequenceNumber;
+				_statistics.outgoingSessionID = peer->outgoingSessionID;
+				_statistics.outgoingUnsequencedGroup = peer->outgoingUnsequencedGroup;
+				_statistics.packetLoss = peer->packetLoss;
+				_statistics.packetLossEpoch = peer->packetLossEpoch;
+				_statistics.packetLossVariance = peer->packetLossVariance;
+				_statistics.packetsLost = peer->packetsLost;
+				_statistics.packetsSent = peer->packetsSent;
+				_statistics.packetThrottle = peer->packetThrottle;
+				_statistics.packetThrottleAcceleration = peer->packetThrottleAcceleration;
+				_statistics.packetThrottleCounter = peer->packetThrottleCounter;
+				_statistics.packetThrottleDeceleration = peer->packetThrottleDeceleration;
+				_statistics.packetThrottleEpoch = peer->packetThrottleEpoch;
+				_statistics.packetThrottleInterval = peer->packetThrottleInterval;
+				_statistics.packetThrottleLimit = peer->packetThrottleLimit;
+				_statistics.pingInterval = peer->pingInterval;
+				_statistics.reliableDataInTransit = peer->reliableDataInTransit;
+				_statistics.timeoutLimit = peer->timeoutLimit;
+				_statistics.timeoutMaximum = peer->timeoutMaximum;
+				_statistics.timeoutMinimum = peer->timeoutMinimum;
+				_statistics.totalWaitingData = peer->totalWaitingData;
+				_statistics.windowSize = peer->windowSize;
 
 				if (_should_exit_thread) {
 					if (!is_disconnecting) {

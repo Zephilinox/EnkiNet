@@ -29,11 +29,13 @@ struct PacketHeader
 {
 	PacketType type = PacketType::NONE;
 	std::uint8_t version = 0;
+	std::uint32_t timeSent = 0;
 };
 
 struct PacketInfo
 {
 	ClientID senderID = 0;
+	std::uint32_t timeReceived = 0;
 };
 
 class Packet

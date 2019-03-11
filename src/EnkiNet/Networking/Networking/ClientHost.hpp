@@ -22,8 +22,7 @@ public:
 	void initialize() final;
 	void deinitialize() final;
 
-	void processPackets() final
-	{};
+	void processPackets() final {};
 
 	void sendPacket(enet_uint8 channel_id, Packet* p, enet_uint32 flags = ENET_PACKET_FLAG_RELIABLE) final;
 
@@ -38,5 +37,4 @@ public:
 	}
 
 private:
-	ManagedConnection mc1;
 };

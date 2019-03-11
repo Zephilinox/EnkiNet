@@ -238,7 +238,7 @@ public:
 		static_assert(RPCUtil<R(Class::*)(Args...)>::template matchesArgs<Args...>(),
 			"You tried to call this rpc with the incorrect number or type of parameters");
 
-		if (instance == nullptr || net_man == nullptr || net_man->client == nullptr )
+		if (instance == nullptr || net_man == nullptr || net_man->client == nullptr || !net_man->client->isConnected())
 		{
 			return;
 		}
