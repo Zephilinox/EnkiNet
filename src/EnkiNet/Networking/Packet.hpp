@@ -8,18 +8,21 @@
 
 //enetpp is expecting this type. todo: change it to std::uint8_t and fix enetpp to stop warnings
 using ClientID = unsigned int;
-using EntityID = std::int32_t;
 
 enum PacketType : std::uint8_t {
 	NONE,
+
 	COMMAND,
-	ENTITY,
-	GLOBAL_RPC,
-	ENTITY_RPC,
+
 	CLIENT_INITIALIZED,
 	CONNECTED,
 	DISCONNECTED,
-	ENTITY_CREATION
+
+	GLOBAL_RPC,
+	ENTITY_RPC,
+
+	ENTITY_CREATION,
+	ENTITY_UPDATE
 };
 
 struct PacketHeader
@@ -40,7 +43,7 @@ public:
 	Packet(const unsigned char* data, std::size_t size);
 
 	void writeBits(int data, int bits_to_write, int offset = 0);
-	void readBits(int& data, int bits_to_read, int offset = 0);
+	int readBits(int bits_to_read, int offset = 0);
 	void writeCompressedFloat(float data, float min, float max, float resolution);
 	void readCompressedFloat(float& data, float min, float max, float resolution);
 

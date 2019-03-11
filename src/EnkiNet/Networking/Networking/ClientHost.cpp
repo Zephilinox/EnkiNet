@@ -11,7 +11,7 @@ void ClientHost::initialize()
 	
 	mc1 = on_packet_received.connect([](Packet p)
 	{
-		if (p.getHeader().type == PacketType::ENTITY)
+		if (p.getHeader().type == PacketType::ENTITY_UPDATE)
 		{
 			auto console = spdlog::get("EnkiNet");
 			auto info = p.read<EntityInfo>();

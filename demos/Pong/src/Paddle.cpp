@@ -32,7 +32,7 @@ void Paddle::onSpawn()
 	{
 		mc1 = game_data->getNetworkManager()->on_network_tick.connect([this]()
 		{
-			Packet p({ PacketType::ENTITY });
+			Packet p({ PacketType::ENTITY_UPDATE });
 			p << this->info;
 			serialize(p);
 			this->game_data->getNetworkManager()->client->sendPacket(0, &p);

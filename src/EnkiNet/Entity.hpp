@@ -10,6 +10,8 @@
 #include "GameData.hpp"
 #include "Networking/Networking/Client.hpp"
 
+using EntityID = std::int32_t;
+
 struct EntityInfo
 {
 	std::string type = "";

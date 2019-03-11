@@ -22,10 +22,10 @@ std::map<std::string, std::function<void(Packet, Wrapee*)>> RPCWrapper<Wrapee>::
 
 //Used for getting type info from functions, and having that info available in the wrapped RPC functions
 template <typename not_important>
-struct rpc;
+struct RPCUtil;
 
 template <typename Return, typename... Parameters>
-struct rpc<Return(Parameters...)>
+struct RPCUtil<Return(Parameters...)>
 {
 	using return_t = Return;
 
@@ -46,7 +46,7 @@ struct rpc<Return(Parameters...)>
 };
 
 template <typename Return, typename Class, typename... Parameters>
-struct rpc<Return((Class::*)(Parameters...))>
+struct RPCUtil<Return((Class::*)(Parameters...))>
 {
 	using return_t = Return;
 
@@ -85,7 +85,7 @@ public:
 	template <typename F>
 	void add(std::string name, F* func)
 	{
-		static_assert(std::is_void<typename rpc<F>::return_t>::value,
+		static_assert(std::is_void<typename RPCUtil<F>::return_t>::value,
 			"You can't register a function as an RPC if it doesn't return void");
 
 		if (functions.count(name))
@@ -93,11 +93,10 @@ public:
 			return;
 		}
 
-		functions[name] = rpc<F>.wrap(func);
-		std::cout << "rpc " << name << " registered\n";
+		functions[name] = RPCUtil<F>::wrap(func);
 	}
 
-	//Register a member RPC with a member function
+	//Register a class RPC with a member function
 	template <typename R, typename Class, typename... Args>
 	void add(std::string name, R(Class::*func)(Args...))
 	{
@@ -109,8 +108,7 @@ public:
 			return;
 		}
 
-		RPCWrapper<Class>::functions[name] = rpc<R(Class::*)(Args...)>::wrap(func);
-		std::cout << "rpc " << name << " registered\n";
+		RPCWrapper<Class>::functions[name] = RPCUtil<R(Class::*)(Args...)>::wrap(func);
 	}
 
 	//Register a derived from Entity RPC with a member function
@@ -125,15 +123,195 @@ public:
 			return;
 		}
 
-		entity_functions[type][name] = rpc<R(Class::*)(Args...)>::wrapEntity(func);
-		std::cout << "rpc " << name << " registered for " + type + "\n";
+		entity_functions[type][name] = RPCUtil<R(Class::*)(Args...)>::wrapEntity(func);
 	}
 
-	//Serialize variadic template args to packet in reverse (now correct) order, so as to fix right-to-left ordering
-	void fillPacket()
+	//Handle a global RPC packet
+	void receive(Packet p)
 	{
+		try
+		{
+			//done this way because getBytesRead will be sizeof(PacketHeader), and anything less than that is invalid
+			if (p.getBytes().size() <= p.getBytesRead())
+			{
+				std::cout << "Invalid RPC packet received due to being empty, ignoring\n";
+				return;
+			}
 
+			std::string name = p.read<std::string>();
+
+			if (!functions.count(name))
+			{
+				std::cout << "Invalid RPC packet received due to invalid name, ignoring\n";
+				return;
+			}
+
+			functions[name](p);
+		}
+		catch (std::exception&)
+		{
+			std::cout << "Invalid RPC packet received that threw an exception, ignoring\n";
+		}
 	}
+
+	//Handle a member function RPC packet
+	template <typename T>
+	void receive(Packet p, T* instance)
+	{
+		try
+		{
+			//done this way because getBytesRead will be sizeof(PacketHeader), and anything less than that is invalid
+			if (p.getBytes().size() <= p.getBytesRead())
+			{
+				std::cout << "Invalid RPC packet received due to being empty, ignoring\n";
+				return;
+			}
+
+			auto info = p.read<EntityInfo>();
+			auto name = p.read<std::string>();
+
+			if constexpr(std::is_base_of_v<Entity, T>)
+			{
+				if (!entity_functions.count(info.type) || !entity_functions[info.type].count(name))
+				{
+					std::cout << "Invalid RPC packet received due to invalid name, ignoring\n";
+					return;
+				}
+
+				entity_functions[info.type][name](p, instance);
+			}
+			else
+			{
+				if (!RPCWrapper<T>::functions.count(name))
+				{
+					std::cout << "Invalid RPC packet received due to invalid name, ignoring\n";
+					return;
+				}
+
+				RPCWrapper<T>::functions[name](p, instance);
+			}
+		}
+		catch (std::exception&)
+		{
+			std::cout << "Invalid RPC packet received that threw an exception, ignoring\n";
+		}
+	}
+
+	//call local global RPC
+	template <typename F, typename... Args>
+	void call([[maybe_unused]] F* f, std::string name, Args... args)
+	{
+		static_assert(RPCUtil<F>::template matchesArgs<Args...>(),
+			"You tried to call this rpc with the incorrect number or type of parameters");
+
+		if (functions.count(name))
+		{
+			Packet p;
+			p << name;
+			fillPacket(p, args...);
+
+			receive(p);
+		}
+	}
+
+	//call local class RPC
+	template <typename R, typename Class, typename T, typename... Args>
+	void call([[maybe_unused]] R(Class::*f)(Args...), std::string name, T* instance, Args... args)
+	{
+		static_assert(RPCUtil<R(Class::*)(Args...)>::template matchesArgs<Args...>(),
+			"You tried to call this rpc with the incorrect number or type of parameters");
+
+		if (RPCWrapper<T>::functions.count(name))
+		{
+			Packet p({ PacketType::ENTITY_RPC });
+			p << EntityInfo{} <<  name, ;
+			fillPacket(p, args...);
+
+			receive(p, instance);
+		}
+	}
+	
+	//call local and remote RPC
+	template <typename R, typename Class, typename T, typename... Args>
+	void call([[maybe_unused]] R(Class::*f)(Args...), std::string name, NetworkManager* net_man, T* instance, Args... args)
+	{
+		static_assert(RPCUtil<R(Class::*)(Args...)>::template matchesArgs<Args...>(),
+			"You tried to call this rpc with the incorrect number or type of parameters");
+
+		if (instance == nullptr || net_man == nullptr || net_man->client == nullptr )
+		{
+			return;
+		}
+
+		if constexpr(std::is_base_of_v<Entity, T>)
+		{
+			//We know it's derived from Entity, so it must have an info member variable, no need to cast it.
+			if (!entity_functions.count(instance->info.type) || !entity_functions[instance->info.type].count(name))
+			{
+				return;
+			}
+
+			Packet p({ PacketType::ENTITY_RPC });
+			p << instance->info << name;
+			fillPacket(p, args...);
+
+			net_man->client->sendPacket(0, &p);
+
+			receive(p, instance);
+		}
+		else
+		{
+			if (!RPCWrapper<T>::functions.count(name))
+			{
+				return;
+			}
+
+			Packet p({ PacketType::GLOBAL_RPC });
+			p << name;
+			fillPacket(p, args...);
+
+			net_man->client->sendPacket(0, &p);
+			receive(p, instance);
+		}
+	}
+
+	//call local global RPC unsafe
+	template <typename... Args>
+	void callUnsafe(std::string name, Args... args)
+	{
+		if (functions.count(name))
+		{
+			Packet p;
+			p << name;
+			fillPacket(p, args...);
+			receive(p);
+		}
+	}
+
+	//call local entity RPC unsafe
+	template <typename T, typename... Args>
+	void callUnsafe(std::string name, T* instance, Args... args)
+	{
+		static_assert(std::is_base_of_v<Entity, T>);
+
+		if (entity_functions.count(instance->info.type) && entity_functions[instance->info.type].count(name))
+		{
+			Packet p({ PacketType::ENTITY_RPC });
+			p << instance->info;
+			p << name;
+			fillPacket(p, args...);
+			receive(p, instance);
+		}
+	}
+
+	//todo: unsafe global remote
+	//todo: unsafe entity local
+	//todo: unsafe entity remote
+
+private:
+	//Serialize variadic template args to packet in reverse (now correct) order, so as to fix right-to-left ordering
+	//not defined in packet header because this stuff is specific to parameter pack expansion and will get misused
+	void fillPacket() {}
 
 	template <typename T>
 	void fillPacket(Packet& p, T x)
@@ -156,185 +334,8 @@ public:
 		return p;
 	}
 
-	//Handle a global RPC packet
-	void receive(Packet p)
-	{
-		try
-		{
-			if (p.getBytes().size() <= p.getBytesRead())
-			{
-				std::cout << "Invalid RPC packet received due to being empty, ignoring\n";
-				return;
-			}
-
-			std::string name = p.read<std::string>();
-
-			if (!functions.count(name))
-			{
-				std::cout << "Invalid RPC packet received due to invalid name, ignoring\n";
-				return;
-			}
-
-			//std::cout << "received packet to call rpc " << name << "\n";
-			functions[name](p);
-		}
-		catch (std::exception&)
-		{
-			std::cout << "Invalid RPC packet received that threw an exception, ignoring\n";
-		}
-	}
-
-	//Handle a member function RPC packet
-	template <typename T>
-	void receive(Packet p, T* instance)
-	{
-		try
-		{
-			if (p.getBytes().size() <= p.getBytesRead())
-			{
-				std::cout << "Invalid RPC packet received due to being empty, ignoring\n";
-				return;
-			}
-
-			auto info = p.read<EntityInfo>();
-			auto name = p.read<std::string>();
-
-			if constexpr(std::is_same_v<T, Entity>)
-			{
-				if (!entity_functions.count(info.type) || !entity_functions[info.type].count(name))
-				{
-					std::cout << "Invalid RPC packet received due to invalid name, ignoring\n";
-					return;
-				}
-
-				entity_functions[info.type][name](p, instance);
-			}
-			else
-			{
-				if (!RPCWrapper<T>::functions.count(name))
-				{
-					std::cout << "Invalid RPC packet received due to invalid name, ignoring\n";
-					return;
-				}
-
-				//std::cout << "received packet to call rpc " << name << "\n";
-				RPCWrapper<T>::functions[name](p, instance);
-			}
-		}
-		catch (std::exception&)
-		{
-			std::cout << "Invalid RPC packet received that threw an exception, ignoring\n";
-		}
-	}
-
-	//call local global rpc
-	template <typename F, typename... Args>
-	void call([[maybe_unused]] F* f, std::string name, Args... args)
-	{
-		if (functions.count(name))
-		{
-			//std::cout << "safe call to rpc " << name << " with the values";
-			//((std::cout << " " << args), ...);
-			//std::cout << "\n";
-			static_assert(rpc<F>::template matchesArgs<Args...>(), "You tried to call this rpc with the incorrect number or type of parameters");
-			Packet p;
-
-			//fill packet with rpc information
-			p << name;
-			fillPacket(p, args...);
-
-			//this call is only local
-			receive(p);
-		}
-	}
-
-	//call local class rpc
-	template <typename R, typename Class, typename T, typename... Args>
-	void call([[maybe_unused]] R(Class::*f)(Args...), std::string name, T* instance, Args... args)
-	{
-		if (RPCWrapper<T>::functions.count(name))
-		{
-			//std::cout << "safe call to rpc " << name << " with the values";
-			//((std::cout << " " << args), ...);
-			//std::cout << "\n";
-			static_assert(rpc<R(Class::*)(Args...)>::template matchesArgs<Args...>(), "You tried to call this rpc with the incorrect number or type of parameters");
-			Packet p({ PacketType::ENTITY_RPC });
-
-			//fill packet with rpc information
-			p << EntityInfo{};
-			p << name;
-			fillPacket(p, args...);
-
-			//this call is only local
-			receive(p, instance);
-		}
-	}
-
-	//call local and remote rpc
-	template <typename R, typename Class, typename T, typename... Args>
-	void call([[maybe_unused]] R(Class::*f)(Args...), std::string name, NetworkManager* net_man, T* instance, Args... args)
-	{
-		if constexpr(std::is_base_of_v<Entity, T>)
-		{
-			auto type = static_cast<Entity*>(instance)->info.type;
-			if (!entity_functions.count(type) || !entity_functions[type].count(name))
-			{
-				return;
-			}
-		}
-		else
-		{
-			if (!RPCWrapper<T>::functions.count(name))
-			{
-				return;
-			}
-		}
-
-		//todo, make this vary depending on if entity*, or just remove anyway
-
-		//std::cout << "safe call to rpc " << name << " with the values";
-		//((std::cout << " " << args), ...);
-		//std::cout << "\n";
-		static_assert(rpc<R(Class::*)(Args...)>::template matchesArgs<Args...>(), "You tried to call this rpc with the incorrect number or type of parameters");
-		Packet p({ PacketType::ENTITY_RPC });
-
-		//fill packet with rpc information
-		p << static_cast<Entity*>(instance)->info;
-		p << name;
-		fillPacket(p, args...);
-
-		if (net_man)
-		{
-			if (net_man->client)
-			{
-				net_man->client->sendPacket(0, &p);
-			}
-		}
-	}
-
-	//call local global rpc unsafe
-	template <typename... Args>
-	void callUnsafe(std::string name, Args... args)
-	{
-		if (functions.count(name))
-		{
-			//std::cout << "unsafe call to rpc " << name << " with the values";
-			//((std::cout << " " << args), ...);
-			//std::cout << "\n";
-			Packet p;
-
-			//fill packet with rpc information
-			p << name;
-			fillPacket(p, args...);
-
-			//this call is only local
-			receive(p);
-		}
-	}
-
-private:
-	//Storage for all global rpc's
+	//Storage for all global RPCUtil's
 	std::map<std::string, std::function<void(Packet)>> functions;
-	//Storage for all member function rpc's for derived from Entity classes
+	//Storage for all member function RPCUtil's for derived from Entity classes
 	std::map<std::string, std::map<std::string, std::function<void(Packet, Entity*)>>> entity_functions;
 };

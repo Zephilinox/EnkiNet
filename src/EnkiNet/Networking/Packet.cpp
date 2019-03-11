@@ -131,8 +131,10 @@ void Packet::writeBits(int data, int bits_to_write, int offset)
 	}
 }
 
-void Packet::readBits(int& data, int bits_to_read, int offset)
+int Packet::readBits(int bits_to_read, int offset)
 {
+	int data = 0;
+
 	if (bits_read >= 8)
 	{
 		bytes_read += bits_read / 8;
@@ -145,7 +147,7 @@ void Packet::readBits(int& data, int bits_to_read, int offset)
 
 	if (sizeof(data) * 8 < bits_to_read + offset)
 	{
-		throw std::runtime_error("Reading these bits with this offset would cause an overflow of the data passed in");
+		throw std::runtime_error("Reading these bits with this offset would cause an overflow of the return value");
 	}
 
 	if (bytes_read + bytes_needed - 1 > bytes.size())
@@ -198,6 +200,8 @@ void Packet::readBits(int& data, int bits_to_read, int offset)
 			bits_left = 0;
 		}
 	}
+
+	return data;
 }
 
 void Packet::writeCompressedFloat(float data, float min, float max, float resolution)

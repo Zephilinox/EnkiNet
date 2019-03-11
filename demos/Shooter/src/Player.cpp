@@ -30,7 +30,7 @@ void Player::onSpawn()
 	{
 		mc1 = game_data->getNetworkManager()->on_network_tick.connect([this]()
 		{
-			Packet p({ PacketType::ENTITY });
+			Packet p({ PacketType::ENTITY_UPDATE });
 			p << info;
 			serialize(p);
 			game_data->getNetworkManager()->client->sendPacket(0, &p);

@@ -34,7 +34,7 @@ void Scenegraph::enableNetworking()
 			{
 				sendAllNetworkedEntitiesToClient(p.info.senderID);
 			}
-			else if (p.getHeader().type == ENTITY)
+			else if (p.getHeader().type == ENTITY_UPDATE)
 			{
 				//Don't send entity updates back to the sender
 				game_data->getNetworkManager()->server->sendPacketToSomeClients(0, &p, ENET_PACKET_FLAG_RELIABLE, [sender=p.info.senderID](const ClientInfo& client)
@@ -72,7 +72,7 @@ void Scenegraph::enableNetworking()
 				createEntity(info);
 				//todo on ent creation also serialize all its stuff?
 			}
-			else if (p.getHeader().type == ENTITY)
+			else if (p.getHeader().type == ENTITY_UPDATE)
 			{
 				auto info = p.read<EntityInfo>();
 				if (entityExists(info.ID))
@@ -242,7 +242,7 @@ void Scenegraph::sendAllNetworkedEntitiesToClient(ClientID client_id)
 			}
 
 			{
-				Packet p({ PacketType::ENTITY });
+				Packet p({ PacketType::ENTITY_UPDATE });
 				p << info;
 				ent.second->serialize(p);
 				game_data->getNetworkManager()->server->sendPacketToOneClient(client_id, 0, &p);
