@@ -123,10 +123,9 @@ TEST_CASE("Packet")
 		Packet p3;
 		int num = 0b11111111;
 		p3.writeBits(num, 8);
-		int output3 = 0;
-		int output4 = 0;
-		p3.readBits(output3, 4);
-		p3.readBits(output4, 4, 4);
+		int output3 = p3.readBits(4);
+		int output4 = p3.readBits(4, 4);
+		
 		CHECK(output3 == 0b00001111);
 		CHECK(output4 == 0b11110000);
 		CHECK(output3 + output4 == num);
@@ -193,7 +192,7 @@ TEST_CASE("Packet")
 
 	SUBCASE("Real Test")
 	{
-		Packet p({ PacketType::ENTITY });
+		Packet p({ PacketType::ENTITY_UPDATE });
 		std::array<float, 2> position = { 300, 400 };
 		float rotation = 27.27f;
 		bool isplayer = true;
