@@ -92,14 +92,15 @@ void Packet::writeBits(int data, int bits_to_write, int offset)
 	{
 		for (int i = 0; i < bits; ++i)
 		{
+			//sorry for ugly casts, blame GCC and Clang
 			int shift = 1 << (i + offset + extra_offset);
 			if (data & (shift))
 			{
-				bytes.data()[bytes_written - 1] = static_cast<std::byte>(static_cast<char>(bytes.data()[bytes_written - 1]) | static_cast<char>((1 << (i + bits_written))));
+				bytes.data()[bytes_written - 1] = static_cast<std::byte>(static_cast<unsigned char>(bytes.data()[bytes_written - 1]) | static_cast<unsigned char>((1 << (i + bits_written))));
 			}
 			else
 			{
-				bytes.data()[bytes_written - 1] = static_cast<std::byte>(static_cast<char>(bytes.data()[bytes_written - 1]) & static_cast<char>(~(1 << (i + bits_written))));
+				bytes.data()[bytes_written - 1] = static_cast<std::byte>(static_cast<unsigned char>(bytes.data()[bytes_written - 1]) & static_cast<unsigned char>(~(1 << (i + bits_written))));
 			}
 		}
 	};

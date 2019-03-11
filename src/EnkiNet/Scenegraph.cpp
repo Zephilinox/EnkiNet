@@ -169,10 +169,7 @@ void Scenegraph::createNetworkedEntity(EntityInfo info)
 	if (info.name == "" || info.type == "")
 	{
 		console->error("Invalid info when creating networked entity.\n\t{}", info);
-	}
-	else
-	{
-		console->info("Creating networked entity.\n\t{}", info);
+		return;
 	}
 
 	if (net_man->server && info.ID == 0)

@@ -1,5 +1,8 @@
 #pragma once
 
+//STD
+#include <set>
+
 //SELF
 #include <EnkiNet/Scenegraph.hpp>
 #include <EnkiNet/Timer.hpp>
@@ -23,6 +26,8 @@ private:
 	std::unique_ptr<sf::RenderWindow> window;
 	std::unique_ptr<Scenegraph> scenegraph;
 	std::unique_ptr<GameData> game_data;
+
+	std::set<ClientID> players;
 
 	ManagedConnection mc1;
 };

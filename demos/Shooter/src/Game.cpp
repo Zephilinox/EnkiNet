@@ -82,7 +82,12 @@ void Game::update()
 			{
 				if (p.getHeader().type == PacketType::CONNECTED)
 				{
-					scenegraph->createNetworkedEntity({ "Player", "Player 2", 0, p.info.senderID });
+					//not already part of the game
+					if (!players.count(p.info.senderID))
+					{
+						scenegraph->createNetworkedEntity({ "Player", "Player " + p.info.senderID, 0, p.info.senderID });
+						players.insert(p.info.senderID);
+					}
 				}
 			});
 		}
