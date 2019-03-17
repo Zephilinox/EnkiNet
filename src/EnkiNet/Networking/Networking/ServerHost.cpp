@@ -126,6 +126,25 @@ void ServerHost::sendPacketToSomeClients(enet_uint8 channel_id, Packet* p, enet_
 	}
 }
 
+void ServerHost::sendPacketToAllExceptOneClient(ClientID client_id_excluded, enet_uint8 channel_id, Packet* p, enet_uint32 flags)
+{
+	auto header = p->getHeader();
+	header.timeSent = enet_time_get();
+	p->setHeader(header);
+
+	auto data = reinterpret_cast<const enet_uint8*>(p->getBytes().data());
+	server.send_packet_to_all_if(channel_id, data, p->getSize(), flags, [client_id_excluded](const ClientInfo& client)
+	{
+		return client.id != client_id_excluded;
+	});
+
+	if (client_id_excluded != 1)
+	{
+		p->resetReadPosition();
+		game_data->getNetworkManager()->client->on_packet_received.emit(*p);
+	}
+}
+
 ClientID ServerHost::getNextUID()
 {
 	auto console = spdlog::get("EnkiNet");

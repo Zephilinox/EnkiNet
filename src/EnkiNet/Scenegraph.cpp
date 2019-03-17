@@ -37,10 +37,7 @@ void Scenegraph::enableNetworking()
 			else if (p.getHeader().type == ENTITY_UPDATE)
 			{
 				//Don't send entity updates back to the sender
-				game_data->getNetworkManager()->server->sendPacketToSomeClients(0, &p, ENET_PACKET_FLAG_RELIABLE, [sender=p.info.senderID](const ClientInfo& client)
-				{
-					return sender != client.id;
-				});
+				game_data->getNetworkManager()->server->sendPacketToAllExceptOneClient(p.info.senderID, 0, &p);
 			}
 			else if (p.getHeader().type == ENTITY_RPC)
 			{
@@ -52,10 +49,7 @@ void Scenegraph::enableNetworking()
 						info.ownerID == p.info.senderID)
 					{
 						//Don't send entity updates back to the sender
-						game_data->getNetworkManager()->server->sendPacketToSomeClients(0, &p, ENET_PACKET_FLAG_RELIABLE, [sender = p.info.senderID](const ClientInfo& client)
-						{
-							return sender != client.id;
-						});
+						game_data->getNetworkManager()->server->sendPacketToAllExceptOneClient(p.info.senderID, 0, &p);
 					}
 				}
 			}
