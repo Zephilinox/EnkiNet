@@ -26,6 +26,9 @@ public:
 	void draw(sf::RenderWindow& window) const;
 
 	void registerEntity(std::string type, BuilderFunction builder);
+
+	template <typename T, typename... Args>
+	void registerEntity(std::string type, Args... args);
 	
 	Entity* createEntity(EntityInfo info);
 	void createNetworkedEntity(EntityInfo info);
@@ -51,3 +54,12 @@ private:
 	bool network_ready = false;
 	std::shared_ptr<spdlog::logger> console;
 };
+
+template <typename T, typename... Args>
+void Scenegraph::registerEntity(std::string type, Args... args)
+{
+	builders[type] = [=](EntityInfo info)
+	{
+		return std::make_unique<T>(info, this->game_data, args...);
+	};
+}

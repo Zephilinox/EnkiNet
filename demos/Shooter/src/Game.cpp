@@ -21,10 +21,7 @@ Game::Game()
 	scenegraph = std::make_unique<Scenegraph>(game_data.get());
 	game_data->scenegraph = scenegraph.get();
 
-	scenegraph->registerEntity("Player", [&](EntityInfo info)
-	{
-		return std::make_unique<Player>(info, game_data.get(), window.get());
-	});
+	scenegraph->registerEntity<Player>("Player", window.get());
 
 	run();
 }
