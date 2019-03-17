@@ -33,7 +33,7 @@ void Player::onSpawn()
 
 	hpText.setFont(font);
 	hpText.setScale(0.3f, 0.3f);
-	hpText.setColor(sf::Color::Black);
+	hpText.setFillColor(sf::Color::Black);
 
 	if (info.ownerID == 1)
 	{
@@ -65,7 +65,7 @@ void Player::update(float dt)
 	for (auto& line : lines)
 	{
 		float lifeRemaining = line.life / 0.25f;
-		line.start.color.a = 255 * lifeRemaining;
+		line.start.color.a = static_cast<std::uint8_t>(255 * lifeRemaining);
 		line.life -= dt;
 	}
 
@@ -165,7 +165,7 @@ void Player::shoot(float x, float y)
 {
 	Line line;
 	auto start = sprite.getPosition();
-	float rads = sprite.getRotation() * (3.1415 / 180.0f);
+	float rads = sprite.getRotation() * (3.1415f / 180.0f);
 	sf::Vector2f rot_vector(std::cos(rads), std::sin(rads));
 	rot_vector *= 30.0f;
 	start += rot_vector;

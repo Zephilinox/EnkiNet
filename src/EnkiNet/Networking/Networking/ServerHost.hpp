@@ -13,15 +13,9 @@
 class ServerHost : public Server
 {
 public:
-	ServerHost(GameData* game_data)
-		: Server(game_data)
-	{}
-
-	~ServerHost() final = default;
-
-	void initialize() final;
-	void deinitialize() final;
-
+	ServerHost(GameData* game_data);
+	~ServerHost() final;
+	
 	void processPackets() final;
 
 	void sendPacketToOneClient(ClientID client_id, enet_uint8 channel_id, Packet* p, enet_uint32 flags = ENET_PACKET_FLAG_RELIABLE) final;

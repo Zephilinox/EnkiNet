@@ -21,8 +21,6 @@ public:
 
 	virtual ~Client() = default;
 
-	virtual void initialize() = 0;
-	virtual void deinitialize() = 0;
 	virtual void processPackets() = 0;
 
 	virtual void sendPacket(enet_uint8 channel_id, Packet* p, enet_uint32 flags = ENET_PACKET_FLAG_RELIABLE) = 0;
@@ -62,18 +60,11 @@ public:
 		return id;
 	}
 
-	inline bool isInitialized() const
-	{
-		return initialized;
-	}
-
 	Signal<Packet> on_packet_received;
 
 protected:
 	GameData* game_data;
-
 	ClientID id = 0;
-	bool initialized = false;
 
 private:
 	std::mutex mutex;

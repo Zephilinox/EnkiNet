@@ -28,8 +28,6 @@ public:
 
 	virtual ~Server() = default;
 
-	virtual void initialize() = 0;
-	virtual void deinitialize() = 0;
 	virtual void processPackets() = 0;
 
 	virtual void sendPacketToOneClient(ClientID client_id, enet_uint8 channel_id, Packet* p, enet_uint32 flags = ENET_PACKET_FLAG_RELIABLE) = 0;
@@ -66,17 +64,10 @@ public:
 		packets.push(std::move(p));
 	}
 
-	inline bool isInitialized() const
-	{
-		return initialized;
-	}
-
 	Signal<Packet> on_packet_received;
 
 protected:
 	GameData* game_data;
-
-	bool initialized = false;
 
 private:
 	std::mutex mutex;

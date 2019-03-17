@@ -1,8 +1,8 @@
 #include "ServerHost.hpp"
 
-void ServerHost::initialize()
+ServerHost::ServerHost(GameData* game_data)
+	: Server(game_data)
 {
-	initialized = true;
 	auto console = spdlog::get("EnkiNet");
 	console->info("Server Initialized");
 
@@ -12,9 +12,9 @@ void ServerHost::initialize()
 		client.id = getNextUID();
 
 		//Tell the client what its ID is
-		Packet p({PacketType::CLIENT_INITIALIZED});
+		Packet p({ PacketType::CLIENT_INITIALIZED });
 		p << client.id;
-		console->info("Client {} initialized. IP = {}" , client.id, ip);
+		console->info("Client {} initialized. IP = {}", client.id, ip);
 		sendPacketToOneClient(client.id, 0, &p);
 	};
 
@@ -34,9 +34,9 @@ void ServerHost::initialize()
 		.set_listen_port(game_data->getNetworkManager()->server_port)
 		.set_initialize_client_function(std::move(client_init)));
 }
-void ServerHost::deinitialize()
+
+ServerHost::~ServerHost()
 {
-	initialized = false;
 	auto console = spdlog::get("EnkiNet");
 	console->info("Server Deinitialized");
 	server.stop_listening();

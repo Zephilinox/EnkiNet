@@ -3,16 +3,16 @@
 //SELF
 #include "../../Entity.hpp"
 
-void ClientHost::initialize()
+ClientHost::ClientHost(GameData* game_data)
+	: Client(game_data)
 {
-	initialized = true;
+	id = 1;
 	auto console = spdlog::get("EnkiNet");
 	console->info("Client Initialized");
 }
 
-void ClientHost::deinitialize()
+ClientHost::~ClientHost()
 {
-	initialized = false;
 	auto console = spdlog::get("EnkiNet");
 	console->info("Client Deinitialized");
 }

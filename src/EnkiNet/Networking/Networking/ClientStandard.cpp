@@ -6,9 +6,9 @@
 //SELF
 #include "../../Entity.hpp"
 
-void ClientStandard::initialize()
+ClientStandard::ClientStandard(GameData* game_data)
+	: Client(game_data)
 {
-	initialized = true;
 	auto console = spdlog::get("EnkiNet");
 	console->info("Client Initialized");
 	client.connect(enetpp::client_connect_params()
@@ -16,10 +16,9 @@ void ClientStandard::initialize()
 		.set_server_host_name_and_port(game_data->getNetworkManager()->server_ip.c_str(), game_data->getNetworkManager()->server_port));
 }
 
-void ClientStandard::deinitialize()
+ClientStandard::~ClientStandard()
 {
 	auto console = spdlog::get("EnkiNet");
-	initialized = false;
 	console->info("Client Deinitialized");
 	client.disconnect();
 }

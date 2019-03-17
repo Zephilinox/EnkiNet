@@ -48,23 +48,23 @@ NetworkManager::~NetworkManager()
 
 void NetworkManager::startHost()
 {
+	assert(!server);
+	assert(!client);
+
 	auto console = spdlog::get("EnkiNet");
 	console->info("Starting Listen Server Hosting");
-	server = std::move(std::make_unique<ServerHost>(game_data));
-	client = std::move(std::make_unique<ClientHost>(game_data));
-
-	server->initialize();
-	client->initialize();
+	server = std::make_unique<ServerHost>(game_data);
+	client = std::make_unique<ClientHost>(game_data);
 }
 
 void NetworkManager::startClient()
 {
 	assert(!server);
+	assert(!client);
 
 	auto console = spdlog::get("EnkiNet");
 	console->info("Starting Client");
 	client = std::move(std::make_unique<ClientStandard>(game_data));
-	client->initialize();
 }
 
 void NetworkManager::stopServer()
@@ -74,14 +74,8 @@ void NetworkManager::stopServer()
 	if (server)
 	{
 		console->info("Server exists");
-		if (server->isInitialized())
-		{
-			console->info("Server was initialized");
-			server->deinitialize();
-		}
-
-		console->info("Server destroyed");
 		server.reset(nullptr);
+		console->info("Server destroyed");
 	}
 }
 
@@ -92,14 +86,8 @@ void NetworkManager::stopClient()
 	if (client)
 	{
 		console->info("Client exists");
-		if (client->isInitialized())
-		{
-			console->info("Client was initialized");
-			client->deinitialize();
-		}
-
-		console->info("Client destroyed");
 		client.reset(nullptr);
+		console->info("Client destroyed");
 	}
 }
 
