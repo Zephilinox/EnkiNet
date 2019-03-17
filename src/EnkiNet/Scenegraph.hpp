@@ -45,7 +45,7 @@ private:
 	void sendAllNetworkedEntitiesToClient(ClientID client_id);
 
 	std::map<EntityID, std::unique_ptr<Entity>> entities;
-	std::map<std::string, std::vector<std::string>> entities_child_types;
+	std::map<std::string, std::vector<std::pair<std::string, std::string>>> entities_child_types;
 	std::map<std::string, BuilderFunction> builders;
 
 	EntityID ID = 1;
@@ -76,7 +76,7 @@ void Scenegraph::registerEntityChildren(std::string type, Args... args)
 
 	for (const auto& child_type : entities_child_types[type])
 	{
-		if (!builders.count(child_type))
+		if (!builders.count(child_type.first))
 		{
 			entities_child_types[type] = {};
 			console->error("aaaaaaaaaaaaaaaaaaaaa");

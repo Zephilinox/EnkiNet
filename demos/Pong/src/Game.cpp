@@ -24,12 +24,19 @@ Game::Game()
 	game_data->scenegraph = scenegraph.get();
 
 	scenegraph->registerEntity<PlayerText>("PlayerText3");
+
 	scenegraph->registerEntity<PlayerText>("PlayerText2");
-	scenegraph->registerEntityChildren("PlayerText2", "PlayerText3");
+	scenegraph->registerEntityChildren("PlayerText2",
+		std::make_pair<std::string, std::string>("PlayerText3", "my child :O" ));
+
 	scenegraph->registerEntity<PlayerText>("PlayerText");
-	scenegraph->registerEntityChildren("PlayerText", "PlayerText2");
+	scenegraph->registerEntityChildren("PlayerText",
+		std::make_pair<std::string, std::string>("PlayerText2", "ayyy"));
+
 	scenegraph->registerEntity<Paddle>("Paddle");
-	scenegraph->registerEntityChildren("Paddle", "PlayerText");
+	scenegraph->registerEntityChildren("Paddle",
+		std::make_pair<std::string, std::string>("PlayerText", "yeet"));
+
 	scenegraph->registerEntity<Ball>("Ball");
 	scenegraph->registerEntity<Collision>("Collision");
 

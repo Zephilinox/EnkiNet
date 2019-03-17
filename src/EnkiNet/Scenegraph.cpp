@@ -171,10 +171,9 @@ void Scenegraph::createNetworkedEntity(EntityInfo info)
 		info.ID = ID++;
 	}
 
-	//todo name
 	for (const auto& child_type : entities_child_types[info.type])
 	{
-		createNetworkedEntity({ child_type, child_type, 0, info.ownerID, info.ID });
+		createNetworkedEntity({ child_type.first, child_type.second, 0, info.ownerID, info.ID });
 	}
 
 	if (info.ownerID == 0 && network_ready)
