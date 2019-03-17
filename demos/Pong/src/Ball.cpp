@@ -49,6 +49,7 @@ void Ball::update(float dt)
 {
 	if (isOwner())
 	{
+		return;
 		if (!game_data->scenegraph->entityExists(4))
 		{
 			return;

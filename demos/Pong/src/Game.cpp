@@ -22,29 +22,18 @@ Game::Game()
 	window = std::make_unique<sf::RenderWindow>(sf::VideoMode(640, 360), "EnkiNet");
 	scenegraph = std::make_unique<Scenegraph>(game_data.get());
 	game_data->scenegraph = scenegraph.get();
-	game_data->getNetworkManager()->network_send_rate = 0;
 
-	scenegraph->registerEntity("Paddle", [&](EntityInfo info)
-	{
-		return std::make_unique<Paddle>(info, game_data.get());
-	});
+	scenegraph->registerEntity<PlayerText>("PlayerText3");
+	scenegraph->registerEntity<PlayerText>("PlayerText2");
+	scenegraph->registerEntityChildren("PlayerText2", "PlayerText3");
+	scenegraph->registerEntity<PlayerText>("PlayerText");
+	scenegraph->registerEntityChildren("PlayerText", "PlayerText2");
+	scenegraph->registerEntity<Paddle>("Paddle");
+	scenegraph->registerEntityChildren("Paddle", "PlayerText");
+	scenegraph->registerEntity<Ball>("Ball");
+	scenegraph->registerEntity<Collision>("Collision");
 
-	scenegraph->registerEntity("Ball", [&](EntityInfo info)
-	{
-		return std::make_unique<Ball>(info, game_data.get());
-	});
-
-	scenegraph->registerEntity("Collision", [&](EntityInfo info)
-	{
-		return std::make_unique<Collision>(info, game_data.get());
-	});
-
-	scenegraph->registerEntity("PlayerText", [&](EntityInfo info)
-	{
-		return std::make_unique<PlayerText>(info, game_data.get());
-	});
-
-	scenegraph->createEntity(EntityInfo{ "Collision", "Collision"});
+	//scenegraph->createEntity(EntityInfo{ "Collision", "Collision"});
 
 	if (!font.loadFromFile("resources/arial.ttf"))
 	{
@@ -58,7 +47,7 @@ Game::Game()
 	score1.setString("0");
 
 	score2.setFont(font);
-	score1.setCharacterSize(30);
+	score2.setCharacterSize(30);
 	score2.setFillColor(sf::Color(220, 25, 25));
 	score2.setPosition(320 + 60, 180);
 	score2.setString("0");

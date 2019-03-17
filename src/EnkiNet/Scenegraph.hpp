@@ -30,6 +30,9 @@ public:
 	template <typename T, typename... Args>
 	void registerEntity(std::string type, Args... args);
 	
+	template <typename... Args>
+	void registerEntityChildren(std::string type, Args... args);
+
 	Entity* createEntity(EntityInfo info);
 	void createNetworkedEntity(EntityInfo info);
 
@@ -41,11 +44,12 @@ public:
 private:
 	void sendAllNetworkedEntitiesToClient(ClientID client_id);
 
-	std::map<uint32_t, std::unique_ptr<Entity>> entities;
+	std::map<EntityID, std::unique_ptr<Entity>> entities;
+	std::map<std::string, std::vector<std::string>> entities_child_types;
 	std::map<std::string, BuilderFunction> builders;
 
-	int ID = 1;
-	int localID = -1;
+	EntityID ID = 1;
+	EntityID localID = -1;
 	GameData* game_data;
 	
 	ManagedConnection mc1;
@@ -62,4 +66,22 @@ void Scenegraph::registerEntity(std::string type, Args... args)
 	{
 		return std::make_unique<T>(info, this->game_data, args...);
 	};
+}
+
+template <typename... Args>
+void Scenegraph::registerEntityChildren(std::string type, Args... args)
+{
+	//todo: names of child entities
+	entities_child_types[type] = { args... };
+
+	for (const auto& child_type : entities_child_types[type])
+	{
+		if (!builders.count(child_type))
+		{
+			entities_child_types[type] = {};
+			console->error("aaaaaaaaaaaaaaaaaaaaa");
+			std::abort();
+			//etc
+		}
+	}
 }

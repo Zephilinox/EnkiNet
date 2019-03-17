@@ -21,7 +21,7 @@ void PlayerText::onSpawn()
 	}
 
 	label.setFont(font);
-	label.setString("Player " + std::to_string(info.ownerID));
+	label.setString(std::string("Player ") + std::to_string(info.ownerID));
 	label.setFillColor(sf::Color::Black);
 	label.setCharacterSize(12);
 }
@@ -35,9 +35,22 @@ void PlayerText::update([[maybe_unused]]float dt)
 	auto console = spdlog::get("console");
 	auto scenegraph = game_data->scenegraph;
 	auto parent = scenegraph->getEntity(info.parentID);
-	auto parent_paddle = static_cast<Paddle*>(parent);
 
-	label.setPosition(parent_paddle->sprite.getPosition() - sf::Vector2f(6, 16));
+	if (parent)
+	{
+		auto parent_paddle = dynamic_cast<Paddle*>(parent);
+		if (parent_paddle)
+		{
+			label.setPosition(parent_paddle->sprite.getPosition() - sf::Vector2f(6, 16));
+		}
+
+		auto parent_player_text = dynamic_cast<PlayerText*>(parent);
+		if (parent_player_text)
+		{
+			label.setString(info.type + " " + std::to_string(info.ID));
+			label.setPosition(parent_player_text->label.getPosition() - sf::Vector2f(0, 16));
+		}
+	}
 }
 
 void PlayerText::draw(sf::RenderWindow& window) const

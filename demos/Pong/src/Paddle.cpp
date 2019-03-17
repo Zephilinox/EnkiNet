@@ -37,10 +37,6 @@ void Paddle::onSpawn()
 			serialize(p);
 			this->game_data->getNetworkManager()->client->sendPacket(0, &p);
 		});
-
-		auto console = spdlog::get("console");
-		console->info("paddle creating net entity.\n\t{}", info);
-		game_data->scenegraph->createNetworkedEntity({ "PlayerText", "PlayerText " + info.name, 0, info.ownerID, info.ID });
 	}
 
 	game_data->scenegraph->rpcs.add("Paddle", "setColour", &Paddle::setColour);
