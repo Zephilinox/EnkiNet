@@ -12,18 +12,18 @@ struct Line
 	float life;
 };
 
-class Player : public Entity
+class Player : public enki::Entity
 {
 public:
-	Player(EntityInfo info, GameData* data, sf::RenderWindow* window);
+	Player(enki::EntityInfo info, enki::GameData* data, sf::RenderWindow* window);
 
 	void onSpawn();
 
 	void update(float dt);
 	void draw(sf::RenderWindow& window) const;
 
-	void serialize(Packet& p);
-	void deserialize(Packet& p);
+	void serialize(enki::Packet& p);
+	void deserialize(enki::Packet& p);
 
 private:
 	void shoot(float x, float y);
@@ -37,13 +37,13 @@ private:
 	float speed = 300;
 	int hp = 10;
 
-	ManagedConnection mc1;
-	ManagedConnection mc2;
-	ManagedConnection mc3;
+	enki::ManagedConnection mc1;
+	enki::ManagedConnection mc2;
+	enki::ManagedConnection mc3;
 	sf::RenderWindow* window = nullptr;
 
 	std::vector<Line> lines;
 
-	Timer shootTimer;
+	enki::Timer shootTimer;
 	float shootDelay = 0.1f;
 };

@@ -17,8 +17,8 @@ Game::Game()
 	auto console = spdlog::get("console");
 	window = std::make_unique<sf::RenderWindow>(sf::VideoMode(640, 360), "EnkiNet");
 
-	game_data = std::make_unique<GameData>();
-	scenegraph = std::make_unique<Scenegraph>(game_data.get());
+	game_data = std::make_unique<enki::GameData>();
+	scenegraph = std::make_unique<enki::Scenegraph>(game_data.get());
 	game_data->scenegraph = scenegraph.get();
 
 	scenegraph->registerEntity<Player>("Player", window.get());
@@ -75,9 +75,9 @@ void Game::update()
 			scenegraph->enableNetworking();
 			scenegraph->createNetworkedEntity({ "Player", "Player 1" });
 
-			mc1 = game_data->getNetworkManager()->server->on_packet_received.connect([gd = game_data.get(), this](Packet p)
+			mc1 = game_data->getNetworkManager()->server->on_packet_received.connect([gd = game_data.get(), this](enki::Packet p)
 			{
-				if (p.getHeader().type == PacketType::CONNECTED)
+				if (p.getHeader().type == enki::PacketType::CONNECTED)
 				{
 					//not already part of the game
 					if (!players.count(p.info.senderID))

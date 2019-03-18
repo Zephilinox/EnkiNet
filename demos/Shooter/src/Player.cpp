@@ -6,7 +6,7 @@
 //LIBS
 #include <EnkiNet/Scenegraph.hpp>
 
-Player::Player(EntityInfo info, GameData* data, sf::RenderWindow* window)
+Player::Player(enki::EntityInfo info, enki::GameData* data, sf::RenderWindow* window)
 	: Entity(info, data)
 	, window(window)
 {
@@ -50,7 +50,7 @@ void Player::onSpawn()
 	{
 		mc1 = game_data->getNetworkManager()->on_network_tick.connect([this]()
 		{
-			Packet p({ PacketType::ENTITY_UPDATE });
+			enki::Packet p({ enki::PacketType::ENTITY_UPDATE });
 			p << info;
 			serialize(p);
 			game_data->getNetworkManager()->client->sendPacket(0, &p);
@@ -145,7 +145,7 @@ void Player::draw(sf::RenderWindow& window_) const
 	}
 }
 
-void Player::serialize(Packet& p)
+void Player::serialize(enki::Packet& p)
 {
 	//15 bits vs 96 (3 floats)
 	p.writeCompressedFloat(sprite.getPosition().x, 0, 640, 0.01f);
@@ -153,7 +153,7 @@ void Player::serialize(Packet& p)
 	p.writeCompressedFloat(sprite.getRotation(), 0, 360, 0.01f);
 }
 
-void Player::deserialize(Packet& p)
+void Player::deserialize(enki::Packet& p)
 {
 	float x = p.readCompressedFloat(0, 640, 0.01f);
 	float y = p.readCompressedFloat(0, 360, 0.01f);

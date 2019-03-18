@@ -4,7 +4,7 @@
 //SELF
 #include "src/Game.hpp"
 
-int main(int argc, char** argv)
+int main()
 {
 	Game game;
 	return 0;

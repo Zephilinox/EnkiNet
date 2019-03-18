@@ -22,12 +22,12 @@ private:
 
 	float dt = 1.0f / 60.0f;
 
-	Timer timer;
+	enki::Timer timer;
 	std::unique_ptr<sf::RenderWindow> window;
-	std::unique_ptr<Scenegraph> scenegraph;
-	std::unique_ptr<GameData> game_data;
+	std::unique_ptr<enki::Scenegraph> scenegraph;
+	std::unique_ptr<enki::GameData> game_data;
 
-	std::set<ClientID> players;
+	std::set<enki::ClientID> players;
 
-	ManagedConnection mc1;
+	enki::ManagedConnection mc1;
 };
