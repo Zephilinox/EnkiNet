@@ -63,6 +63,10 @@ void Paddle::input(sf::Event& e)
 				latest_network_y = sprite.getPosition().y;
 				last_interpolation_y = sprite.getPosition().y;
 			}
+			if (e.key.code == sf::Keyboard::Num4)
+			{
+				game_data->scenegraph->rpcs.call(&Paddle::setColour, std::string("setColour"), game_data->getNetworkManager(), this, std::rand() % 255, std::rand() % 255, std::rand() % 255);
+			}
 		}
 		else
 		{

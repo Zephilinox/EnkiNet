@@ -72,6 +72,14 @@ namespace enki
 			Packet p(data, data_size);
 			p.info.senderID = client.id;
 			p.info.timeReceived = enet_time_get();
+
+			//Sometimes on LAN/localhost a client's time will be a few milliseconds off
+			//So if it's before the packet sent time, we make them the same so there's no timetravel
+			if (p.getHeader().timeSent > p.info.timeReceived)
+			{
+				p.info.timeReceived = p.getHeader().timeSent;
+			}
+
 			pushPacket(std::move(p));
 		};
 
@@ -108,6 +116,8 @@ namespace enki
 		server.send_packet_to_all_if(channel_id, data, p->getSize(), flags, []([[maybe_unused]]const ClientInfo& client) {return true; });
 
 		p->resetReadPosition();
+		p->info.timeReceived = header.timeSent;
+		p->info.senderID = 1;
 		game_data->getNetworkManager()->client->on_packet_received.emit(*p);
 	}
 
@@ -124,6 +134,8 @@ namespace enki
 		if (predicate({ 1 }))
 		{
 			p->resetReadPosition();
+			p->info.timeReceived = header.timeSent;
+			p->info.senderID = 1;
 			game_data->getNetworkManager()->client->on_packet_received.emit(*p);
 		}
 	}
@@ -143,6 +155,8 @@ namespace enki
 		if (client_id_excluded != 1)
 		{
 			p->resetReadPosition();
+			p->info.timeReceived = header.timeSent;
+			p->info.senderID = 1;
 			game_data->getNetworkManager()->client->on_packet_received.emit(*p);
 		}
 	}

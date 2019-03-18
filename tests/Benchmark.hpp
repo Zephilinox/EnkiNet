@@ -109,9 +109,9 @@ void benchmark()
 	enki::Timer timer;
 
 #ifdef _DEBUG
-	int count = 50'000;
+	int count = 500'000;
 #else
-	int count = 5'000'000;
+	int count = 50'000'000;
 #endif
 
 	std::cout << "\n";

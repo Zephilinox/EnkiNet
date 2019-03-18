@@ -137,10 +137,22 @@ void Game::update()
 				game_data_ptr->getNetworkManager()->server->sendPacketToAllClients(0, &p);
 			});
 
+			mc2 = game_data->getNetworkManager()->client->on_packet_received.connect([game_data_ptr](enki::Packet p)
+			{
+				auto console = spdlog::get("console");
+				if (p.info.timeReceived - p.getHeader().timeSent > 500)
+				{
+					console->info("local client received {}. sent at {} and received at {}, delta of {}", p.getHeader().type, p.getHeader().timeSent, p.info.timeReceived, p.info.timeReceived - p.getHeader().timeSent);
+				}
+			});
+
 			mc3 = game_data->getNetworkManager()->server->on_packet_received.connect([game_data_ptr](enki::Packet p)
 			{
 				auto console = spdlog::get("console");
-				console->info("server received {}. sent at {} and received at {}, delta of {}", p.getHeader().type, p.getHeader().timeSent, p.info.timeReceived, p.info.timeReceived - p.getHeader().timeSent);
+				if (p.info.timeReceived - p.getHeader().timeSent > 500)
+				{
+					console->info("server received {} from {}. sent at {} and received at {}, delta of {}", p.getHeader().type, p.info.senderID, p.getHeader().timeSent, p.info.timeReceived, p.info.timeReceived - p.getHeader().timeSent);
+				}
 				
 				if (p.getHeader().type == enki::PacketType::CONNECTED)
 				{
@@ -157,7 +169,10 @@ void Game::update()
 			mc2 = game_data->getNetworkManager()->client->on_packet_received.connect([game_data_ptr](enki::Packet p)
 			{
 				auto console = spdlog::get("console");
-				console->info("client received {}. sent at {} and received at {}, delta of {}", p.getHeader().type, p.getHeader().timeSent, p.info.timeReceived, p.info.timeReceived - p.getHeader().timeSent);
+				if (p.info.timeReceived - p.getHeader().timeSent > 500)
+				{
+					console->info("client received {}. sent at {} and received at {}, delta of {}", p.getHeader().type, p.getHeader().timeSent, p.info.timeReceived, p.info.timeReceived - p.getHeader().timeSent);
+				}
 
 				if (p.getHeader().type == enki::PacketType::COMMAND)
 				{

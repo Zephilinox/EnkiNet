@@ -107,7 +107,7 @@ namespace enki
 
 		if (network_process_timer.getElapsedTime() > 1.0f / float(network_send_rate))
 		{
-			if ((server && !server->getConnectedClients().empty()) ||
+			if ((server && (!server->getConnectedClients().empty() || client)) ||
 				!server && client && client->isConnected())
 			{
 				network_process_timer.restart();
