@@ -4,8 +4,8 @@
 #include <spdlog/fmt/fmt.h>
 #include <EnkiNet/Scenegraph.hpp>
 
-Paddle::Paddle(EntityInfo info, GameData* game_data)
-	: Entity(info, game_data)
+Paddle::Paddle(enki::EntityInfo info, enki::GameData* game_data)
+	: enki::Entity(info, game_data)
 {
 }
 
@@ -32,7 +32,7 @@ void Paddle::onSpawn()
 	{
 		mc1 = game_data->getNetworkManager()->on_network_tick.connect([this]()
 		{
-			Packet p({ PacketType::ENTITY_UPDATE });
+			enki::Packet p({ enki::PacketType::ENTITY_UPDATE });
 			p << this->info;
 			serialize(p);
 			this->game_data->getNetworkManager()->client->sendPacket(0, &p);
@@ -140,12 +140,12 @@ void Paddle::draw(sf::RenderWindow& window) const
 	}
 }
 
-void Paddle::serialize(Packet& p)
+void Paddle::serialize(enki::Packet& p)
 {
 	p << sprite.getPosition().x << sprite.getPosition().y;
 }
 
-void Paddle::deserialize(Packet& p)
+void Paddle::deserialize(enki::Packet& p)
 {
 	float x = p.read<float>();
 

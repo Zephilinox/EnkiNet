@@ -8,7 +8,7 @@
 #include "Ball.hpp"
 #include "Paddle.hpp"
 
-Collision::Collision(EntityInfo info, GameData* game_data)
+Collision::Collision(enki::EntityInfo info, enki::GameData* game_data)
 	: Entity(info, game_data)
 {
 }
@@ -23,10 +23,6 @@ void Collision::onSpawn()
 
 	paddle2_collider.height = 128;
 	paddle2_collider.width = 32;
-}
-
-void Collision::input([[maybe_unused]]sf::Event& e)
-{
 }
 
 void Collision::update([[maybe_unused]]float dt)
@@ -87,19 +83,4 @@ void Collision::update([[maybe_unused]]float dt)
 			}
 		}
 	}	
-}
-
-void Collision::draw([[maybe_unused]]sf::RenderWindow& window) const
-{
-	
-}
-
-void Collision::serialize([[maybe_unused]]Packet& p)
-{
-	
-}
-
-void Collision::deserialize([[maybe_unused]]Packet& p)
-{
-	
 }

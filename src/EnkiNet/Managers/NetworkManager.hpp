@@ -12,42 +12,45 @@
 #include "../Signals/Signal.hpp"
 #include "../Timer.hpp"
 
-class GameData;
-class Server;
-class Client;
-
-class NetworkManager
+namespace enki
 {
-public:
-	NetworkManager(GameData* game_data);
-	~NetworkManager();
+	class GameData;
+	class Server;
+	class Client;
 
-	void startHost();
-	void startClient();
-	
-	void stopServer();
-	void stopClient();
+	class NetworkManager
+	{
+	public:
+		NetworkManager(GameData* game_data);
+		~NetworkManager();
 
-	void update();
+		void startHost();
+		void startClient();
 
-	std::unique_ptr<Server> server;
-	std::unique_ptr<Client> client;
-	Signal<> on_network_tick;
-	int network_send_rate = 60;
-	int network_process_rate = 120;
+		void stopServer();
+		void stopClient();
 
-	//note: doesn't include the server even if its a player too
-	uint32_t max_clients = 7;
-	uint8_t channel_count = 1;
-	std::string server_ip = "localhost";
-	uint16_t server_port = 22222;
+		void update();
 
-private:
-	void runThreadedNetwork();
+		std::unique_ptr<Server> server;
+		std::unique_ptr<Client> client;
+		Signal<> on_network_tick;
+		int network_send_rate = 60;
+		int network_process_rate = 120;
 
-	GameData* game_data;
-	std::thread network_thread;
-	bool exit_thread = false;
+		//note: doesn't include the server even if its a player too
+		uint32_t max_clients = 7;
+		uint8_t channel_count = 1;
+		std::string server_ip = "localhost";
+		uint16_t server_port = 22222;
 
-	Timer network_process_timer;
-};
+	private:
+		void runThreadedNetwork();
+
+		GameData* game_data;
+		std::thread network_thread;
+		bool exit_thread = false;
+
+		Timer network_process_timer;
+	};
+}

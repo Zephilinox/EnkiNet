@@ -6,18 +6,13 @@
 //SELF
 #include <EnkiNet/Entity.hpp>
 
-class Collision : public Entity
+class Collision : public enki::Entity
 {
 public:
-	Collision(EntityInfo info, GameData* game_data);
+	Collision(enki::EntityInfo info, enki::GameData* game_data);
 
-	virtual void onSpawn();
-	virtual void input(sf::Event& e);
-	virtual void update(float dt);
-	virtual void draw(sf::RenderWindow& window) const;
-
-	virtual void serialize(Packet& p);
-	virtual void deserialize(Packet& p);
+	void onSpawn() final;
+	void update(float dt) final;
 
 private:
 	sf::Rect<float> ball_collider;

@@ -5,19 +5,17 @@
 #include <EnkiNet/Entity.hpp>
 #include <EnkiNet/Timer.hpp>
 
-class Paddle : public Entity
+class Paddle : public enki::Entity
 {
 public:
-	Paddle(EntityInfo info, GameData* game_data);
+	Paddle(enki::EntityInfo info, enki::GameData* game_data);
 
-	virtual void onSpawn();
-
-	virtual void input(sf::Event& e);
-	virtual void update(float dt);
-	virtual void draw(sf::RenderWindow& window) const;
-
-	virtual void serialize(Packet& p);
-	virtual void deserialize(Packet& p);
+	void onSpawn() final;
+	void input(sf::Event& e) final;
+	void update(float dt) final;
+	void draw(sf::RenderWindow& window) const final;
+	void serialize(enki::Packet& p) final;
+	void deserialize(enki::Packet& p) final;
 
 	sf::Sprite sprite;
 	sf::Texture texture;
@@ -25,11 +23,11 @@ public:
 	void setColour(int r, int g, int b);
 
 private:
-	ManagedConnection mc1;
+	enki::ManagedConnection mc1;
 	bool interpolation_enabled = false;
 	sf::Sprite latest_sprite;
 	float latest_network_y = 0;
 	float last_interpolation_y = 0;
 	float interpolation_y = 0;
-	Timer interpolation_timer;
+	enki::Timer interpolation_timer;
 };

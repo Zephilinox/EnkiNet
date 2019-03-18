@@ -18,9 +18,9 @@ Game::Game()
 {
 	spdlog::stdout_color_mt("console");
 	auto console = spdlog::get("console");
-	game_data = std::make_unique<GameData>();
+	game_data = std::make_unique<enki::GameData>();
 	window = std::make_unique<sf::RenderWindow>(sf::VideoMode(640, 360), "EnkiNet");
-	scenegraph = std::make_unique<Scenegraph>(game_data.get());
+	scenegraph = std::make_unique<enki::Scenegraph>(game_data.get());
 	game_data->scenegraph = scenegraph.get();
 
 	scenegraph->registerEntity<PlayerText>("PlayerText3");
@@ -125,26 +125,26 @@ void Game::update()
 		{
 			game_data->getNetworkManager()->startHost();
 			scenegraph->enableNetworking();
-			scenegraph->createNetworkedEntity(EntityInfo{ "Paddle", "Paddle 1" });
-			scenegraph->createNetworkedEntity(EntityInfo{ "Ball", "Ball" });
-			GameData* game_data_ptr = game_data.get();
+			scenegraph->createNetworkedEntity(enki::EntityInfo{ "Paddle", "Paddle 1" });
+			scenegraph->createNetworkedEntity(enki::EntityInfo{ "Ball", "Ball" });
+			enki::GameData* game_data_ptr = game_data.get();
 			mc1 = game_data->getNetworkManager()->on_network_tick.connect([game_data_ptr]()
 			{
-				Packet p({ PacketType::COMMAND });
+				enki::Packet p({ enki::PacketType::COMMAND });
 				p << std::string("Scores");
 				p << game_data_ptr->score1;
 				p << game_data_ptr->score2;
 				game_data_ptr->getNetworkManager()->server->sendPacketToAllClients(0, &p);
 			});
 
-			mc3 = game_data->getNetworkManager()->server->on_packet_received.connect([game_data_ptr](Packet p)
+			mc3 = game_data->getNetworkManager()->server->on_packet_received.connect([game_data_ptr](enki::Packet p)
 			{
 				auto console = spdlog::get("console");
 				console->info("server received {}. sent at {} and received at {}, delta of {}", p.getHeader().type, p.getHeader().timeSent, p.info.timeReceived, p.info.timeReceived - p.getHeader().timeSent);
 				
-				if (p.getHeader().type == PacketType::CONNECTED)
+				if (p.getHeader().type == enki::PacketType::CONNECTED)
 				{
-					game_data_ptr->scenegraph->createNetworkedEntity(EntityInfo{ "Paddle", "Paddle 2", 0, p.info.senderID });
+					game_data_ptr->scenegraph->createNetworkedEntity(enki::EntityInfo{ "Paddle", "Paddle 2", 0, p.info.senderID });
 				}
 			});
 		}
@@ -153,13 +153,13 @@ void Game::update()
 		{
 			game_data->getNetworkManager()->startClient();
 			scenegraph->enableNetworking();
-			GameData* game_data_ptr = game_data.get();
-			mc2 = game_data->getNetworkManager()->client->on_packet_received.connect([game_data_ptr](Packet p)
+			enki::GameData* game_data_ptr = game_data.get();
+			mc2 = game_data->getNetworkManager()->client->on_packet_received.connect([game_data_ptr](enki::Packet p)
 			{
 				auto console = spdlog::get("console");
 				console->info("client received {}. sent at {} and received at {}, delta of {}", p.getHeader().type, p.getHeader().timeSent, p.info.timeReceived, p.info.timeReceived - p.getHeader().timeSent);
 
-				if (p.getHeader().type == PacketType::COMMAND)
+				if (p.getHeader().type == enki::PacketType::COMMAND)
 				{
 					std::string id = p.read<std::string>();
 					if (id == "Scores")

@@ -8,22 +8,26 @@
 //SELF
 #include "Managers/NetworkManager.hpp"
 
-class Scenegraph;
-
-//oof todo
-class GameData
+namespace enki
 {
-public:
-	GameData();
 
-	NetworkManager* getNetworkManager() noexcept;
-	Scenegraph* scenegraph = nullptr;
+	class Scenegraph;
 
-	bool window_active = true;
-	//todo
-	int score1 = 0;
-	int score2 = 0;
+	//oof todo
+	class GameData
+	{
+	public:
+		GameData();
 
-private:
-	NetworkManager network_manager;
-};
+		NetworkManager* getNetworkManager() noexcept;
+		Scenegraph* scenegraph = nullptr;
+
+		bool window_active = true;
+		//todo
+		int score1 = 0;
+		int score2 = 0;
+
+	private:
+		NetworkManager network_manager;
+	};
+}

@@ -1,21 +1,24 @@
 #include "Timer.hpp"
 
-Timer::Timer() noexcept
+namespace enki
 {
-	restart();
-}
+	Timer::Timer() noexcept
+	{
+		restart();
+	}
 
-float Timer::getElapsedTime() const noexcept
-{
-	return getElapsedTime<seconds>();
-}
+	float Timer::getElapsedTime() const noexcept
+	{
+		return getElapsedTime<seconds>();
+	}
 
-Timer::nanoseconds Timer::getChronoElapsedTime() const noexcept
-{
-	return clock::now() - start_time;
-}
+	Timer::nanoseconds Timer::getChronoElapsedTime() const noexcept
+	{
+		return clock::now() - start_time;
+	}
 
-void Timer::restart() noexcept
-{
-	start_time = clock::now();
+	void Timer::restart() noexcept
+	{
+		start_time = clock::now();
+	}
 }

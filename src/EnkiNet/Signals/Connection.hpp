@@ -4,83 +4,86 @@
 #include <functional>
 #include <memory>
 
-template <typename... Args>
-class Signal;
-
-class Disconnector;
-
-/*
-Connection is returned by signal.connect()
-you use it to control disconnecting your function from the signal
-*/
-class Connection
+namespace enki
 {
-public:
-	Connection() noexcept = default;
-	Connection(const Connection& c) = default;
+	template <typename... Args>
+	class Signal;
 
-	//Not Required?
-	//Connection(Connection&& c) = default;
+	class Disconnector;
 
-	virtual ~Connection() noexcept = default;
-
-	//Not Required?
-	//Connection& operator=(const Connection& c) = default;
-
-	//Required
-	Connection& operator=(Connection&& c) noexcept = default;
-
-	//Check to see if the Connection is still valid
-	operator bool() const noexcept;
-
-	//Ensures both Connections are connected to the same Signal and referring to the same function
-	//Might return false if both connections are invalid, depending on what made them invalid.
-	friend bool operator ==(const Connection& lhs, const Connection& rhs) noexcept
+	/*
+	Connection is returned by signal.connect()
+	you use it to control disconnecting your function from the signal
+	*/
+	class Connection
 	{
-		return lhs.slot_id == rhs.slot_id && lhs.dc.lock().get() == rhs.dc.lock().get();
-	}
+	public:
+		Connection() noexcept = default;
+		Connection(const Connection& c) = default;
 
-	//Returns true if disconnection was successful
-	//False if it was not, or if it's already disconnected
-	bool disconnect();
+		//Not Required?
+		//Connection(Connection&& c) = default;
 
-private:
-	//Signal needs to be able to create Connection with specific params
-	//Clients should not be able to, as it means they can do random shit to a signal
-	//Note: this means that a Signal<int> is a friend of Connection<bool>
-	//But this shouldn't be a problem, since it's created based on the Signal <Args...>
-	template <typename...>
-	friend class Signal;
+		virtual ~Connection() noexcept = default;
 
-	//Only meant to be accessed by Signal
-	Connection(std::weak_ptr<Disconnector> dc, unsigned id);
+		//Not Required?
+		//Connection& operator=(const Connection& c) = default;
 
-	std::weak_ptr<Disconnector> dc;
-	unsigned slot_id;
-};
+		//Required
+		Connection& operator=(Connection&& c) noexcept = default;
 
-/*
-Just a wrapper around Connection
-Automatically disconnects on destruction
-RAII
-*/
-class ManagedConnection : public Connection
-{
-public:
-	ManagedConnection() noexcept = default;
-	ManagedConnection(Connection c);
+		//Check to see if the Connection is still valid
+		operator bool() const noexcept;
 
-	//Possibly useful
-	ManagedConnection(const ManagedConnection&) = default;
+		//Ensures both Connections are connected to the same Signal and referring to the same function
+		//Might return false if both connections are invalid, depending on what made them invalid.
+		friend bool operator ==(const Connection& lhs, const Connection& rhs) noexcept
+		{
+			return lhs.slot_id == rhs.slot_id && lhs.dc.lock().get() == rhs.dc.lock().get();
+		}
 
-	//Not Required?
-	//ManagedConnection(ManagedConnection&& c) noexcept = default;
+		//Returns true if disconnection was successful
+		//False if it was not, or if it's already disconnected
+		bool disconnect();
 
-	virtual ~ManagedConnection() noexcept override final;
+	private:
+		//Signal needs to be able to create Connection with specific params
+		//Clients should not be able to, as it means they can do random shit to a signal
+		//Note: this means that a Signal<int> is a friend of Connection<bool>
+		//But this shouldn't be a problem, since it's created based on the Signal <Args...>
+		template <typename...>
+		friend class Signal;
 
-	//Not Required?
-	//ManagedConnection& operator=(const ManagedConnection& c) = default;
+		//Only meant to be accessed by Signal
+		Connection(std::weak_ptr<Disconnector> dc, unsigned id);
 
-	//Required, hides connection operator=? important?
-	ManagedConnection& operator=(ManagedConnection&& c) noexcept;
-};
+		std::weak_ptr<Disconnector> dc;
+		unsigned slot_id;
+	};
+
+	/*
+	Just a wrapper around Connection
+	Automatically disconnects on destruction
+	RAII
+	*/
+	class ManagedConnection : public Connection
+	{
+	public:
+		ManagedConnection() noexcept = default;
+		ManagedConnection(Connection c);
+
+		//Possibly useful
+		ManagedConnection(const ManagedConnection&) = default;
+
+		//Not Required?
+		//ManagedConnection(ManagedConnection&& c) noexcept = default;
+
+		virtual ~ManagedConnection() noexcept override final;
+
+		//Not Required?
+		//ManagedConnection& operator=(const ManagedConnection& c) = default;
+
+		//Required, hides connection operator=? important?
+		ManagedConnection& operator=(ManagedConnection&& c) noexcept;
+	};
+}

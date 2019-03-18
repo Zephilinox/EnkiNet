@@ -4,17 +4,16 @@
 #include <SFML/Graphics.hpp>
 #include <EnkiNet/Entity.hpp>
 
-class Ball : public Entity
+class Ball : public enki::Entity
 {
 public:
-	Ball(EntityInfo info, GameData* game_data);
+	Ball(enki::EntityInfo info, enki::GameData* game_data);
 
-	virtual void onSpawn();
-	virtual void input(sf::Event& e);
-	virtual void update(float dt);
-	virtual void draw(sf::RenderWindow& window) const;
-	virtual void serialize(Packet& p);
-	virtual void deserialize(Packet& p);
+	void onSpawn() final;
+	void update(float dt) final;
+	void draw(sf::RenderWindow& window) const final;
+	void serialize(enki::Packet& p) final;
+	void deserialize(enki::Packet& p) final;
 
 	sf::Sprite sprite;
 	sf::Texture texture;
@@ -24,6 +23,6 @@ public:
 	float y_speed = 300;
 
 private:
-	ManagedConnection mc1;
-	ManagedConnection mc2;
+	enki::ManagedConnection mc1;
+	enki::ManagedConnection mc2;
 };

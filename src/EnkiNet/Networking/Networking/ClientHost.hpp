@@ -8,24 +8,27 @@
 #include "ServerHost.hpp"
 #include "../../GameData.hpp"
 
-class ClientHost : public Client
+namespace enki
 {
-public:
-	ClientHost(GameData* game_data);
-	~ClientHost() final;
-
-	void processPackets() final {};
-	void sendPacket(enet_uint8 channel_id, Packet* p, enet_uint32 flags = ENET_PACKET_FLAG_RELIABLE) final;
-
-	inline bool isConnected() const final
+	class ClientHost : public Client
 	{
-		return true;
-	}
+	public:
+		ClientHost(GameData* game_data);
+		~ClientHost() final;
 
-	inline bool isConnecting() const final
-	{
-		return true;
-	}
+		void processPackets() final {};
+		void sendPacket(enet_uint8 channel_id, Packet* p, enet_uint32 flags = ENET_PACKET_FLAG_RELIABLE) final;
 
-private:
-};
+		inline bool isConnected() const final
+		{
+			return true;
+		}
+
+		inline bool isConnecting() const final
+		{
+			return true;
+		}
+
+	private:
+	};
+}

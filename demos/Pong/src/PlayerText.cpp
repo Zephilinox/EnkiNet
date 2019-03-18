@@ -8,7 +8,7 @@
 #include "Ball.hpp"
 #include "Paddle.hpp"
 
-PlayerText::PlayerText(EntityInfo info, GameData* game_data)
+PlayerText::PlayerText(enki::EntityInfo info, enki::GameData* game_data)
 	: Entity(info, game_data)
 {
 }
@@ -24,10 +24,6 @@ void PlayerText::onSpawn()
 	label.setString(std::string("Player ") + std::to_string(info.ownerID));
 	label.setFillColor(sf::Color::Black);
 	label.setCharacterSize(12);
-}
-
-void PlayerText::input([[maybe_unused]]sf::Event& e)
-{
 }
 
 void PlayerText::update([[maybe_unused]]float dt)
@@ -56,14 +52,4 @@ void PlayerText::update([[maybe_unused]]float dt)
 void PlayerText::draw(sf::RenderWindow& window) const
 {
 	window.draw(label);
-}
-
-void PlayerText::serialize([[maybe_unused]]Packet& p)
-{
-	
-}
-
-void PlayerText::deserialize([[maybe_unused]]Packet& p)
-{
-	
 }

@@ -7,7 +7,7 @@
 #include <EnkiNet/Networking/Networking/ServerHost.hpp>
 #include <EnkiNet/Scenegraph.hpp>
 
-Ball::Ball(EntityInfo info, GameData* game_data)
+Ball::Ball(enki::EntityInfo info, enki::GameData* game_data)
 	: Entity(info, game_data)
 {
 }
@@ -22,7 +22,7 @@ void Ball::onSpawn()
 	{
 		mc1 = game_data->getNetworkManager()->on_network_tick.connect([this]()
 		{
-			Packet p({ PacketType::ENTITY_UPDATE });
+			enki::Packet p({ enki::PacketType::ENTITY_UPDATE });
 			p << this->info;
 			serialize(p);
 			this->game_data->getNetworkManager()->client->sendPacket(0, &p);
@@ -30,9 +30,9 @@ void Ball::onSpawn()
 
 		if (game_data->getNetworkManager()->server)
 		{
-			mc2 = game_data->getNetworkManager()->server->on_packet_received.connect([this](Packet p)
+			mc2 = game_data->getNetworkManager()->server->on_packet_received.connect([this](enki::Packet p)
 			{
-				if (p.getHeader().type == PacketType::CONNECTED)
+				if (p.getHeader().type == enki::PacketType::CONNECTED)
 				{
 					sprite.setPosition(320, 180);
 				}
@@ -41,15 +41,13 @@ void Ball::onSpawn()
 	}
 }
 
-void Ball::input([[maybe_unused]]sf::Event& e)
-{
-}
-
 void Ball::update(float dt)
 {
 	if (isOwner())
 	{
+		//todo when not messing with children, also todo collision
 		return;
+
 		if (!game_data->scenegraph->entityExists(4))
 		{
 			return;
@@ -104,12 +102,12 @@ void Ball::draw(sf::RenderWindow& window) const
 	window.draw(sprite);
 }
 
-void Ball::serialize(Packet& p)
+void Ball::serialize(enki::Packet& p)
 {
 	p << sprite.getPosition().x << sprite.getPosition().y;
 }
 
-void Ball::deserialize(Packet& p)
+void Ball::deserialize(enki::Packet& p)
 {
 	float x = p.read<float>();
 	float y = p.read<float>();
