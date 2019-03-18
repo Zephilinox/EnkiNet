@@ -41,18 +41,18 @@ void math(int x_vel, int y_vel)
 	}
 }
 
-void print_time(Timer& t, int count)
+void print_time(enki::Timer& t, int count)
 {
 	auto time = t.getChronoElapsedTime();
 	std::cout << count << " calls took " <<
-		std::chrono::duration_cast<Timer::seconds_float>(time).count() << " seconds\n";
+		std::chrono::duration_cast<enki::Timer::seconds_float>(time).count() << " seconds\n";
 	std::cout << "each call took " <<
-		std::chrono::duration_cast<Timer::nanoseconds_float>(time).count() / count << " nanoseconds\n";
+		std::chrono::duration_cast<enki::Timer::nanoseconds_float>(time).count() / count << " nanoseconds\n";
 }
 
-void benchmark_entity(Timer&t, int count)
+void benchmark_entity(enki::Timer&t, int count)
 {
-	RPCManager rpcm;
+	enki::RPCManager rpcm;
 	ent e;
 
 	t.restart();
@@ -76,9 +76,9 @@ void benchmark_entity(Timer&t, int count)
 }
 
 template <typename F, typename... Args>
-void benchmark(F* function, std::string name, Timer t, int count, Args... args)
+void benchmark(F* function, std::string name, enki::Timer t, int count, Args... args)
 {
-	RPCManager rpcm;
+	enki::RPCManager rpcm;
 	t.restart();
 	for (int i = 0; i < count; ++i)
 	{
@@ -99,14 +99,14 @@ void benchmark(F* function, std::string name, Timer t, int count, Args... args)
 
 void benchmark()
 {
-	RPCManager rpcm;
+	enki::RPCManager rpcm;
 	rpcm.add("zero", &zero);
 	rpcm.add("one", &one);
 	rpcm.add("two", &two);
 	rpcm.add("three", &three);
 	rpcm.add("math", &math);
 
-	Timer timer;
+	enki::Timer timer;
 
 #ifdef _DEBUG
 	int count = 50'000;

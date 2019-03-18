@@ -19,7 +19,7 @@ void test(int i, double d, float s, int ii)
 
 TEST_CASE("RPC")
 {
-	RPCManager rpcm;
+	enki::RPCManager rpcm;
 	rpcm.add("test", test);
 
 	std::cout << "\n";
@@ -39,7 +39,7 @@ TEST_CASE("RPC")
 	std::cout << "\n";
 
 	//let's do it manually
-	Packet p;
+	enki::Packet p;
 	p << std::string("two") << true;
 	rpcm.receive(p);
 	//this makes the client throw an exception, so we need to capture that exception rather than crash the game, now fixed
@@ -47,7 +47,7 @@ TEST_CASE("RPC")
 	std::cout << "\n";
 
 	//now let's try a valid rpc, but one which has the wrong types
-	Packet p2;
+	enki::Packet p2;
 	p2 << std::string("test") << true << true << true << true;
 	rpcm.receive(p2);
 	//this also causes an exception to be thrown and the client to crash, now fixed
@@ -55,7 +55,7 @@ TEST_CASE("RPC")
 	std::cout << "\n";
 
 	//Now let's try sending one big arg to a valid function expecting 4 smaller args
-	Packet p3;
+	enki::Packet p3;
 	p3 << std::string("test") << 50 << 50;
 	rpcm.receive(p3);
 

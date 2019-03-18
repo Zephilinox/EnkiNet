@@ -7,16 +7,16 @@ struct vector2
 	float x = 0;
 	float y = 0;
 
-	friend Packet& operator <<(Packet& p, const vector2& v);
-	friend Packet& operator >>(Packet& p, vector2& v);
+	friend enki::Packet& operator <<(enki::Packet& p, const vector2& v);
+	friend enki::Packet& operator >>(enki::Packet& p, vector2& v);
 };
 
-Packet& operator <<(Packet& p, const vector2& v)
+enki::Packet& operator <<(enki::Packet& p, const vector2& v)
 {
 	return p << v.x << v.y;
 }
 
-Packet& operator >>(Packet& p, vector2& v)
+enki::Packet& operator >>(enki::Packet& p, vector2& v)
 {
 	return p >> v.x >> v.y;
 }
@@ -25,7 +25,7 @@ TEST_CASE("Packet")
 {
 	SUBCASE("Strings")
 	{
-		Packet p;
+		enki::Packet p;
 		std::string s = "hey";
 		p << s;
 		auto s2 = p.read<std::string>();
@@ -37,7 +37,7 @@ TEST_CASE("Packet")
 
 	SUBCASE("Custom Class")
 	{
-		Packet p;
+		enki::Packet p;
 		vector2 v{ 1, 3 };
 		p << v;
 		vector2 v2;
@@ -48,7 +48,7 @@ TEST_CASE("Packet")
 
 	SUBCASE("Vector")
 	{
-		Packet p;
+		enki::Packet p;
 		std::vector<int> vecs{ 1, 2 };
 		p << vecs;
 		std::vector<int> vecs2{};
@@ -58,7 +58,7 @@ TEST_CASE("Packet")
 
 	SUBCASE("Array")
 	{
-		Packet p;
+		enki::Packet p;
 		std::array<bool, 10> bools = { true, true, false, true, true, true, true, true, true, true };
 		p << bools;
 		std::array<bool, 10> bools2;
@@ -68,12 +68,12 @@ TEST_CASE("Packet")
 
 	SUBCASE("Header")
 	{
-		Packet p;
+		enki::Packet p;
 		int oldtype = p.getHeader().type;
 		int oldtype_bytes = static_cast<int>(p.getBytes().data()[0]);
 		CHECK(static_cast<int>(oldtype) == oldtype_bytes);
 
-		p.setHeader({ PacketType::GLOBAL_RPC });
+		p.setHeader({ enki::PacketType::GLOBAL_RPC });
 
 		int type = p.getHeader().type;
 		int type_bytes = static_cast<int>(p.getBytes().data()[0]);
@@ -82,43 +82,43 @@ TEST_CASE("Packet")
 
 	SUBCASE("Write Bits")
 	{
-		//todo: remove new packet to check for accurate byte boundary changes
-		Packet p2;
+		//todo: remove new enki::Packet to check for accurate byte boundary changes
+		enki::Packet p2;
 		int num = 0b00001111;
 		p2.writeBits(num, 8);
-		int resulting_num = static_cast<int>(p2.getBytes().data()[sizeof(PacketHeader)]);
+		int resulting_num = static_cast<int>(p2.getBytes().data()[sizeof(enki::PacketHeader)]);
 		CHECK(num == resulting_num);
 
 		int num2 = 0b01001100;
 		p2.writeBits(num2, 8);
-		int resulting_num2 = static_cast<int>(p2.getBytes().data()[sizeof(PacketHeader) + 1]);
+		int resulting_num2 = static_cast<int>(p2.getBytes().data()[sizeof(enki::PacketHeader) + 1]);
 		CHECK(num2 == resulting_num2);
 
 		int num3 = 0b00001111;
 		p2.writeBits(num3, 4);
-		int resulting_num3 = static_cast<int>(p2.getBytes().data()[sizeof(PacketHeader) + 2]);
+		int resulting_num3 = static_cast<int>(p2.getBytes().data()[sizeof(enki::PacketHeader) + 2]);
 		CHECK(0b00001111 == resulting_num3);
 
 		int num4 = 0b11110000;
 		p2.writeBits(num4, 4, 4);
-		int resulting_num4 = static_cast<int>(p2.getBytes().data()[sizeof(PacketHeader) + 2]);
+		int resulting_num4 = static_cast<int>(p2.getBytes().data()[sizeof(enki::PacketHeader) + 2]);
 		CHECK(0b11111111 == resulting_num4);
 	}
 
 	SUBCASE("Read Bits")
 	{
-		Packet p2;
+		enki::Packet p2;
 		p2 << 0b00001111;
-		int input = static_cast<int>(p2.getBytes().data()[sizeof(PacketHeader)]);
+		int input = static_cast<int>(p2.getBytes().data()[sizeof(enki::PacketHeader)]);
 		int output = p2.readBits(8);
 		CHECK(input == output);
 
 		p2 << 0b11110000;
-		int input2 = static_cast<int>(p2.getBytes().data()[sizeof(PacketHeader) + 1]);
+		int input2 = static_cast<int>(p2.getBytes().data()[sizeof(enki::PacketHeader) + 1]);
 		int output2 = p2.readBits(8);
 		CHECK(input2 == output2);
 
-		Packet p3;
+		enki::Packet p3;
 		int num = 0b11111111;
 		p3.writeBits(num, 8);
 		int output3 = p3.readBits(4);
@@ -131,7 +131,7 @@ TEST_CASE("Packet")
 
 	SUBCASE("Write Bits Overflowing Bytes")
 	{
-		Packet p;
+		enki::Packet p;
 		try
 		{
 			int num = 0b000001111;
@@ -148,15 +148,15 @@ TEST_CASE("Packet")
 
 		}
 
-		CHECK(p.getBytes().size() == sizeof(PacketHeader) + 3);
-		CHECK(static_cast<int>(p.getBytes()[sizeof(PacketHeader)]) == 0b11111111);
-		CHECK(static_cast<int>(p.getBytes()[sizeof(PacketHeader) + 1]) == 0b11001111);
-		CHECK(static_cast<int>(p.getBytes()[sizeof(PacketHeader) + 2]) == 0b00111111);
+		CHECK(p.getBytes().size() == sizeof(enki::PacketHeader) + 3);
+		CHECK(static_cast<int>(p.getBytes()[sizeof(enki::PacketHeader)]) == 0b11111111);
+		CHECK(static_cast<int>(p.getBytes()[sizeof(enki::PacketHeader) + 1]) == 0b11001111);
+		CHECK(static_cast<int>(p.getBytes()[sizeof(enki::PacketHeader) + 2]) == 0b00111111);
 	}
 
 	SUBCASE("Read Bits Overflowing Bytes")
 	{
-		Packet p;
+		enki::Packet p;
 		p << 1000000;
 		int num = p.readBits(32);
 		CHECK(num == 1000000);
@@ -164,21 +164,21 @@ TEST_CASE("Packet")
 
 	SUBCASE("Compressed Range")
 	{
-		Packet p;
+		enki::Packet p;
 		float f1 = 0.5f;
 		p.writeCompressedFloat(f1, 0, 1, 0.01f);
 		float f2 = p.readCompressedFloat(0, 1, 0.01f);
 		CHECK(f1 == f2);
 
 		//will fail due to not supporting > 8 bits on read/write
-		/*Packet p2;
+		/*enki::Packet p2;
 		float f3 = 5;
 		p2.writeCompressedFloat(f3, -10, 10, 0.01f);
 		float f4;
 		p2.readCompressedFloat(f4, -10, 10, 0.01f);
 		CHECK(f3 == f4);
 
-		Packet p3;
+		enki::Packet p3;
 		float f5 = 1.0f / 60.0f;
 		p3.writeCompressedFloat(f5, 0, 1, 0.001f);
 		float f6;
@@ -188,7 +188,7 @@ TEST_CASE("Packet")
 
 	SUBCASE("Real Test")
 	{
-		Packet p({ PacketType::ENTITY_UPDATE });
+		enki::Packet p({ enki::PacketType::ENTITY_UPDATE });
 		std::array<float, 2> position = { 300, 400 };
 		float rotation = 27.27f;
 		bool isplayer = true;
@@ -207,8 +207,8 @@ TEST_CASE("Packet")
 		int received_isplayer = p.readBits(1);
 		bool actual_isplayer = actual_isplayer = static_cast<bool>(received_isplayer);
 
-		CHECK(p.getBytes().size() < sizeof(PacketHeader) + sizeof(position) + sizeof(rotation) + sizeof(isplayer));
-		std::cout << p.getBytes().size() << " < " << sizeof(PacketHeader) + sizeof(position) + sizeof(rotation) + sizeof(isplayer) << ", yay bytes saved!\n";
+		CHECK(p.getBytes().size() < sizeof(enki::PacketHeader) + sizeof(position) + sizeof(rotation) + sizeof(isplayer));
+		std::cout << p.getBytes().size() << " < " << sizeof(enki::PacketHeader) + sizeof(position) + sizeof(rotation) + sizeof(isplayer) << ", yay bytes saved!\n";
 		CHECK(position[0] == doctest::Approx(received_pos[0]));
 		CHECK(position[1] == doctest::Approx(received_pos[1]));
 		CHECK(rotation == received_rot);
