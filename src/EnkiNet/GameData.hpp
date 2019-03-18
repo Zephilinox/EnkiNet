@@ -10,6 +10,7 @@
 
 class Scenegraph;
 
+//oof todo
 class GameData
 {
 public:
@@ -19,6 +20,7 @@ public:
 	Scenegraph* scenegraph = nullptr;
 
 	bool window_active = true;
+	//todo
 	int score1 = 0;
 	int score2 = 0;
 

@@ -64,9 +64,6 @@ Game::Game()
 
 void Game::run()
 {
-	//start delta time at a sane value
-	dt = 1.0f / 60.0f;
-
 	window->setFramerateLimit(120);
 	while (window->isOpen())
 	{
@@ -96,9 +93,9 @@ void Game::input()
 			game_data->window_active = true;
 		}
 
-		if (e.type == sf::Event::Closed)
+		if (e.type == sf::Event::LostFocus)
 		{
-			game_data->window_active = false;
+			//game_data->window_active = false;
 		}
 
 		if (e.type == sf::Event::KeyPressed)
