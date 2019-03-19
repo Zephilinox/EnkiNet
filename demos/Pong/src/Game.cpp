@@ -37,6 +37,10 @@ Game::Game()
 	scenegraph->registerEntityChildren("Paddle",
 		std::make_pair<std::string, std::string>("PlayerText", "yeet"));
 
+	//if the master calls it, every remote calls it
+	//if a remote tries to call it, nothing will happen
+	game_data->scenegraph->rpcs.add(enki::RPCType::RemoteAndLocal, "Paddle", "setColour", &Paddle::setColour);
+
 	scenegraph->registerEntity<Ball>("Ball");
 	scenegraph->registerEntity<Collision>("Collision");
 

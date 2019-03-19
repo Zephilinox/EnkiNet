@@ -43,15 +43,54 @@ namespace enki
 				}
 				else if (p.getHeader().type == ENTITY_RPC)
 				{
+					auto rpctype = p.read<RPCType>();
 					auto info = p.read<EntityInfo>();
 					if (entityExists(info.ID))
 					{
 						auto ent = getEntity(info.ID);
-						if (info == ent->info &&
-							info.ownerID == p.info.senderID)
+						if (info == ent->info)
 						{
-							//Don't send entity updates back to the sender
-							game_data->getNetworkManager()->server->sendPacketToAllExceptOneClient(p.info.senderID, 0, &p);
+							if (rpctype == Local)
+							{
+								console->error("ytho1");
+								//ytho
+							}
+							else if (rpctype == Master)
+							{
+								if (info.ownerID == p.info.senderID)
+								{
+									console->error("ytho2");
+									//ytho
+								}
+								else
+								{
+									//only send packet to master
+									game_data->getNetworkManager()->server->sendPacketToOneClient(info.ownerID, 0, &p);
+								}
+							}
+							else if (rpctype == Remote || rpctype == RemoteAndLocal)
+							{
+								if (info.ownerID == p.info.senderID)
+								{
+									//only send packets to non-owners, which must be all except sender
+									game_data->getNetworkManager()->server->sendPacketToAllExceptOneClient(p.info.senderID, 0, &p);
+								}
+								else
+								{
+									console->error("ytho3");
+									//ytho
+								}
+							}
+							else if (rpctype == MasterAndRemote || rpctype == All)
+							{
+								//send to everyone else
+								game_data->getNetworkManager()->server->sendPacketToAllExceptOneClient(p.info.senderID, 0, &p);
+							}
+							else
+							{
+								console->error("ytho4");
+								//ytho
+							}
 						}
 					}
 				}
@@ -90,12 +129,12 @@ namespace enki
 				}
 				else if (p.getHeader().type == ENTITY_RPC)
 				{
+					[[maybe_unused]] auto rpctype = p.read<RPCType>();
 					auto info = p.read<EntityInfo>();
 					if (entityExists(info.ID))
 					{
 						auto ent = getEntity(info.ID);
-						if (info == ent->info &&
-							info.ownerID == p.info.senderID)
+						if (info == ent->info)
 						{
 							p.resetReadPosition();
 							rpcs.receive(p, ent);

@@ -38,8 +38,6 @@ void Paddle::onSpawn()
 			this->game_data->getNetworkManager()->client->sendPacket(0, &p);
 		});
 	}
-
-	game_data->scenegraph->rpcs.add("Paddle", "setColour", &Paddle::setColour);
 }
 
 void Paddle::input(sf::Event& e)
@@ -63,17 +61,16 @@ void Paddle::input(sf::Event& e)
 				latest_network_y = sprite.getPosition().y;
 				last_interpolation_y = sprite.getPosition().y;
 			}
+
 			if (e.key.code == sf::Keyboard::Num4)
 			{
 				game_data->scenegraph->rpcs.call(&Paddle::setColour, std::string("setColour"), game_data->getNetworkManager(), this, std::rand() % 255, std::rand() % 255, std::rand() % 255);
 			}
 		}
-		else
+
+		if (e.key.code == sf::Keyboard::Num3)
 		{
-			if (e.key.code == sf::Keyboard::Num3)
-			{
-				game_data->scenegraph->rpcs.call(&Paddle::setColour, std::string("setColour"), game_data->getNetworkManager(), this, std::rand() % 255, std::rand() % 255, std::rand() % 255);
-			}
+			game_data->scenegraph->rpcs.call(&Paddle::setColour, std::string("setColour"), game_data->getNetworkManager(), this, std::rand() % 255, std::rand() % 255, std::rand() % 255);
 		}
 	}
 }
