@@ -24,6 +24,8 @@ namespace enki
 		Remote,
 
 		//if you own the entity it will also execute it for you
+		//Note that this might be slower than just using Remote and then calling the function directly as normal
+		//This is provided mainly for ease-of-use, as well as when you might not be able to call it directly for some reason
 		RemoteAndLocal,
 
 		//RPC runs for masters and non-owners
@@ -34,7 +36,23 @@ namespace enki
 		Local,
 
 		//Calling this RPC will execute it for everyone, including yourself
+		//Note that this might be slower than just using MasterAndRemote and then calling the function directly as normal
+		//This is provided mainly for ease-of-use, as well as when you might not be able to call it directly for some reason
 		All,
+	};
+
+	struct EntityRPC
+	{
+		using FunctionType = std::function<void(Packet, Entity*)>;
+		RPCType rpctype;
+		FunctionType function;
+	};
+
+	struct GlobalRPC
+	{
+		using FunctionType = std::function<void(Packet)>;
+		RPCType rpctype;
+		FunctionType function;
 	};
 	
 	inline Packet& operator <<(Packet& p, RPCType r)
@@ -56,15 +74,18 @@ namespace enki
 	class RPCWrapper
 	{
 	public:
-		static std::map<std::string, std::function<void(Packet, Wrapee*)>> functions;
-		static std::map<std::string, RPCType> rpctypes;
+		struct ClassRPC
+		{
+			using FunctionType = std::function<void(Packet, Wrapee*)>;
+			RPCType rpctype;
+			FunctionType function;
+		};
+
+		static std::map<std::string, ClassRPC> class_rpcs;
 	};
 
 	template <class Wrapee>
-	std::map<std::string, std::function<void(Packet, Wrapee*)>> RPCWrapper<Wrapee>::functions;
-
-	template <class Wrapee>
-	std::map<std::string, RPCType> RPCWrapper<Wrapee>::rpctypes;
+	std::map<std::string, typename RPCWrapper<Wrapee>::ClassRPC> RPCWrapper<Wrapee>::class_rpcs;
 
 	//Used for getting type info from functions, and having that info available in the wrapped RPC functions
 	template <typename not_important>
@@ -134,13 +155,13 @@ namespace enki
 			static_assert(std::is_void<typename RPCUtil<F>::return_t>::value,
 				"You can't register a function as an RPC if it doesn't return void");
 
-			if (functions.count(name))
+			if (global_rpcs.count(name))
 			{
 				return;
 			}
 
-			functions[name] = RPCUtil<F>::wrap(func);
-			rpctypes[name] = rpctype;
+			global_rpcs[name].function = RPCUtil<F>::wrap(func);
+			global_rpcs[name].rpctype = rpctype;
 		}
 
 		//Register a class RPC with a member function
@@ -150,12 +171,12 @@ namespace enki
 			static_assert(std::is_void<R>::value,
 				"You can't register a function as an RPC if it doesn't return void");
 
-			if (RPCWrapper<Class>::functions.count(name))
+			if (RPCWrapper<Class>::class_rpcs.count(name))
 			{
 				return;
 			}
 
-			RPCWrapper<Class>::functions[name] = RPCUtil<R(Class::*)(Args...)>::wrap(func);
+			RPCWrapper<Class>::class_rpcs[name] = RPCUtil<R(Class::*)(Args...)>::wrap(func);
 			RPCWrapper<Class>::rpctypes[name] = rpctype;
 		}
 
@@ -166,13 +187,13 @@ namespace enki
 			static_assert(std::is_void<R>::value,
 				"You can't register a function as an RPC if it doesn't return void");
 
-			if (entity_functions.count(type) && entity_functions[type].count(name))
+			if (entity_rpcs.count(type) && entity_rpcs[type].count(name))
 			{
 				return;
 			}
 
-			entity_functions[type][name] = RPCUtil<R(Class::*)(Args...)>::wrapEntity(func);
-			entity_rpctypes[type][name] = rpctype;
+			entity_rpcs[type][name].function = RPCUtil<R(Class::*)(Args...)>::wrapEntity(func);
+			entity_rpcs[type][name].rpctype = rpctype;
 		}
 
 		//Handle a global RPC packet
@@ -189,13 +210,13 @@ namespace enki
 
 				std::string name = p.read<std::string>();
 
-				if (!functions.count(name))
+				if (!global_rpcs.count(name))
 				{
 					std::cout << "Invalid RPC packet received due to invalid name, ignoring\n";
 					return;
 				}
 
-				functions[name](p);
+				global_rpcs[name].function(p);
 			}
 			catch (std::exception&)
 			{
@@ -223,23 +244,23 @@ namespace enki
 
 				if constexpr (std::is_base_of_v<Entity, T>)
 				{
-					if (!entity_functions.count(info.type) || !entity_functions[info.type].count(name))
+					if (!entity_rpcs.count(info.type) || !entity_rpcs[info.type].count(name))
 					{
 						std::cout << "Invalid RPC packet received due to invalid name, ignoring\n";
 						return;
 					}
 
-					entity_functions[info.type][name](p, instance);
+					entity_rpcs[info.type][name].function(p, instance);
 				}
 				else
 				{
-					if (!RPCWrapper<T>::functions.count(name))
+					if (!RPCWrapper<T>::class_rpcs.count(name))
 					{
 						std::cout << "Invalid RPC packet received due to invalid name, ignoring\n";
 						return;
 					}
 
-					RPCWrapper<T>::functions[name](p, instance);
+					RPCWrapper<T>::class_rpcs[name](p, instance);
 				}
 			}
 			catch (std::exception&)
@@ -255,7 +276,7 @@ namespace enki
 			static_assert(RPCUtil<F>::template matchesArgs<Args...>(),
 				"You tried to call this rpc with the incorrect number or type of parameters");
 
-			if (!functions.count(name))
+			if (!global_rpcs.count(name))
 			{
 				return;
 			}
@@ -274,7 +295,7 @@ namespace enki
 			static_assert(RPCUtil<R(Class::*)(Args...)>::template matchesArgs<Args...>(),
 				"You tried to call this rpc with the incorrect number or type of parameters");
 
-			if (!RPCWrapper<T>::functions.count(name))
+			if (!RPCWrapper<T>::class_rpcs.count(name))
 			{
 				return;
 			}
@@ -304,8 +325,8 @@ namespace enki
 			if constexpr (std::is_base_of_v<Entity, T>)
 			{
 				//We know it's derived from Entity, so it must have an info member variable, no need to cast it.
-				if (!entity_functions.count(instance->info.type) ||
-					!entity_functions[instance->info.type].count(name))
+				if (!entity_rpcs.count(instance->info.type) ||
+					!entity_rpcs[instance->info.type].count(name))
 				{
 					return;
 				}
@@ -313,7 +334,7 @@ namespace enki
 				bool local = false;
 				bool networked = false;
 
-				switch (entity_rpctypes[instance->info.type][name])
+				switch (entity_rpcs[instance->info.type][name].rpctype)
 				{
 					case Master:
 						if (instance->isOwner())
@@ -353,7 +374,7 @@ namespace enki
 				}
 
 				Packet p({ PacketType::ENTITY_RPC });
-				p << entity_rpctypes[instance->info.type][name] << instance->info << name;
+				p << entity_rpcs[instance->info.type][name].rpctype << instance->info << name;
 				fillPacket(p, args...);
 
 				if (networked)
@@ -368,7 +389,7 @@ namespace enki
 			}
 			else
 			{
-				if (!RPCWrapper<T>::functions.count(name))
+				if (!RPCWrapper<T>::class_rpcs.count(name))
 				{
 					return;
 				}
@@ -386,7 +407,7 @@ namespace enki
 		template <typename... Args>
 		void callUnsafe(std::string name, Args... args)
 		{
-			if (!functions.count(name))
+			if (!global_rpcs.count(name))
 			{
 				return
 			}
@@ -403,8 +424,8 @@ namespace enki
 		{
 			static_assert(std::is_base_of_v<Entity, T>);
 
-			if (!entity_functions.count(instance->info.type) ||
-				!entity_functions[instance->info.type].count(name))
+			if (!entity_rpcs.count(instance->info.type) ||
+				!entity_rpcs[instance->info.type].count(name))
 			{
 				return;
 			}
@@ -447,10 +468,8 @@ namespace enki
 		}
 
 		//Storage for all global RPCUtil's
-		std::map<std::string, std::function<void(Packet)>> functions;
-		std::map<std::string, RPCType> rpctypes;
+		std::map<std::string, GlobalRPC> global_rpcs;
 		//Storage for all member function RPCUtil's for derived from Entity classes
-		std::map<std::string, std::map<std::string, std::function<void(Packet, Entity*)>>> entity_functions;
-		std::map<std::string, std::map<std::string, RPCType>> entity_rpctypes;
+		std::map<std::string, std::map<std::string, EntityRPC>> entity_rpcs;
 	};
 }
