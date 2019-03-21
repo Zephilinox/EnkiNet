@@ -48,7 +48,7 @@ namespace enki
 				{
 					auto info = p.read<EntityInfo>();
 					auto name = p.read<std::string>();
-					auto rpctype = rpcs.getRPCType(info.type, name);
+					auto rpctype = rpc_man.getRPCType(info.type, name);
 
 					if (entityExists(info.ID))
 					{
@@ -153,7 +153,7 @@ namespace enki
 						if (info == ent->info)
 						{
 							p.resetReadPosition();
-							rpcs.receive(p, ent);
+							rpc_man.receive(p, ent);
 						}
 					}
 					else

@@ -90,7 +90,7 @@ namespace enki
 			return nullptr;
 		}
 
-		RPCManager rpcs;
+		RPCManager rpc_man;
 
 	private:
 		void sendAllNetworkedEntitiesToClient(ClientID client_id);

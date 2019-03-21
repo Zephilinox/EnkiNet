@@ -64,13 +64,13 @@ void Paddle::input(sf::Event& e)
 
 			if (e.key.code == sf::Keyboard::Num4)
 			{
-				game_data->scenegraph->rpcs.call(&Paddle::setColour, std::string("setColour"), game_data->getNetworkManager(), this, std::rand() % 255, std::rand() % 255, std::rand() % 255);
+				game_data->scenegraph->rpc_man.call(&Paddle::setColour, std::string("setColour"), game_data->getNetworkManager(), this, std::rand() % 255, std::rand() % 255, std::rand() % 255);
 			}
 		}
 
 		if (e.key.code == sf::Keyboard::Num3)
 		{
-			game_data->scenegraph->rpcs.call(&Paddle::setColour, std::string("setColour"), game_data->getNetworkManager(), this, std::rand() % 255, std::rand() % 255, std::rand() % 255);
+			game_data->scenegraph->rpc_man.call(&Paddle::setColour, std::string("setColour"), game_data->getNetworkManager(), this, std::rand() % 255, std::rand() % 255, std::rand() % 255);
 		}
 	}
 }
@@ -167,5 +167,4 @@ void Paddle::deserialize(enki::Packet& p)
 void Paddle::setColour(int r, int g, int b)
 {
 	sprite.setColor(sf::Color(uint8_t(r), uint8_t(g), uint8_t(b), uint8_t(255)));
-	game_data->scenegraph->deleteEntity(info.ID);
 }

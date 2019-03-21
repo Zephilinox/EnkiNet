@@ -57,7 +57,7 @@ void Player::onSpawn()
 		});
 	}
 
-	game_data->scenegraph->rpcs.add("Player", "shoot", &Player::shoot);
+	game_data->scenegraph->rpc_man.add("Player", "shoot", &Player::shoot);
 }
 
 void Player::update(float dt)
@@ -88,7 +88,7 @@ void Player::update(float dt)
 		if (shootTimer.getElapsedTime() > shootDelay)
 		{
 			sf::Vector2f pos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(*window));
-			game_data->scenegraph->rpcs.call(&Player::shoot, "shoot", game_data->getNetworkManager(), this, pos.x, pos.y);
+			game_data->scenegraph->rpc_man.call(&Player::shoot, "shoot", game_data->getNetworkManager(), this, pos.x, pos.y);
 			shootTimer.restart();
 		}
 	}

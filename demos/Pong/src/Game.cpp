@@ -39,7 +39,7 @@ Game::Game()
 
 	//if the master calls it, every remote calls it
 	//if a remote tries to call it, nothing will happen
-	game_data->scenegraph->rpcs.add(enki::RPCType::RemoteAndLocal, "Paddle", "setColour", &Paddle::setColour);
+	game_data->scenegraph->rpc_man.add(enki::RPCType::RemoteAndLocal, "Paddle", "setColour", &Paddle::setColour);
 
 	scenegraph->registerEntity<Ball>("Ball");
 	scenegraph->registerEntity<Collision>("Collision");
