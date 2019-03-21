@@ -237,8 +237,6 @@ namespace enki
 					return;
 				}
 
-				//todo, p.skip
-				[[maybe_unused]]auto rpctype = p.read<RPCType>();
 				auto info = p.read<EntityInfo>();
 				auto name = p.read<std::string>();
 
@@ -374,7 +372,7 @@ namespace enki
 				}
 
 				Packet p({ PacketType::ENTITY_RPC });
-				p << entity_rpcs[instance->info.type][name].rpctype << instance->info << name;
+				p << instance->info << name;
 				fillPacket(p, args...);
 
 				if (networked)
@@ -440,6 +438,25 @@ namespace enki
 		//todo: unsafe global remote
 		//todo: unsafe entity local
 		//todo: unsafe entity remote
+
+		//global rpc
+		RPCType getRPCType(std::string name)
+		{
+			return global_rpcs[name].rpctype;
+		}
+
+		//entity rpc
+		RPCType getRPCType(std::string type, std::string name)
+		{
+			return entity_rpcs[type][name].rpctype;
+		}
+
+		//class rpc
+		template <typename T>
+		RPCType getRPCType(std::string name)
+		{
+			return RPCWrapper<T>::class_rpcs[name].rpctype;
+		}
 
 	private:
 		//Serialize variadic template args to packet in reverse (now correct) order, so as to fix right-to-left ordering

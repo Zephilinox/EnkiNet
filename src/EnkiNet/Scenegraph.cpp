@@ -43,8 +43,10 @@ namespace enki
 				}
 				else if (p.getHeader().type == ENTITY_RPC)
 				{
-					auto rpctype = p.read<RPCType>();
 					auto info = p.read<EntityInfo>();
+					auto name = p.read<std::string>();
+					auto rpctype = rpcs.getRPCType(info.type, name);
+
 					if (entityExists(info.ID))
 					{
 						auto ent = getEntity(info.ID);
@@ -129,7 +131,6 @@ namespace enki
 				}
 				else if (p.getHeader().type == ENTITY_RPC)
 				{
-					[[maybe_unused]] auto rpctype = p.read<RPCType>();
 					auto info = p.read<EntityInfo>();
 					if (entityExists(info.ID))
 					{
@@ -259,8 +260,9 @@ namespace enki
 	{
 		if (network_ready && game_data->getNetworkManager()->server)
 		{
-			for (auto& ent : entities)
+			for (auto i = entities.rbegin(); i != entities.rend(); ++i)
 			{
+				auto& ent = *i;
 				EntityInfo info = ent.second->info;
 
 				if (info.name == "" || info.type == "")
