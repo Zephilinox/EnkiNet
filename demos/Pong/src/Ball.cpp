@@ -43,13 +43,13 @@ void Ball::onSpawn()
 
 void Ball::update(float dt)
 {
+	if (game_data->scenegraph->findEntitiesByType("Paddle").size() != 2)
+	{
+		return;
+	}
+
 	if (isOwner())
 	{
-		if (game_data->scenegraph->findEntitiesByType("Paddle").size() != 2)
-		{
-			return;
-		}
-
 		if (moving_left)
 		{
 			sprite.move(-300 * dt, 0);

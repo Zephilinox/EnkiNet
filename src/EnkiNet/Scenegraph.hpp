@@ -48,6 +48,48 @@ namespace enki
 		std::vector<Entity*> findEntitiesByParent(EntityID parent) const;
 		std::vector<Entity*> findEntitiesByPredicate(std::function<bool(const Entity&)> predicate) const;
 
+		template <typename T>
+		T* findEntityByType(std::string type) const
+		{
+			for (const auto& ent : entities)
+			{
+				if (ent.second->info.type == type)
+				{
+					return static_cast<T*>(ent.second.get());
+				}
+			}
+
+			return nullptr;
+		}
+
+		template <typename T>
+		T* findEntityByName(std::string name) const
+		{
+			for (const auto& ent : entities)
+			{
+				if (ent.second->info.name == name)
+				{
+					return static_cast<T*>(ent.second.get());
+				}
+			}
+
+			return nullptr;
+		}
+
+		template <typename T>
+		T* findEntityByPredicate(std::function<bool(const Entity&)> predicate) const
+		{
+			for (const auto& ent : entities)
+			{
+				if (predicate(*ent.second.get()))
+				{
+					return static_cast<T*>(ent.second.get());
+				}
+			}
+
+			return nullptr;
+		}
+
 		RPCManager rpcs;
 
 	private:
