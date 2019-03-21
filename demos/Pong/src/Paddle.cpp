@@ -167,4 +167,5 @@ void Paddle::deserialize(enki::Packet& p)
 void Paddle::setColour(int r, int g, int b)
 {
 	sprite.setColor(sf::Color(uint8_t(r), uint8_t(g), uint8_t(b), uint8_t(255)));
+	game_data->scenegraph->deleteEntity(info.ID);
 }

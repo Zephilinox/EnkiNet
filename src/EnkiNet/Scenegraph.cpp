@@ -1,5 +1,8 @@
 #include "Scenegraph.hpp"
 
+//STD
+#include <experimental/map>
+
 //SELF
 #include "Networking/Networking/ServerHost.hpp"
 #include "Networking/Networking/ClientHost.hpp"
@@ -96,6 +99,18 @@ namespace enki
 						}
 					}
 				}
+				else if (p.getHeader().type == ENTITY_DELETION)
+				{
+					auto entID = p.read<EntityID>();
+					if (entityExists(entID))
+					{
+						auto ent = getEntity(entID);
+						if (ent->info.ownerID == p.info.senderID)
+						{
+							game_data->getNetworkManager()->server->sendPacketToAllClients(0, &p);
+						}
+					}
+				}
 			});
 		}
 
@@ -146,6 +161,14 @@ namespace enki
 						console->error("Received an RPC packet for an entity that does not exist.\n\t{}", info);
 					}
 				}
+				else if (p.getHeader().type == ENTITY_DELETION)
+				{
+					auto entID = p.read<EntityID>();
+					if (entityExists(entID))
+					{
+						entities[entID]->remove = true;
+					}
+				}
 			});
 		}
 	}
@@ -162,8 +185,20 @@ namespace enki
 	{
 		for (auto& ent : entities)
 		{
-			ent.second->update(dt);
+			if (ent.second->info.parentID == 0 || entities.count(ent.second->info.parentID))
+			{
+				ent.second->update(dt);
+			}
+			else
+			{
+				deleteEntity(ent.second->info.ID);
+			}
 		}
+
+		std::experimental::erase_if(entities, [](const auto& ent)
+		{
+			return ent.second->remove;
+		});
 	}
 
 	void Scenegraph::draw(sf::RenderWindow& window) const
@@ -298,5 +333,27 @@ namespace enki
 	bool Scenegraph::entityExists(EntityID entityID)
 	{
 		return entities.count(entityID);
+	}
+
+	void Scenegraph::deleteEntity(EntityID entityID)
+	{
+		if (entities[entityID]->info.ID < 0)
+		{
+			entities[entityID]->remove = true;
+		}
+		else if (network_ready)
+		{
+			Packet p({ ENTITY_DELETION });
+			p << entityID;
+
+			if (game_data->getNetworkManager()->server)
+			{
+				game_data->getNetworkManager()->server->sendPacketToAllClients(0, &p);
+			}
+			else if (game_data->getNetworkManager()->client)
+			{
+				game_data->getNetworkManager()->client->sendPacket(0, &p);
+			}
+		}
 	}
 }

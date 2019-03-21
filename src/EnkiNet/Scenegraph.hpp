@@ -41,6 +41,8 @@ namespace enki
 		Entity* getEntity(EntityID entityID);
 		bool entityExists(EntityID entityID);
 
+		void deleteEntity(EntityID entityID);
+
 		RPCManager rpcs;
 
 	private:

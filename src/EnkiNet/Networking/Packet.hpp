@@ -24,7 +24,8 @@ namespace enki
 		ENTITY_RPC,
 
 		ENTITY_CREATION,
-		ENTITY_UPDATE
+		ENTITY_UPDATE,
+		ENTITY_DELETION
 	};
 
 	struct PacketHeader

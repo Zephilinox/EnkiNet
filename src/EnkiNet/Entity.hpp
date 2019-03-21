@@ -89,6 +89,7 @@ namespace enki
 
 		EntityInfo info;
 		GameData* game_data;
+		bool remove = false;
 
 	private:
 	};
