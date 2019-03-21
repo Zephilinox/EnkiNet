@@ -44,7 +44,7 @@ Game::Game()
 	scenegraph->registerEntity<Ball>("Ball");
 	scenegraph->registerEntity<Collision>("Collision");
 
-	//scenegraph->createEntity(EntityInfo{ "Collision", "Collision"});
+	scenegraph->createEntity({ "Collision", "Collision"});
 
 	if (!font.loadFromFile("resources/arial.ttf"))
 	{

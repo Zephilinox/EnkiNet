@@ -356,4 +356,79 @@ namespace enki
 			}
 		}
 	}
+
+	std::vector<Entity*> Scenegraph::findEntitiesByType(std::string type) const
+	{
+		std::vector<Entity*> ents;
+
+		for (const auto& ent : entities)
+		{
+			if (ent.second->info.type == type)
+			{
+				ents.push_back(ent.second.get());
+			}
+		}
+
+		return ents;
+	}
+
+	std::vector<Entity*> Scenegraph::findEntitiesByName(std::string name) const
+	{
+		std::vector<Entity*> ents;
+
+		for (const auto& ent : entities)
+		{
+			if (ent.second->info.name == name)
+			{
+				ents.push_back(ent.second.get());
+			}
+		}
+
+		return ents;
+	}
+
+	std::vector<Entity*> Scenegraph::findEntitiesByOwner(ClientID owner) const
+	{
+		std::vector<Entity*> ents;
+
+		for (const auto& ent : entities)
+		{
+			if (ent.second->info.ownerID == owner)
+			{
+				ents.push_back(ent.second.get());
+			}
+		}
+
+		return ents;
+	}
+
+	std::vector<Entity*> Scenegraph::findEntitiesByParent(EntityID parent) const
+	{
+		std::vector<Entity*> ents;
+
+		for (const auto& ent : entities)
+		{
+			if (ent.second->info.parentID == parent)
+			{
+				ents.push_back(ent.second.get());
+			}
+		}
+
+		return ents;
+	}
+
+	std::vector<Entity*> Scenegraph::findEntitiesByPredicate(std::function<bool(const Entity&)> predicate) const
+	{
+		std::vector<Entity*> ents;
+
+		for (const auto& ent : entities)
+		{
+			if (predicate(*ent.second.get()))
+			{
+				ents.push_back(ent.second.get());
+			}
+		}
+
+		return ents;
+	}
 }

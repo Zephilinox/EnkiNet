@@ -45,10 +45,7 @@ void Ball::update(float dt)
 {
 	if (isOwner())
 	{
-		//todo when not messing with children, also todo collision
-		return;
-
-		if (!game_data->scenegraph->entityExists(4))
+		if (game_data->scenegraph->findEntitiesByType("Paddle").size() != 2)
 		{
 			return;
 		}

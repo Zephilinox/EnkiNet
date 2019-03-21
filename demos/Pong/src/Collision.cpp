@@ -29,22 +29,48 @@ void Collision::update([[maybe_unused]]float dt)
 {
 	auto console = spdlog::get("console");
 	auto scenegraph = game_data->scenegraph;
-	if (scenegraph->entityExists(3))
+
+	Ball* ball = nullptr;
+	Paddle* paddle1 = nullptr;
+	Paddle* paddle2 = nullptr;
+
 	{
-		auto ball = static_cast<Ball*>(scenegraph->getEntity(3));
+		auto balls = scenegraph->findEntitiesByType("Ball");
+		if (!balls.empty())
+		{
+			ball = static_cast<Ball*>(balls[0]);
+		}
+	}
+
+	{
+		auto paddle1s = scenegraph->findEntitiesByName("Paddle 1");
+		if (!paddle1s.empty())
+		{
+			paddle1 = static_cast<Paddle*>(paddle1s[0]);
+		}
+	}
+
+	{
+		auto paddle2s = scenegraph->findEntitiesByName("Paddle 2");
+		if (!paddle2s.empty())
+		{
+			paddle2 = static_cast<Paddle*>(paddle2s[0]);
+		}
+	}
+
+	if (ball && paddle1 && paddle2)
+	{
 		ball_collider.left = ball->sprite.getPosition().x;
 		ball_collider.top = ball->sprite.getPosition().y;
 		
-		if (scenegraph->entityExists(1))
 		{
-			auto paddle1 = static_cast<Paddle*>(scenegraph->getEntity(1));
 			paddle1_collider.left = paddle1->sprite.getPosition().x;
 			paddle1_collider.top = paddle1->sprite.getPosition().y;
-			
+
 			if (ball_collider.intersects(paddle1_collider))
 			{
 				ball->moving_left = false;
-				
+
 				if (ball->y_dir == 0)
 				{
 					if (std::rand() % 2)
@@ -59,9 +85,7 @@ void Collision::update([[maybe_unused]]float dt)
 			}
 		}
 		
-		if (scenegraph->entityExists(4))
 		{
-			auto paddle2 = static_cast<Paddle*>(scenegraph->getEntity(4));
 			paddle2_collider.left = paddle2->sprite.getPosition().x;
 			paddle2_collider.top = paddle2->sprite.getPosition().y;
 

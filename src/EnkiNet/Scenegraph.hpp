@@ -42,6 +42,11 @@ namespace enki
 		bool entityExists(EntityID entityID);
 
 		void deleteEntity(EntityID entityID);
+		std::vector<Entity*> findEntitiesByType(std::string type) const;
+		std::vector<Entity*> findEntitiesByName(std::string name) const;
+		std::vector<Entity*> findEntitiesByOwner(ClientID owner) const;
+		std::vector<Entity*> findEntitiesByParent(EntityID parent) const;
+		std::vector<Entity*> findEntitiesByPredicate(std::function<bool(const Entity&)> predicate) const;
 
 		RPCManager rpcs;
 
