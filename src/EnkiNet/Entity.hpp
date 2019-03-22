@@ -4,11 +4,13 @@
 //For whatever reason fmt and enet conflict a bit because of the ordering of winsock includes, so defining this fixes that
 #define WIN32_LEAN_AND_MEAN
 #include <spdlog/fmt/ostr.h>
+#include <SFML/Graphics.hpp>
 
 //SELF
 #include "Networking/Packet.hpp"
 #include "GameData.hpp"
 #include "Networking/Networking/Client.hpp"
+#include "Managers/NetworkManager.hpp"
 
 namespace enki
 {

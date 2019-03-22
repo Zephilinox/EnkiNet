@@ -6,6 +6,7 @@
 //LIBS
 #include <SFML/Graphics.hpp>
 #include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 #include <EnkiNet/Networking/Networking/ServerHost.hpp>
 
 //SELF
@@ -84,7 +85,7 @@ void Game::input()
 
 		if (e.type == sf::Event::GainedFocus)
 		{
-			game_data->window_active = true;
+			//game_data->window_active = true;
 		}
 
 		if (e.type == sf::Event::LostFocus)
@@ -113,7 +114,7 @@ void Game::input()
 
 void Game::update()
 {
-	if (game_data->window_active &&
+	if (/*game_data->window_active &&*/
 		!game_data->network_manager->server &&
 		!game_data->network_manager->client)
 	{

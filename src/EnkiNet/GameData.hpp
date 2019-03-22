@@ -1,26 +1,15 @@
 #pragma once
 
-//LIBS
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
-#include <SFML/Graphics.hpp>
-
-//SELF
-#include "Managers/NetworkManager.hpp"
-
 namespace enki
 {
 	class Scenegraph;
+	class NetworkManager;
 
-	//oof todo
-	class GameData
+	struct GameData
 	{
 	public:
-		GameData();
-
 		NetworkManager* network_manager = nullptr;
 		Scenegraph* scenegraph = nullptr;
-
-		bool window_active = true;
+		void* custom = nullptr;
 	};
 }

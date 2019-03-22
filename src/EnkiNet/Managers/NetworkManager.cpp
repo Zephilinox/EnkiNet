@@ -6,6 +6,7 @@
 
 //LIBS
 #include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 //SELF
 #include "../Networking/Networking/ServerHost.hpp"

@@ -3,6 +3,9 @@
 //STD
 #include <experimental/map>
 
+//LIBS
+#include <spdlog/sinks/stdout_color_sinks.h>
+
 //SELF
 #include "Networking/Networking/ServerHost.hpp"
 #include "Networking/Networking/ClientHost.hpp"
