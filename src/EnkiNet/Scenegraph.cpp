@@ -170,6 +170,26 @@ namespace enki
 					}
 				}
 			});
+
+			mc3 = game_data->getNetworkManager()->on_network_tick.connect([this]()
+			{
+				total_network_ticks++;
+
+				enki::Packet p({ enki::PacketType::ENTITY_UPDATE });
+
+				for (auto& ent : entities)
+				{
+					if (ent.second->isOwner() &&
+						ent.second->network_tick_rate > 0 &&
+						total_network_ticks % ent.second->network_tick_rate == 0)
+					{
+						p.clear();
+						p << ent.second->info;
+						ent.second->serialize(p);
+						this->game_data->getNetworkManager()->client->sendPacket(0, &p);
+					}
+				}
+			});
 		}
 	}
 

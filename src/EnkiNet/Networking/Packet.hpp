@@ -53,6 +53,7 @@ namespace enki
 		[[nodiscard]] float readCompressedFloat(float min, float max, float resolution);
 
 		void resetReadPosition();
+		void clear();
 
 		void setHeader(PacketHeader header);
 		const PacketHeader& getHeader() const;

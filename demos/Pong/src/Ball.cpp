@@ -10,6 +10,7 @@
 Ball::Ball(enki::EntityInfo info, enki::GameData* game_data)
 	: Entity(info, game_data)
 {
+	network_tick_rate = 1;
 }
 
 void Ball::onSpawn()
@@ -20,14 +21,6 @@ void Ball::onSpawn()
 
 	if (isOwner())
 	{
-		mc1 = game_data->getNetworkManager()->on_network_tick.connect([this]()
-		{
-			enki::Packet p({ enki::PacketType::ENTITY_UPDATE });
-			p << this->info;
-			serialize(p);
-			this->game_data->getNetworkManager()->client->sendPacket(0, &p);
-		});
-
 		if (game_data->getNetworkManager()->server)
 		{
 			mc2 = game_data->getNetworkManager()->server->on_packet_received.connect([this](enki::Packet p)

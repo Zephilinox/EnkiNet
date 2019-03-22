@@ -90,6 +90,7 @@ namespace enki
 		EntityInfo info;
 		GameData* game_data;
 		bool remove = false;
+		std::uint32_t network_tick_rate = 0;
 
 	private:
 	};

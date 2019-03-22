@@ -7,6 +7,7 @@
 Paddle::Paddle(enki::EntityInfo info, enki::GameData* game_data)
 	: enki::Entity(info, game_data)
 {
+	network_tick_rate = 1;
 }
 
 void Paddle::onSpawn()
@@ -27,17 +28,6 @@ void Paddle::onSpawn()
 
 	latest_sprite = sprite;
 	latest_sprite.setColor(sf::Color(50, 50, 50, 100));
-
-	if (isOwner())
-	{
-		mc1 = game_data->getNetworkManager()->on_network_tick.connect([this]()
-		{
-			enki::Packet p({ enki::PacketType::ENTITY_UPDATE });
-			p << this->info;
-			serialize(p);
-			this->game_data->getNetworkManager()->client->sendPacket(0, &p);
-		});
-	}
 }
 
 void Paddle::input(sf::Event& e)

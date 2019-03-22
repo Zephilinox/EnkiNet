@@ -239,6 +239,16 @@ namespace enki
 		bits_read = 8;
 	}
 
+	void Packet::clear()
+	{
+		bytes.clear();
+		memcpy(bytes.data(), &header, sizeof(PacketHeader));
+		bytes_read = sizeof(PacketHeader);
+		bits_read = 8;
+		bytes_written = sizeof(PacketHeader);
+		bits_written = 8;
+	}
+
 	void Packet::setHeader(PacketHeader p_header)
 	{
 		header = p_header;

@@ -105,9 +105,11 @@ namespace enki
 
 		ManagedConnection mc1;
 		ManagedConnection mc2;
+		ManagedConnection mc3;
 
 		bool network_ready = false;
 		std::shared_ptr<spdlog::logger> console;
+		std::uint32_t total_network_ticks = 0;
 	};
 
 	template <typename T, typename... Args>
