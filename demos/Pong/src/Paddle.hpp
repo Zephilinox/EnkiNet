@@ -23,7 +23,6 @@ public:
 	void setColour(int r, int g, int b);
 
 private:
-	enki::ManagedConnection mc1;
 	bool interpolation_enabled = false;
 	sf::Sprite latest_sprite;
 	float latest_network_y = 0;

@@ -24,5 +24,4 @@ public:
 
 private:
 	enki::ManagedConnection mc1;
-	enki::ManagedConnection mc2;
 };

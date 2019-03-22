@@ -373,6 +373,7 @@ namespace enki
 
 				Packet p({ PacketType::ENTITY_RPC });
 				p << instance->info << name;
+
 				fillPacket(p, args...);
 
 				if (networked)
@@ -462,6 +463,7 @@ namespace enki
 		//Serialize variadic template args to packet in reverse (now correct) order, so as to fix right-to-left ordering
 		//not defined in packet header because this stuff is specific to parameter pack expansion and will get misused
 		void fillPacket() {}
+		void fillPacket([[maybe_unused]]Packet& p) {}
 
 		template <typename T>
 		void fillPacket(Packet& p, T x)

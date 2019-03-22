@@ -1,11 +1,8 @@
 #include "Ball.hpp"
 
-//LIBS
-#include <spdlog/fmt/fmt.h>
-
 //SELF
-#include <EnkiNet/Networking/Networking/ServerHost.hpp>
 #include <EnkiNet/Scenegraph.hpp>
+#include "Score.hpp"
 
 Ball::Ball(enki::EntityInfo info, enki::GameData* game_data)
 	: Entity(info, game_data)
@@ -23,7 +20,7 @@ void Ball::onSpawn()
 	{
 		if (game_data->network_manager->server)
 		{
-			mc2 = game_data->network_manager->server->on_packet_received.connect([this](enki::Packet p)
+			mc1 = game_data->network_manager->server->on_packet_received.connect([this](enki::Packet p)
 			{
 				if (p.getHeader().type == enki::PacketType::CONNECTED)
 				{
@@ -50,7 +47,13 @@ void Ball::update(float dt)
 			{
 				sprite.setPosition(320 - 16, 180 - 16);
 				y_speed = float(std::rand() % 300 + 100);
-				game_data->score2++;
+
+				Score* score = game_data->scenegraph->findEntityByType<Score>("Score");
+				if (score)
+				{
+					game_data->scenegraph->rpc_man.call(&Score::increaseScore2, "increaseScore2", game_data->network_manager, score);
+				}
+
 				moving_left = false;
 			}
 		}
@@ -61,7 +64,13 @@ void Ball::update(float dt)
 			{
 				sprite.setPosition(320 - 16, 180 - 16);
 				y_speed = float(std::rand() % 300 + 100);
-				game_data->score1++;
+
+				Score* score = game_data->scenegraph->findEntityByType<Score>("Score");
+				if (score)
+				{
+					game_data->scenegraph->rpc_man.call(&Score::increaseScore1, "increaseScore1", game_data->network_manager, score);
+				}
+
 				moving_left = true;
 			}
 		}

@@ -24,11 +24,8 @@ private:
 	std::unique_ptr<enki::Scenegraph> scenegraph;
 	std::unique_ptr<enki::GameData> game_data;
 	std::unique_ptr<enki::NetworkManager> network_manager;
+
 	enki::Timer timer;
-	enki::RPCManager rpcm;
-	sf::Font font;
-	sf::Text score1;
-	sf::Text score2;
 
 	enki::ManagedConnection mc1;
 	enki::ManagedConnection mc2;

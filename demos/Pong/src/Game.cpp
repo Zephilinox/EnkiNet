@@ -13,6 +13,7 @@
 #include "Ball.hpp"
 #include "Collision.hpp"
 #include "PlayerText.hpp"
+#include "Score.hpp"
 
 Game::Game()
 {
@@ -44,26 +45,13 @@ Game::Game()
 	game_data->scenegraph->rpc_man.add(enki::RPCType::RemoteAndLocal, "Paddle", "setColour", &Paddle::setColour);
 
 	scenegraph->registerEntity<Ball>("Ball");
-	scenegraph->registerEntity<Collision>("Collision");
 
+	scenegraph->registerEntity<Collision>("Collision");
 	scenegraph->createEntity({ "Collision", "Collision"});
 
-	if (!font.loadFromFile("resources/arial.ttf"))
-	{
-		console->error("Failed to load font");
-	}
-
-	score1.setFont(font);
-	score1.setCharacterSize(30);
-	score1.setFillColor(sf::Color(0, 150, 255));
-	score1.setPosition(320 - 60, 180);
-	score1.setString("0");
-
-	score2.setFont(font);
-	score2.setCharacterSize(30);
-	score2.setFillColor(sf::Color(220, 25, 25));
-	score2.setPosition(320 + 60, 180);
-	score2.setString("0");
+	scenegraph->registerEntity<Score>("Score");
+	game_data->scenegraph->rpc_man.add(enki::RPCType::RemoteAndLocal, "Score", "increaseScore1", &Score::increaseScore1);
+	game_data->scenegraph->rpc_man.add(enki::RPCType::RemoteAndLocal, "Score", "increaseScore2", &Score::increaseScore2);
 
 	run();
 }
@@ -135,15 +123,8 @@ void Game::update()
 			scenegraph->enableNetworking();
 			scenegraph->createNetworkedEntity(enki::EntityInfo{ "Paddle", "Paddle 1" });
 			scenegraph->createNetworkedEntity(enki::EntityInfo{ "Ball", "Ball" });
+			scenegraph->createNetworkedEntity({ "Score", "Score" });
 			enki::GameData* game_data_ptr = game_data.get();
-			mc1 = game_data->network_manager->on_network_tick.connect([game_data_ptr]()
-			{
-				enki::Packet p({ enki::PacketType::COMMAND });
-				p << std::string("Scores");
-				p << game_data_ptr->score1;
-				p << game_data_ptr->score2;
-				game_data_ptr->network_manager->server->sendPacketToAllClients(0, &p);
-			});
 
 			mc2 = game_data->network_manager->client->on_packet_received.connect([game_data_ptr](enki::Packet p)
 			{
@@ -181,30 +162,16 @@ void Game::update()
 				{
 					console->info("client received {}. sent at {} and received at {}, delta of {}", p.getHeader().type, p.getHeader().timeSent, p.info.timeReceived, p.info.timeReceived - p.getHeader().timeSent);
 				}
-
-				if (p.getHeader().type == enki::PacketType::COMMAND)
-				{
-					std::string id = p.read<std::string>();
-					if (id == "Scores")
-					{
-						game_data_ptr->score1 = p.read<int>();
-						game_data_ptr->score2 = p.read<int>();
-					}
-				}
 			});
 		}
 	}
 
-	score1.setString(std::to_string(game_data->score1));
-	score2.setString(std::to_string(game_data->score2));
 	scenegraph->update(dt);
 }
 
 void Game::draw() const
 {
 	window->clear({ 230, 230, 230, 255 });
-	window->draw(score1);
-	window->draw(score2);
 	scenegraph->draw(*window.get());
 	window->display();
 }
