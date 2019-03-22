@@ -3,11 +3,14 @@
 //STD
 #include <set>
 
-//SELF
+//LIBS
 #include <EnkiNet/Scenegraph.hpp>
 #include <EnkiNet/Timer.hpp>
 #include <EnkiNet/Networking/RPC.hpp>
 #include <EnkiNet/GameData.hpp>
+
+//SELF
+#include "CustomData.hpp"
 
 class Game
 {
@@ -27,6 +30,7 @@ private:
 	std::unique_ptr<enki::Scenegraph> scenegraph;
 	std::unique_ptr<enki::GameData> game_data;
 	std::unique_ptr<enki::NetworkManager> network_manager;
+	std::unique_ptr<CustomData> custom_data;
 
 	std::set<enki::ClientID> players;
 

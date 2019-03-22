@@ -18,11 +18,14 @@ Game::Game()
 	auto console = spdlog::get("console");
 	window = std::make_unique<sf::RenderWindow>(sf::VideoMode(640, 360), "EnkiNet");
 
+	custom_data = std::make_unique<CustomData>();
 	game_data = std::make_unique<enki::GameData>();
 	scenegraph = std::make_unique<enki::Scenegraph>(game_data.get());
 	network_manager = std::make_unique<enki::NetworkManager>();
+	network_manager->network_send_rate = 1000000;
 	game_data->scenegraph = scenegraph.get();
 	game_data->network_manager = network_manager.get();
+	game_data->custom = custom_data.get();
 
 	scenegraph->registerEntity<Player>("Player", window.get());
 
@@ -31,9 +34,10 @@ Game::Game()
 
 void Game::run()
 {
-	window->setFramerateLimit(120);
+	//window->setFramerateLimit(120);
 
-	//auto console = spdlog::get("console");
+	enki::Timer fpsTimer;
+	auto console = spdlog::get("console");
 	while (window->isOpen())
 	{
 		game_data->network_manager->update();
@@ -43,7 +47,11 @@ void Game::run()
 		draw();
 
 		dt = timer.getElapsedTime();
-		//console->info("FPS: {}", 1.0f / dt);
+		if (fpsTimer.getElapsedTime() > 0.5f)
+		{
+			console->info("FPS: {}", 1.0f / dt);
+			fpsTimer.restart();
+		}
 		timer.restart();
 	}
 }
@@ -59,11 +67,11 @@ void Game::input()
 		}
 		else if (e.type == sf::Event::GainedFocus)
 		{
-			//game_data->window_active = true;
+			custom_data->window_active = true;
 		}
 		else if (e.type == sf::Event::LostFocus)
 		{
-			//game_data->window_active = false;
+			custom_data->window_active = false;
 		}
 
 		scenegraph->input(e);

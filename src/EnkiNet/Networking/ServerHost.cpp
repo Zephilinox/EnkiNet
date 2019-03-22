@@ -44,6 +44,8 @@ namespace enki
 	{
 		auto console = spdlog::get("EnkiNet");
 		console->info("Server Deinitialized");
+		console->info("Server received {} in {} packets", server.enet_host->totalReceivedData, server.enet_host->totalReceivedPackets);
+		console->info("Server sent {} in {} packets", server.enet_host->totalSentData, server.enet_host->totalSentPackets);
 		server.stop_listening();
 	}
 
@@ -85,9 +87,6 @@ namespace enki
 			}
 
 			pushPacket(std::move(p));
-
-			console->info("Server received {} in {} packets", server.enet_host->totalReceivedData, server.enet_host->totalReceivedPackets);
-			console->info("Server sent {} in {} packets", server.enet_host->totalSentData, server.enet_host->totalSentPackets);
 		};
 
 		server.consume_events(std::move(on_client_connected),

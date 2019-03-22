@@ -6,6 +6,9 @@
 //LIBS
 #include <EnkiNet/Scenegraph.hpp>
 
+//SELF
+#include "CustomData.hpp"
+
 Player::Player(enki::EntityInfo info, enki::GameData* data, sf::RenderWindow* window)
 	: Entity(info, data)
 	, window(window)
@@ -68,7 +71,7 @@ void Player::update(float dt)
 	hpText.setPosition(sprite.getPosition().x + 10, sprite.getPosition().y - 30);
 	hpText.setString("HP: " + std::to_string(hp));
 
-	if (!isOwner()/* || !game_data->window_active*/)
+	if (!isOwner() || !static_cast<CustomData*>(game_data->custom)->window_active)
 	{
 		return;
 	}
@@ -137,6 +140,8 @@ void Player::draw(sf::RenderWindow& window_) const
 
 void Player::serialize(enki::Packet& p)
 {
+	static int i = 0;
+	i++;
 	//15 bits vs 96 (3 floats)
 	p.writeCompressedFloat(sprite.getPosition().x, 0, 640, 0.01f);
 	p.writeCompressedFloat(sprite.getPosition().y, 0, 360, 0.01f);

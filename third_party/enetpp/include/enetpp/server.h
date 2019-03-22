@@ -107,11 +107,21 @@ namespace enetpp {
 			assert(is_listening());
 			if (_thread != nullptr) {
 				std::lock_guard<std::mutex> lock(_packet_queue_mutex);
+
 				auto packet = enet_packet_create(data, data_size, flags);
+				bool queued = false;
+
 				for (auto c : _connected_clients) {
 					if (predicate(*c)) {
+						queued = true;
 						_packet_queue.emplace(channel_id, packet, c->get_id());
 					}
+				}
+
+				//memory leak otherwise
+				if (!queued)
+				{
+					enet_packet_destroy(packet);
 				}
 			}
 		}
@@ -136,6 +146,7 @@ namespace enetpp {
 						case ENET_EVENT_TYPE_CONNECT: {
 							_connected_clients.push_back(e._client);
 							on_client_connected(*e._client);
+							enet_packet_destroy(e._packet);
 							break;
 						}
 
@@ -146,6 +157,7 @@ namespace enetpp {
 							unsigned int client_id = e._client->get_id();
 							delete e._client;
 							on_client_disconnected(client_id);
+							enet_packet_destroy(e._packet);
 							break;
 						}
 
@@ -157,6 +169,7 @@ namespace enetpp {
 
 						case ENET_EVENT_TYPE_NONE:
 						default:
+							enet_packet_destroy(e._packet);
 							assert(false);
 							break;
 					}

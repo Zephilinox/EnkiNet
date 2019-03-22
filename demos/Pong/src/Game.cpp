@@ -7,7 +7,7 @@
 #include <SFML/Graphics.hpp>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
-#include <EnkiNet/Networking/Networking/ServerHost.hpp>
+#include <EnkiNet/Networking/ServerHost.hpp>
 
 //SELF
 #include "Paddle.hpp"
@@ -39,6 +39,7 @@ Game::Game()
 
 	scenegraph->registerEntity<Paddle>("Paddle");
 	scenegraph->registerEntityChildren("Paddle",
+		std::make_pair<std::string, std::string>("PlayerText", "yeet"),
 		std::make_pair<std::string, std::string>("PlayerText", "yeet"));
 
 	//if the master calls it, every remote calls it
@@ -125,9 +126,8 @@ void Game::update()
 			scenegraph->createNetworkedEntity(enki::EntityInfo{ "Paddle", "Paddle 1" });
 			scenegraph->createNetworkedEntity(enki::EntityInfo{ "Ball", "Ball" });
 			scenegraph->createNetworkedEntity({ "Score", "Score" });
-			enki::GameData* game_data_ptr = game_data.get();
 
-			mc2 = game_data->network_manager->client->on_packet_received.connect([game_data_ptr](enki::Packet p)
+			mc2 = game_data->network_manager->client->on_packet_received.connect([](enki::Packet p)
 			{
 				auto console = spdlog::get("console");
 				if (p.info.timeReceived - p.getHeader().timeSent > 500)
@@ -136,7 +136,7 @@ void Game::update()
 				}
 			});
 
-			mc3 = game_data->network_manager->server->on_packet_received.connect([game_data_ptr](enki::Packet p)
+			mc3 = game_data->network_manager->server->on_packet_received.connect([scenegraph = scenegraph.get()](enki::Packet p)
 			{
 				auto console = spdlog::get("console");
 				if (p.info.timeReceived - p.getHeader().timeSent > 500)
@@ -146,7 +146,7 @@ void Game::update()
 				
 				if (p.getHeader().type == enki::PacketType::CONNECTED)
 				{
-					game_data_ptr->scenegraph->createNetworkedEntity(enki::EntityInfo{ "Paddle", "Paddle 2", 0, p.info.senderID });
+					scenegraph->createNetworkedEntity(enki::EntityInfo{ "Paddle", "Paddle 2", 0, p.info.senderID });
 				}
 			});
 		}
@@ -155,8 +155,7 @@ void Game::update()
 		{
 			game_data->network_manager->startClient();
 			scenegraph->enableNetworking();
-			enki::GameData* game_data_ptr = game_data.get();
-			mc2 = game_data->network_manager->client->on_packet_received.connect([game_data_ptr](enki::Packet p)
+			mc2 = game_data->network_manager->client->on_packet_received.connect([](enki::Packet p)
 			{
 				auto console = spdlog::get("console");
 				if (p.info.timeReceived - p.getHeader().timeSent > 500)
