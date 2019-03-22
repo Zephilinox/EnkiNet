@@ -6,6 +6,7 @@
 //LIBS
 #include <SFML/Graphics.hpp>
 #include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 #include <EnkiNet/Networking/Networking/ServerHost.hpp>
 
 //SELF
@@ -19,7 +20,9 @@ Game::Game()
 
 	game_data = std::make_unique<enki::GameData>();
 	scenegraph = std::make_unique<enki::Scenegraph>(game_data.get());
+	network_manager = std::make_unique<enki::NetworkManager>();
 	game_data->scenegraph = scenegraph.get();
+	game_data->network_manager = network_manager.get();
 
 	scenegraph->registerEntity<Player>("Player", window.get());
 
@@ -32,7 +35,7 @@ void Game::run()
 
 	while (window->isOpen())
 	{
-		game_data->getNetworkManager()->update();
+		game_data->network_manager->update();
 
 		input();
 		update();
@@ -54,11 +57,11 @@ void Game::input()
 		}
 		else if (e.type == sf::Event::GainedFocus)
 		{
-			game_data->window_active = true;
+			//game_data->window_active = true;
 		}
 		else if (e.type == sf::Event::LostFocus)
 		{
-			game_data->window_active = false;
+			//game_data->window_active = false;
 		}
 
 		scenegraph->input(e);
@@ -67,15 +70,17 @@ void Game::input()
 
 void Game::update()
 {
-	if (game_data->window_active && !game_data->getNetworkManager()->server && !game_data->getNetworkManager()->client)
+	if (/*game_data->window_active &&*/
+		!game_data->network_manager->server &&
+		!game_data->network_manager->client)
 	{
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
 		{
-			game_data->getNetworkManager()->startHost();
+			game_data->network_manager->startHost();
 			scenegraph->enableNetworking();
 			scenegraph->createNetworkedEntity({ "Player", "Player 1" });
 
-			mc1 = game_data->getNetworkManager()->server->on_packet_received.connect([gd = game_data.get(), this](enki::Packet p)
+			mc1 = game_data->network_manager->server->on_packet_received.connect([gd = game_data.get(), this](enki::Packet p)
 			{
 				if (p.getHeader().type == enki::PacketType::CONNECTED)
 				{
@@ -91,7 +96,7 @@ void Game::update()
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::C))
 		{
-			game_data->getNetworkManager()->startClient();
+			game_data->network_manager->startClient();
 			scenegraph->enableNetworking();
 		}
 	}

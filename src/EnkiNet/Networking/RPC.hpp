@@ -170,14 +170,21 @@ namespace enki
 		{
 			static_assert(std::is_void<R>::value,
 				"You can't register a function as an RPC if it doesn't return void");
-
-			if (RPCWrapper<Class>::class_rpcs.count(name))
+			if constexpr (std::is_base_of_v<Entity, Class>)
 			{
-				return;
+				static_assert(false,
+					"You can't call add(rpctype, name, function pointer) for a derived class of Entity. Use add(rpctype, type, name, function pointer) instead");
 			}
+			else
+			{
+				if (RPCWrapper<Class>::class_rpcs.count(name))
+				{
+					return;
+				}
 
-			RPCWrapper<Class>::class_rpcs[name] = RPCUtil<R(Class::*)(Args...)>::wrap(func);
-			RPCWrapper<Class>::rpctypes[name] = rpctype;
+				RPCWrapper<Class>::class_rpcs[name] = RPCUtil<R(Class::*)(Args...)>::wrap(func);
+				RPCWrapper<Class>::rpctypes[name] = rpctype;
+			}
 		}
 
 		//Register a derived from Entity RPC with a member function

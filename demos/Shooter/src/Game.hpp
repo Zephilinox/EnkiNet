@@ -26,6 +26,7 @@ private:
 	std::unique_ptr<sf::RenderWindow> window;
 	std::unique_ptr<enki::Scenegraph> scenegraph;
 	std::unique_ptr<enki::GameData> game_data;
+	std::unique_ptr<enki::NetworkManager> network_manager;
 
 	std::set<enki::ClientID> players;
 

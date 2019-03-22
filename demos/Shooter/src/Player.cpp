@@ -10,6 +10,7 @@ Player::Player(enki::EntityInfo info, enki::GameData* data, sf::RenderWindow* wi
 	: Entity(info, data)
 	, window(window)
 {
+	network_tick_rate = 1;
 }
 
 void Player::onSpawn()
@@ -46,18 +47,7 @@ void Player::onSpawn()
 		playerName.setFillColor(sf::Color(200, 60, 60));
 	}
 
-	if (isOwner())
-	{
-		mc1 = game_data->getNetworkManager()->on_network_tick.connect([this]()
-		{
-			enki::Packet p({ enki::PacketType::ENTITY_UPDATE });
-			p << info;
-			serialize(p);
-			game_data->getNetworkManager()->client->sendPacket(0, &p);
-		});
-	}
-
-	game_data->scenegraph->rpc_man.add("Player", "shoot", &Player::shoot);
+	game_data->scenegraph->rpc_man.add(enki::RPCType::RemoteAndLocal, "Player", "shoot", &Player::shoot);
 }
 
 void Player::update(float dt)
@@ -78,7 +68,7 @@ void Player::update(float dt)
 	hpText.setPosition(sprite.getPosition().x + 10, sprite.getPosition().y - 30);
 	hpText.setString("HP: " + std::to_string(hp));
 
-	if (!isOwner() || !game_data->window_active)
+	if (!isOwner()/* || !game_data->window_active*/)
 	{
 		return;
 	}
@@ -88,7 +78,7 @@ void Player::update(float dt)
 		if (shootTimer.getElapsedTime() > shootDelay)
 		{
 			sf::Vector2f pos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(*window));
-			game_data->scenegraph->rpc_man.call(&Player::shoot, "shoot", game_data->getNetworkManager(), this, pos.x, pos.y);
+			game_data->scenegraph->rpc_man.call(&Player::shoot, "shoot", game_data->network_manager, this, pos.x, pos.y);
 			shootTimer.restart();
 		}
 	}

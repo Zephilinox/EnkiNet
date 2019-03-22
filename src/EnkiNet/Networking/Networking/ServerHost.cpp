@@ -119,11 +119,15 @@ namespace enki
 		header.timeSent = enet_time_get();
 		p->setHeader(header);
 
-		auto data = reinterpret_cast<const enet_uint8*>(p->getBytes().data());
+		if (!server.get_connected_clients().empty())
+		{
+			auto data = reinterpret_cast<const enet_uint8*>(p->getBytes().data());
 #pragma warning (push)
 #pragma warning (disable: 4100)
-		server.send_packet_to_all_if(channel_id, data, p->getSize(), flags, []([[maybe_unused]]const ClientInfo& client) {return true; });
+			server.send_packet_to_all_if(channel_id, data, p->getSize(), flags, []([[maybe_unused]]const ClientInfo& client) {return true; });
 #pragma warning (pop)
+		}
+
 		p->resetReadPosition();
 		p->info.timeReceived = header.timeSent;
 		p->info.senderID = 1;
@@ -137,8 +141,11 @@ namespace enki
 		p->setHeader(header);
 
 		auto console = spdlog::get("EnkiNet");
-		auto data = reinterpret_cast<const enet_uint8*>(p->getBytes().data());
-		server.send_packet_to_all_if(channel_id, data, p->getSize(), flags, predicate);
+		if (!server.get_connected_clients().empty())
+		{
+			auto data = reinterpret_cast<const enet_uint8*>(p->getBytes().data());
+			server.send_packet_to_all_if(channel_id, data, p->getSize(), flags, predicate);
+		}
 
 		if (predicate({ 1 }))
 		{
@@ -155,11 +162,14 @@ namespace enki
 		header.timeSent = enet_time_get();
 		p->setHeader(header);
 
-		auto data = reinterpret_cast<const enet_uint8*>(p->getBytes().data());
-		server.send_packet_to_all_if(channel_id, data, p->getSize(), flags, [client_id_excluded](const ClientInfo& client)
+		if (!server.get_connected_clients().empty())
 		{
-			return client.id != client_id_excluded;
-		});
+			auto data = reinterpret_cast<const enet_uint8*>(p->getBytes().data());
+			server.send_packet_to_all_if(channel_id, data, p->getSize(), flags, [client_id_excluded](const ClientInfo& client)
+			{
+				return client.id != client_id_excluded;
+			});
+		}
 
 		if (client_id_excluded != 1)
 		{
