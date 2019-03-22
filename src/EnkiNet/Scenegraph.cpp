@@ -7,9 +7,9 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 //SELF
-#include "Networking/Networking/ServerHost.hpp"
-#include "Networking/Networking/ClientHost.hpp"
-#include "Networking/Networking/ClientStandard.hpp"
+#include "Networking/ServerHost.hpp"
+#include "Networking/ClientHost.hpp"
+#include "Networking/ClientStandard.hpp"
 
 namespace enki
 {

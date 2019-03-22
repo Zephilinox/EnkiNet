@@ -1,7 +1,7 @@
 #include "ClientHost.hpp"
 
 //SELF
-#include "../../Entity.hpp"
+#include "Entity.hpp"
 
 namespace enki
 {

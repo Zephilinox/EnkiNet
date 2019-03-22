@@ -7,7 +7,7 @@
 #include <SFML/Graphics.hpp>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
-#include <EnkiNet/Networking/Networking/ServerHost.hpp>
+#include <EnkiNet/Networking/ServerHost.hpp>
 
 //SELF
 #include "Player.hpp"
@@ -33,6 +33,7 @@ void Game::run()
 {
 	window->setFramerateLimit(120);
 
+	//auto console = spdlog::get("console");
 	while (window->isOpen())
 	{
 		game_data->network_manager->update();
@@ -42,6 +43,7 @@ void Game::run()
 		draw();
 
 		dt = timer.getElapsedTime();
+		//console->info("FPS: {}", 1.0f / dt);
 		timer.restart();
 	}
 }

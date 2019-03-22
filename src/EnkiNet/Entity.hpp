@@ -9,7 +9,7 @@
 //SELF
 #include "Networking/Packet.hpp"
 #include "GameData.hpp"
-#include "Networking/Networking/Client.hpp"
+#include "Networking/Client.hpp"
 #include "Managers/NetworkManager.hpp"
 
 namespace enki

@@ -4,9 +4,9 @@
 #include <enetpp/client.h>
 
 //SELF
-#include "../../Signals/Signal.hpp"
-#include "../Packet.hpp"
-#include "../../Timer.hpp"
+#include "Signals/Signal.hpp"
+#include "Packet.hpp"
+#include "Timer.hpp"
 
 namespace enki
 {

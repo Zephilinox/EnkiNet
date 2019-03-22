@@ -5,7 +5,7 @@
 
 //SELF
 #include "Client.hpp"
-#include "../../GameData.hpp"
+#include "GameData.hpp"
 
 namespace enki
 {

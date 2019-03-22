@@ -5,11 +5,11 @@ project(EnkiNet)
 set(EnkiNet_HEADERS 
 	"EnkiNet/Networking/Packet.hpp"
 	"EnkiNet/Networking/RPC.hpp"
-	"EnkiNet/Networking/Networking/Client.hpp"
-	"EnkiNet/Networking/Networking/ClientHost.hpp"
-	"EnkiNet/Networking/Networking/ClientStandard.hpp"
-	"EnkiNet/Networking/Networking/Server.hpp"
-	"EnkiNet/Networking/Networking/ServerHost.hpp"
+	"EnkiNet/Networking/Client.hpp"
+	"EnkiNet/Networking/ClientHost.hpp"
+	"EnkiNet/Networking/ClientStandard.hpp"
+	"EnkiNet/Networking/Server.hpp"
+	"EnkiNet/Networking/ServerHost.hpp"
 	
 	"EnkiNet/Managers/NetworkManager.hpp"
 	
@@ -26,9 +26,9 @@ set(EnkiNet_HEADERS
 
 set (EnkiNet_SRC
 	"EnkiNet/Networking/Packet.cpp"
-	"EnkiNet/Networking/Networking/ClientHost.cpp"
-	"EnkiNet/Networking/Networking/ClientStandard.cpp"
-	"EnkiNet/Networking/Networking/ServerHost.cpp"
+	"EnkiNet/Networking/ClientHost.cpp"
+	"EnkiNet/Networking/ClientStandard.cpp"
+	"EnkiNet/Networking/ServerHost.cpp"
 	
 	"EnkiNet/Managers/NetworkManager.cpp"
 	
@@ -36,7 +36,6 @@ set (EnkiNet_SRC
 	
 	"EnkiNet/Timer.cpp"
 	"EnkiNet/Scenegraph.cpp"
-	"EnkiNet/GameData.cpp"
 )
 
 include(FilesystemSourceGroup)
@@ -77,6 +76,15 @@ target_link_libraries(EnkiNet
 	enet
 	${UNIX_LIBS}
 )
+
+target_include_directories(EnkiNet PUBLIC
+	"${CMAKE_SOURCE_DIR}/src/"
+)
+
+target_include_directories(EnkiNet PRIVATE
+	"${CMAKE_SOURCE_DIR}/src/EnkiNet"
+)
+
 
 #couldn't figure out a better way to do this, don't really want to use install targets
 #remove old headers
