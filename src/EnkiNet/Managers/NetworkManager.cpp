@@ -16,11 +16,15 @@ namespace enki
 {
 	using namespace std::chrono_literals;
 
-	NetworkManager::NetworkManager(GameData* game_data)
-		: game_data(game_data)
+	NetworkManager::NetworkManager()
 	{
-		spdlog::stdout_color_mt("EnkiNet");
 		auto console = spdlog::get("EnkiNet");
+		if (console == nullptr)
+		{
+			spdlog::stdout_color_mt("EnkiNet");
+			console = spdlog::get("EnkiNet");
+		}
+
 		//todo
 		std::cout << "Max Clients: " << max_clients << "\n";
 		std::cout << "Max Channels: " << std::to_string(channel_count) << "\n";
@@ -55,8 +59,10 @@ namespace enki
 
 		auto console = spdlog::get("EnkiNet");
 		console->info("Starting Listen Server Hosting");
-		server = std::make_unique<ServerHost>(game_data);
-		client = std::make_unique<ClientHost>(game_data);
+		server = std::make_unique<ServerHost>(max_clients, channel_count, server_port);
+		client = std::make_unique<ClientHost>();
+		static_cast<ServerHost*>(server.get())->client = client.get();
+		static_cast<ClientHost*>(client.get())->server = server.get();
 	}
 
 	void NetworkManager::startClient()
@@ -66,7 +72,7 @@ namespace enki
 
 		auto console = spdlog::get("EnkiNet");
 		console->info("Starting Client");
-		client = std::move(std::make_unique<ClientStandard>(game_data));
+		client = std::move(std::make_unique<ClientStandard>(channel_count, server_ip, server_port));
 	}
 
 	void NetworkManager::stopServer()

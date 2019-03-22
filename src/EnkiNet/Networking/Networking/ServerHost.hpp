@@ -15,7 +15,7 @@ namespace enki
 	class ServerHost : public Server
 	{
 	public:
-		ServerHost(GameData* game_data);
+		ServerHost(std::uint32_t max_clients, std::uint8_t channel_count, std::uint16_t server_port);
 		~ServerHost() final;
 
 		void processPackets() final;
@@ -34,6 +34,8 @@ namespace enki
 		{
 			return server.get_connected_clients();
 		}
+
+		Client* client;
 
 	private:
 		ClientID getNextUID();

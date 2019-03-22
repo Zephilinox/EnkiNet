@@ -21,7 +21,9 @@ Game::Game()
 	game_data = std::make_unique<enki::GameData>();
 	window = std::make_unique<sf::RenderWindow>(sf::VideoMode(640, 360), "EnkiNet");
 	scenegraph = std::make_unique<enki::Scenegraph>(game_data.get());
+	network_manager = std::make_unique<enki::NetworkManager>();
 	game_data->scenegraph = scenegraph.get();
+	game_data->network_manager = network_manager.get();
 
 	scenegraph->registerEntity<PlayerText>("PlayerText3");
 
@@ -71,7 +73,7 @@ void Game::run()
 	window->setFramerateLimit(120);
 	while (window->isOpen())
 	{
-		game_data->getNetworkManager()->update();
+		game_data->network_manager->update();
 
 		input();
 		update();
@@ -106,13 +108,13 @@ void Game::input()
 		{
 			if (e.key.code == sf::Keyboard::F1)
 			{
-				if (game_data->getNetworkManager()->network_send_rate == 10)
+				if (game_data->network_manager->network_send_rate == 10)
 				{
-					game_data->getNetworkManager()->network_send_rate = 60;
+					game_data->network_manager->network_send_rate = 60;
 				}
 				else
 				{
-					game_data->getNetworkManager()->network_send_rate = 10;
+					game_data->network_manager->network_send_rate = 10;
 				}
 			}
 		}
@@ -123,25 +125,27 @@ void Game::input()
 
 void Game::update()
 {
-	if (game_data->window_active && !game_data->getNetworkManager()->server && !game_data->getNetworkManager()->client)
+	if (game_data->window_active &&
+		!game_data->network_manager->server &&
+		!game_data->network_manager->client)
 	{
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
 		{
-			game_data->getNetworkManager()->startHost();
+			game_data->network_manager->startHost();
 			scenegraph->enableNetworking();
 			scenegraph->createNetworkedEntity(enki::EntityInfo{ "Paddle", "Paddle 1" });
 			scenegraph->createNetworkedEntity(enki::EntityInfo{ "Ball", "Ball" });
 			enki::GameData* game_data_ptr = game_data.get();
-			mc1 = game_data->getNetworkManager()->on_network_tick.connect([game_data_ptr]()
+			mc1 = game_data->network_manager->on_network_tick.connect([game_data_ptr]()
 			{
 				enki::Packet p({ enki::PacketType::COMMAND });
 				p << std::string("Scores");
 				p << game_data_ptr->score1;
 				p << game_data_ptr->score2;
-				game_data_ptr->getNetworkManager()->server->sendPacketToAllClients(0, &p);
+				game_data_ptr->network_manager->server->sendPacketToAllClients(0, &p);
 			});
 
-			mc2 = game_data->getNetworkManager()->client->on_packet_received.connect([game_data_ptr](enki::Packet p)
+			mc2 = game_data->network_manager->client->on_packet_received.connect([game_data_ptr](enki::Packet p)
 			{
 				auto console = spdlog::get("console");
 				if (p.info.timeReceived - p.getHeader().timeSent > 500)
@@ -150,7 +154,7 @@ void Game::update()
 				}
 			});
 
-			mc3 = game_data->getNetworkManager()->server->on_packet_received.connect([game_data_ptr](enki::Packet p)
+			mc3 = game_data->network_manager->server->on_packet_received.connect([game_data_ptr](enki::Packet p)
 			{
 				auto console = spdlog::get("console");
 				if (p.info.timeReceived - p.getHeader().timeSent > 500)
@@ -167,10 +171,10 @@ void Game::update()
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::C))
 		{
-			game_data->getNetworkManager()->startClient();
+			game_data->network_manager->startClient();
 			scenegraph->enableNetworking();
 			enki::GameData* game_data_ptr = game_data.get();
-			mc2 = game_data->getNetworkManager()->client->on_packet_received.connect([game_data_ptr](enki::Packet p)
+			mc2 = game_data->network_manager->client->on_packet_received.connect([game_data_ptr](enki::Packet p)
 			{
 				auto console = spdlog::get("console");
 				if (p.info.timeReceived - p.getHeader().timeSent > 500)

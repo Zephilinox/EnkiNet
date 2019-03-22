@@ -21,9 +21,9 @@ void Ball::onSpawn()
 
 	if (isOwner())
 	{
-		if (game_data->getNetworkManager()->server)
+		if (game_data->network_manager->server)
 		{
-			mc2 = game_data->getNetworkManager()->server->on_packet_received.connect([this](enki::Packet p)
+			mc2 = game_data->network_manager->server->on_packet_received.connect([this](enki::Packet p)
 			{
 				if (p.getHeader().type == enki::PacketType::CONNECTED)
 				{

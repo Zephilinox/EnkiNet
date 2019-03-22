@@ -14,14 +14,13 @@
 
 namespace enki
 {
-	class GameData;
 	class Server;
 	class Client;
 
 	class NetworkManager
 	{
 	public:
-		NetworkManager(GameData* game_data);
+		NetworkManager();
 		~NetworkManager();
 
 		void startHost();
@@ -47,10 +46,8 @@ namespace enki
 	private:
 		void runThreadedNetwork();
 
-		GameData* game_data;
 		std::thread network_thread;
 		bool exit_thread = false;
-
 		Timer network_process_timer;
 	};
 }

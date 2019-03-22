@@ -79,12 +79,12 @@ namespace enki
 
 		inline bool isOwner() const
 		{
-			if (!game_data->getNetworkManager()->client)
+			if (!game_data->network_manager->client)
 			{
 				return info.ownerID == 0;
 			}
 
-			return game_data->getNetworkManager()->client->getID() == info.ownerID;
+			return game_data->network_manager->client->getID() == info.ownerID;
 		}
 
 		EntityInfo info;

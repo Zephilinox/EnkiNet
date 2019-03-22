@@ -14,6 +14,11 @@ namespace enki
 		: game_data(game_data)
 	{
 		console = spdlog::get("EnkiNet");
+		if (console == nullptr)
+		{
+			spdlog::stdout_color_mt("EnkiNet");
+			console = spdlog::get("EnkiNet");
+		}
 	}
 
 	void Scenegraph::enableNetworking()
@@ -25,9 +30,9 @@ namespace enki
 
 		network_ready = true;
 
-		if (game_data->getNetworkManager()->server)
+		if (game_data->network_manager->server)
 		{
-			mc1 = game_data->getNetworkManager()->server->on_packet_received.connect([this](Packet p)
+			mc1 = game_data->network_manager->server->on_packet_received.connect([this](Packet p)
 			{
 				if (p.getHeader().type == ENTITY_CREATION)
 				{
@@ -42,7 +47,7 @@ namespace enki
 				else if (p.getHeader().type == ENTITY_UPDATE)
 				{
 					//Don't send entity updates back to the sender
-					game_data->getNetworkManager()->server->sendPacketToAllExceptOneClient(p.info.senderID, 0, &p);
+					game_data->network_manager->server->sendPacketToAllExceptOneClient(p.info.senderID, 0, &p);
 				}
 				else if (p.getHeader().type == ENTITY_RPC)
 				{
@@ -70,7 +75,7 @@ namespace enki
 								else
 								{
 									//only send packet to master
-									game_data->getNetworkManager()->server->sendPacketToOneClient(info.ownerID, 0, &p);
+									game_data->network_manager->server->sendPacketToOneClient(info.ownerID, 0, &p);
 								}
 							}
 							else if (rpctype == Remote || rpctype == RemoteAndLocal)
@@ -78,7 +83,7 @@ namespace enki
 								if (info.ownerID == p.info.senderID)
 								{
 									//only send packets to non-owners, which must be all except sender
-									game_data->getNetworkManager()->server->sendPacketToAllExceptOneClient(p.info.senderID, 0, &p);
+									game_data->network_manager->server->sendPacketToAllExceptOneClient(p.info.senderID, 0, &p);
 								}
 								else
 								{
@@ -89,7 +94,7 @@ namespace enki
 							else if (rpctype == MasterAndRemote || rpctype == All)
 							{
 								//send to everyone else
-								game_data->getNetworkManager()->server->sendPacketToAllExceptOneClient(p.info.senderID, 0, &p);
+								game_data->network_manager->server->sendPacketToAllExceptOneClient(p.info.senderID, 0, &p);
 							}
 							else
 							{
@@ -107,16 +112,16 @@ namespace enki
 						auto ent = getEntity(entID);
 						if (ent->info.ownerID == p.info.senderID)
 						{
-							game_data->getNetworkManager()->server->sendPacketToAllClients(0, &p);
+							game_data->network_manager->server->sendPacketToAllClients(0, &p);
 						}
 					}
 				}
 			});
 		}
 
-		if (game_data->getNetworkManager()->client)
+		if (game_data->network_manager->client)
 		{
-			mc2 = game_data->getNetworkManager()->client->on_packet_received.connect([this](Packet p)
+			mc2 = game_data->network_manager->client->on_packet_received.connect([this](Packet p)
 			{
 				if (p.getHeader().type == ENTITY_CREATION)
 				{
@@ -136,7 +141,7 @@ namespace enki
 						}
 						else
 						{
-							console->error("Received entity update with invalid info.\n\t{}\n\tVS\n\t{}\n\tSender ID = {}, Client ID = {}", info, ent->info, p.info.senderID, game_data->getNetworkManager()->client->getID());
+							console->error("Received entity update with invalid info.\n\t{}\n\tVS\n\t{}\n\tSender ID = {}, Client ID = {}", info, ent->info, p.info.senderID, game_data->network_manager->client->getID());
 						}
 					}
 					else
@@ -171,7 +176,7 @@ namespace enki
 				}
 			});
 
-			mc3 = game_data->getNetworkManager()->on_network_tick.connect([this]()
+			mc3 = game_data->network_manager->on_network_tick.connect([this]()
 			{
 				total_network_ticks++;
 
@@ -186,7 +191,7 @@ namespace enki
 						p.clear();
 						p << ent.second->info;
 						ent.second->serialize(p);
-						this->game_data->getNetworkManager()->client->sendPacket(0, &p);
+						this->game_data->network_manager->client->sendPacket(0, &p);
 					}
 				}
 			});
@@ -255,7 +260,7 @@ namespace enki
 
 	void Scenegraph::createNetworkedEntity(EntityInfo info)
 	{
-		auto net_man = game_data->getNetworkManager();
+		auto net_man = game_data->network_manager;
 
 		if (info.name == "" || info.type == "")
 		{
@@ -313,7 +318,7 @@ namespace enki
 
 	void Scenegraph::sendAllNetworkedEntitiesToClient(ClientID client_id)
 	{
-		if (network_ready && game_data->getNetworkManager()->server)
+		if (network_ready && game_data->network_manager->server)
 		{
 			for (auto i = entities.rbegin(); i != entities.rend(); ++i)
 			{
@@ -332,14 +337,14 @@ namespace enki
 				{
 					Packet p({ PacketType::ENTITY_CREATION });
 					p << info;
-					game_data->getNetworkManager()->server->sendPacketToOneClient(client_id, 0, &p);
+					game_data->network_manager->server->sendPacketToOneClient(client_id, 0, &p);
 				}
 
 				{
 					Packet p({ PacketType::ENTITY_UPDATE });
 					p << info;
 					ent.second->serialize(p);
-					game_data->getNetworkManager()->server->sendPacketToOneClient(client_id, 0, &p);
+					game_data->network_manager->server->sendPacketToOneClient(client_id, 0, &p);
 				}
 			}
 		}
@@ -366,13 +371,13 @@ namespace enki
 			Packet p({ ENTITY_DELETION });
 			p << entityID;
 
-			if (game_data->getNetworkManager()->server)
+			if (game_data->network_manager->server)
 			{
-				game_data->getNetworkManager()->server->sendPacketToAllClients(0, &p);
+				game_data->network_manager->server->sendPacketToAllClients(0, &p);
 			}
-			else if (game_data->getNetworkManager()->client)
+			else if (game_data->network_manager->client)
 			{
-				game_data->getNetworkManager()->client->sendPacket(0, &p);
+				game_data->network_manager->client->sendPacket(0, &p);
 			}
 		}
 	}

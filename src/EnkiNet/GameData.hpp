@@ -10,7 +10,6 @@
 
 namespace enki
 {
-
 	class Scenegraph;
 
 	//oof todo
@@ -19,15 +18,12 @@ namespace enki
 	public:
 		GameData();
 
-		NetworkManager* getNetworkManager() noexcept;
+		NetworkManager* network_manager = nullptr;
 		Scenegraph* scenegraph = nullptr;
 
 		bool window_active = true;
 		//todo
 		int score1 = 0;
 		int score2 = 0;
-
-	private:
-		NetworkManager network_manager;
 	};
 }

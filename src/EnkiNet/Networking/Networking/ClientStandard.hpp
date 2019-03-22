@@ -12,7 +12,7 @@ namespace enki
 	class ClientStandard : public Client
 	{
 	public:
-		ClientStandard(GameData* game_data);
+		ClientStandard(std::uint8_t channel_count, std::string server_ip, std::uint16_t server_port);
 		~ClientStandard() final;
 
 		void processPackets() final;

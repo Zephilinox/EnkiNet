@@ -51,16 +51,11 @@ void Paddle::input(sf::Event& e)
 				latest_network_y = sprite.getPosition().y;
 				last_interpolation_y = sprite.getPosition().y;
 			}
-
-			if (e.key.code == sf::Keyboard::Num4)
-			{
-				game_data->scenegraph->rpc_man.call(&Paddle::setColour, std::string("setColour"), game_data->getNetworkManager(), this, std::rand() % 255, std::rand() % 255, std::rand() % 255);
-			}
 		}
 
 		if (e.key.code == sf::Keyboard::Num3)
 		{
-			game_data->scenegraph->rpc_man.call(&Paddle::setColour, std::string("setColour"), game_data->getNetworkManager(), this, std::rand() % 255, std::rand() % 255, std::rand() % 255);
+			game_data->scenegraph->rpc_man.call(&Paddle::setColour, std::string("setColour"), game_data->network_manager, this, std::rand() % 255, std::rand() % 255, std::rand() % 255);
 		}
 	}
 }
@@ -111,7 +106,7 @@ void Paddle::update(float dt)
 		}
 		else
 		{
-			float network_delay = 1.0f / 10.0f;
+			float network_delay = 1.0f / (game_data->network_manager->network_send_rate / network_tick_rate);
 			float interpolation_time = interpolation_timer.getElapsedTime();
 			float interpolation_percent = float(1.0 - ((network_delay - interpolation_time) / network_delay));
 

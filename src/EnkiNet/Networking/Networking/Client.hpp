@@ -5,22 +5,19 @@
 
 //LIB
 #include <enetpp/client.h>
+#include <spdlog/spdlog.h>
 
 //SELF
 #include "../../Signals/Signal.hpp"
 #include "../Packet.hpp"
 #include "../../Timer.hpp"
-#include "../../GameData.hpp"
 
 namespace enki
 {
 	class Client
 	{
 	public:
-		Client(GameData* game_data)
-			: game_data(game_data)
-		{}
-
+		Client() = default;
 		virtual ~Client() = default;
 
 		virtual void processPackets() = 0;
@@ -65,7 +62,6 @@ namespace enki
 		Signal<Packet> on_packet_received;
 
 	protected:
-		GameData* game_data;
 		ClientID id = 0;
 
 	private:

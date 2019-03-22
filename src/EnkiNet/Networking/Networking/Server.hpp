@@ -4,7 +4,6 @@
 #include <enetpp/client.h>
 
 //SELF
-#include "../../GameData.hpp"
 #include "../../Signals/Signal.hpp"
 #include "../Packet.hpp"
 #include "../../Timer.hpp"
@@ -24,10 +23,7 @@ namespace enki
 	class Server
 	{
 	public:
-		Server(GameData* game_data)
-			: game_data(game_data)
-		{}
-
+		Server() = default;
 		virtual ~Server() = default;
 
 		virtual void processPackets() = 0;
@@ -67,10 +63,7 @@ namespace enki
 		}
 
 		Signal<Packet> on_packet_received;
-
-	protected:
-		GameData* game_data;
-
+	
 	private:
 		std::mutex mutex;
 		std::queue<Packet> packets;

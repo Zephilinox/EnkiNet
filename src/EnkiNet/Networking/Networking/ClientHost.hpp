@@ -13,7 +13,7 @@ namespace enki
 	class ClientHost : public Client
 	{
 	public:
-		ClientHost(GameData* game_data);
+		ClientHost();
 		~ClientHost() final;
 
 		void processPackets() final {};
@@ -28,6 +28,8 @@ namespace enki
 		{
 			return true;
 		}
+
+		Server* server;
 
 	private:
 	};

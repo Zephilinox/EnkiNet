@@ -5,8 +5,7 @@
 
 namespace enki
 {
-	ClientHost::ClientHost(GameData* game_data)
-		: Client(game_data)
+	ClientHost::ClientHost()
 	{
 		id = 1;
 		auto console = spdlog::get("EnkiNet");
@@ -29,6 +28,6 @@ namespace enki
 		//console->info("client sending packet");
 		p->info.senderID = id;
 		p->info.timeReceived = enet_time_get();
-		game_data->getNetworkManager()->server->on_packet_received.emit(*p);
+		server->on_packet_received.emit(*p);
 	}
 }

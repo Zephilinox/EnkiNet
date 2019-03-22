@@ -8,14 +8,13 @@
 
 namespace enki
 {
-	ClientStandard::ClientStandard(GameData* game_data)
-		: Client(game_data)
+	ClientStandard::ClientStandard(std::uint8_t channel_count, std::string server_ip, std::uint16_t server_port)
 	{
 		auto console = spdlog::get("EnkiNet");
 		console->info("Client Initialized");
 		client.connect(enetpp::client_connect_params()
-			.set_channel_count(game_data->getNetworkManager()->channel_count)
-			.set_server_host_name_and_port(game_data->getNetworkManager()->server_ip.c_str(), game_data->getNetworkManager()->server_port));
+			.set_channel_count(channel_count)
+			.set_server_host_name_and_port(server_ip.c_str(), server_port));
 	}
 
 	ClientStandard::~ClientStandard()
