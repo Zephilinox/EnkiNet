@@ -17,12 +17,15 @@ Game::Game()
 	spdlog::stdout_color_mt("console");
 	auto console = spdlog::get("console");
 	window = std::make_unique<sf::RenderWindow>(sf::VideoMode(640, 360), "EnkiNet");
+	input_manager.window = window.get();
 
-	custom_data = std::make_unique<CustomData>();
 	game_data = std::make_unique<enki::GameData>();
+	custom_data = std::make_unique<CustomData>();
+	custom_data->input_manager = &input_manager;
 	scenegraph = std::make_unique<enki::Scenegraph>(game_data.get());
+	auto enki_logger = spdlog::get("EnkiNet");
+	enki_logger->set_level(spdlog::level::off);
 	network_manager = std::make_unique<enki::NetworkManager>();
-	network_manager->network_send_rate = 1000000;
 	game_data->scenegraph = scenegraph.get();
 	game_data->network_manager = network_manager.get();
 	game_data->custom = custom_data.get();
@@ -40,8 +43,6 @@ void Game::run()
 	auto console = spdlog::get("console");
 	while (window->isOpen())
 	{
-		game_data->network_manager->update();
-
 		input();
 		update();
 		draw();
@@ -80,15 +81,25 @@ void Game::input()
 
 void Game::update()
 {
-	if (/*game_data->window_active &&*/
-		!game_data->network_manager->server &&
-		!game_data->network_manager->client)
+	game_data->network_manager->update();
+	input_manager.update();
+
+	static bool networking = false;
+
+	if (!networking && custom_data->window_active)
 	{
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
+		if (input_manager.isKeyPressed(sf::Keyboard::Key::S))
 		{
+			networking = true;
 			game_data->network_manager->startHost();
 			scenegraph->enableNetworking();
+			
 			scenegraph->createNetworkedEntity({ "Player", "Player 1" });
+
+			for (int i = 0; i < 100; ++i)
+			{
+				scenegraph->createNetworkedEntity({ "Player", "Player X" });
+			}
 
 			mc1 = game_data->network_manager->server->on_packet_received.connect([gd = game_data.get(), this](enki::Packet p)
 			{
@@ -104,8 +115,9 @@ void Game::update()
 			});
 		}
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::C))
+		if (input_manager.isKeyPressed(sf::Keyboard::Key::C))
 		{
+			networking = true;
 			game_data->network_manager->startClient();
 			scenegraph->enableNetworking();
 		}

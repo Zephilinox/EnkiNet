@@ -5,6 +5,9 @@ project(Shooter)
 add_executable(Shooter
 "main.cpp"
 
+"src/Managers/InputManager.hpp"
+"src/Managers/InputManager.cpp"
+
 "src/Game.hpp"
 "src/Game.cpp"
 

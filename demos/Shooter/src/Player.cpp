@@ -38,6 +38,7 @@ void Player::onSpawn()
 	hpText.setFont(font);
 	hpText.setScale(0.3f, 0.3f);
 	hpText.setFillColor(sf::Color::Black);
+	hpText.setString("HP: " + std::to_string(hp));
 
 	if (info.ownerID == 1)
 	{
@@ -69,14 +70,15 @@ void Player::update(float dt)
 
 	playerName.setPosition(sprite.getPosition().x - 30, sprite.getPosition().y - 30);
 	hpText.setPosition(sprite.getPosition().x + 10, sprite.getPosition().y - 30);
-	hpText.setString("HP: " + std::to_string(hp));
 
 	if (!isOwner() || !static_cast<CustomData*>(game_data->custom)->window_active)
 	{
 		return;
 	}
 
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+	auto input_manager = static_cast<CustomData*>(game_data->custom)->input_manager;
+
+	if (input_manager->isMouseButtonDown(sf::Mouse::Button::Left))
 	{
 		if (shootTimer.getElapsedTime() > shootDelay)
 		{
@@ -88,22 +90,22 @@ void Player::update(float dt)
 
 	dir = sf::Vector2f(0, 0);
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
+	if (input_manager->isKeyDown(sf::Keyboard::Key::W))
 	{
 		dir.y -= 1;
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
+	if (input_manager->isKeyDown(sf::Keyboard::Key::A))
 	{
 		dir.x -= 1;
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
+	if (input_manager->isKeyDown(sf::Keyboard::Key::S))
 	{
 		dir.y += 1;
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
+	if (input_manager->isKeyDown(sf::Keyboard::Key::D))
 	{
 		dir.x += 1;
 	}
@@ -115,7 +117,7 @@ void Player::update(float dt)
 		sprite.move(dir * speed * dt);
 	}
 
-	auto mousePos = sf::Mouse::getPosition(*window);
+	auto mousePos = input_manager->getMousePosition();
 	auto distance = static_cast<sf::Vector2f>(mousePos) - sprite.getPosition();
 	float length = std::sqrtf((distance.x * distance.x) + (distance.y * distance.y));
 	distance /= length;

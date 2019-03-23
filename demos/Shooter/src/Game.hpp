@@ -31,6 +31,7 @@ private:
 	std::unique_ptr<enki::GameData> game_data;
 	std::unique_ptr<enki::NetworkManager> network_manager;
 	std::unique_ptr<CustomData> custom_data;
+	InputManager input_manager;
 
 	std::set<enki::ClientID> players;
 

@@ -7,6 +7,8 @@
 //LIB
 #include <enetpp/client.h>
 #include <enetpp/server.h>
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 //SELF
 #include "../Signals/Signal.hpp"
@@ -49,5 +51,6 @@ namespace enki
 		std::thread network_thread;
 		bool exit_thread = false;
 		Timer network_process_timer;
+		std::shared_ptr<spdlog::logger> console = nullptr;
 	};
 }
