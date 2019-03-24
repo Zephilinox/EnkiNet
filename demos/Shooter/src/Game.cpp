@@ -14,6 +14,7 @@
 #include "Managers/MapManager.hpp"
 #include "Floor.hpp"
 #include "Wall.hpp"
+#include "HealthSpawner.hpp"
 
 Game::Game()
 {
@@ -41,6 +42,7 @@ Game::Game()
 	scenegraph->registerEntity<Player>("Player", window.get());
 	scenegraph->registerEntity<class Floor>("Floor");
 	scenegraph->registerEntity<class Wall>("Wall");
+	scenegraph->registerEntity<HealthSpawner>("HealthSpawner");
 
 	run();
 }

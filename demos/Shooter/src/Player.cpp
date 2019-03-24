@@ -162,6 +162,11 @@ void Player::deserializeOnTick(enki::Packet& p)
 	sprite.setRotation(p.readCompressedFloat(0, 360, 0.01f));
 }
 
+void Player::increaseHP()
+{
+	hp++;
+}
+
 void Player::shoot(float x, float y)
 {
 	Line line;

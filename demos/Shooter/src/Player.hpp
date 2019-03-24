@@ -25,6 +25,8 @@ public:
 	void serializeOnTick(enki::Packet& p) final;
 	void deserializeOnTick(enki::Packet& p) final;
 
+	void increaseHP();
+
 private:
 	void shoot(float x, float y);
 

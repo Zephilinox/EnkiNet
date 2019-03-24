@@ -306,7 +306,7 @@ namespace enki
 			}
 
 			Packet p({ PacketType::ENTITY_RPC });
-			p << EntityInfo{} << name, ;
+			p << EntityInfo{} << name;
 			fillPacket(p, args...);
 
 			receive(p, instance);
@@ -483,14 +483,6 @@ namespace enki
 		{
 			fillPacket(p, args...);
 			p << x;
-		}
-
-		template <typename... Args>
-		Packet fillPacket(Args... args)
-		{
-			Packet p;
-			fillPacket(p, args...);
-			return p;
 		}
 
 		//Storage for all global RPCUtil's

@@ -111,6 +111,13 @@ void MapManager::createMap()
 					scenegraph->createNetworkedEntity({ "Wall", name }, p);
 					break;
 				}
+
+				case Tile::HealthPickup:
+				{
+					std::string name = std::string("HealthSpawner ") + std::to_string(x) + ", " + std::to_string(y);
+					scenegraph->createNetworkedEntity({ "HealthSpawner", name }, p);
+					break;
+				}
 				}
 
 				x++;
