@@ -11,21 +11,27 @@
 
 //SELF
 #include "Player.hpp"
+#include "Managers/MapManager.hpp"
 
 Game::Game()
 {
 	spdlog::stdout_color_mt("console");
 	auto console = spdlog::get("console");
+
 	window = std::make_unique<sf::RenderWindow>(sf::VideoMode(640, 360), "EnkiNet");
 	input_manager.window = window.get();
 
 	game_data = std::make_unique<enki::GameData>();
 	custom_data = std::make_unique<CustomData>();
+
 	custom_data->input_manager = &input_manager;
+
 	scenegraph = std::make_unique<enki::Scenegraph>(game_data.get());
 	auto enki_logger = spdlog::get("EnkiNet");
 	enki_logger->set_level(spdlog::level::off);
+
 	network_manager = std::make_unique<enki::NetworkManager>();
+
 	game_data->scenegraph = scenegraph.get();
 	game_data->network_manager = network_manager.get();
 	game_data->custom = custom_data.get();
@@ -81,7 +87,7 @@ void Game::input()
 
 void Game::update()
 {
-	game_data->network_manager->update();
+	network_manager->update();
 	input_manager.update();
 
 	static bool networking = false;
@@ -91,9 +97,12 @@ void Game::update()
 		if (input_manager.isKeyPressed(sf::Keyboard::Key::S))
 		{
 			networking = true;
-			game_data->network_manager->startHost();
+			network_manager->startHost();
 			scenegraph->enableNetworking();
-			
+
+			map_manager = std::make_unique<MapManager>(scenegraph.get(), network_manager.get());
+			custom_data->map_manager = map_manager.get();
+
 			scenegraph->createNetworkedEntity({ "Player", "Player 1" });
 
 			for (int i = 0; i < 100; ++i)
@@ -101,7 +110,7 @@ void Game::update()
 				scenegraph->createNetworkedEntity({ "Player", "Player X" });
 			}
 
-			mc1 = game_data->network_manager->server->on_packet_received.connect([gd = game_data.get(), this](enki::Packet p)
+			mc1 = network_manager->server->on_packet_received.connect([this](enki::Packet p)
 			{
 				if (p.getHeader().type == enki::PacketType::CONNECTED)
 				{
@@ -118,7 +127,7 @@ void Game::update()
 		if (input_manager.isKeyPressed(sf::Keyboard::Key::C))
 		{
 			networking = true;
-			game_data->network_manager->startClient();
+			network_manager->startClient();
 			scenegraph->enableNetworking();
 		}
 	}

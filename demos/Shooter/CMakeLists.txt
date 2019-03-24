@@ -7,12 +7,17 @@ add_executable(Shooter
 
 "src/Managers/InputManager.hpp"
 "src/Managers/InputManager.cpp"
+"src/Managers/MapManager.hpp"
+"src/Managers/MapManager.cpp"
 
 "src/Game.hpp"
 "src/Game.cpp"
 
 "src/Player.hpp"
 "src/Player.cpp"
+
+"src/CustomData.hpp"
+"src/CustomData.cpp"
 )
 
 include(Settings)

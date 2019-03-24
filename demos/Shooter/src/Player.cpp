@@ -9,9 +9,8 @@
 //SELF
 #include "CustomData.hpp"
 
-Player::Player(enki::EntityInfo info, enki::GameData* data, sf::RenderWindow* window)
+Player::Player(enki::EntityInfo info, enki::GameData* data)
 	: Entity(info, data)
-	, window(window)
 {
 	network_tick_rate = 1;
 }
@@ -82,7 +81,7 @@ void Player::update(float dt)
 	{
 		if (shootTimer.getElapsedTime() > shootDelay)
 		{
-			sf::Vector2f pos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(*window));
+			sf::Vector2f pos = static_cast<CustomData*>(game_data->custom)->input_manager->getMousePosition();
 			game_data->scenegraph->rpc_man.call(&Player::shoot, "shoot", game_data->network_manager, this, pos.x, pos.y);
 			shootTimer.restart();
 		}

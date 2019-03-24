@@ -15,7 +15,7 @@ struct Line
 class Player : public enki::Entity
 {
 public:
-	Player(enki::EntityInfo info, enki::GameData* data, sf::RenderWindow* window);
+	Player(enki::EntityInfo info, enki::GameData* data);
 
 	void onSpawn();
 
@@ -40,7 +40,6 @@ private:
 	enki::ManagedConnection mc1;
 	enki::ManagedConnection mc2;
 	enki::ManagedConnection mc3;
-	sf::RenderWindow* window = nullptr;
 
 	std::vector<Line> lines;
 
