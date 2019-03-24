@@ -9,9 +9,13 @@ class Ball : public enki::Entity
 public:
 	Ball(enki::EntityInfo info, enki::GameData* game_data);
 
-	void onSpawn() final;
+	void onSpawn(enki::Packet& p) final;
 	void update(float dt) final;
 	void draw(sf::RenderWindow& window) const final;
+
+	void serializeOnConnection(enki::Packet& p) final;
+	void deserializeOnConnection(enki::Packet& p) final;
+
 	void serializeOnTick(enki::Packet& p) final;
 	void deserializeOnTick(enki::Packet& p) final;
 

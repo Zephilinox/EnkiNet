@@ -10,7 +10,7 @@ Paddle::Paddle(enki::EntityInfo info, enki::GameData* game_data)
 	network_tick_rate = 1;
 }
 
-void Paddle::onSpawn()
+void Paddle::onSpawn([[maybe_unused]]enki::Packet& p)
 {
 	texture.loadFromFile("resources/Paddle.png");
 	sprite.setTexture(texture);
@@ -124,6 +124,24 @@ void Paddle::draw(sf::RenderWindow& window) const
 	{
 		window.draw(latest_sprite);
 	}
+}
+
+void Paddle::serializeOnConnection(enki::Packet& p)
+{
+	p << sprite.getColor().r
+		<< sprite.getColor().g 
+		<< sprite.getColor().b;
+	serializeOnTick(p);
+}
+
+void Paddle::deserializeOnConnection(enki::Packet& p)
+{
+	sf::Color c;
+	p >> c.r >> c.g >> c.b;
+	c.a = 255;
+	sprite.setColor(c);
+
+	deserializeOnTick(p);
 }
 
 void Paddle::serializeOnTick(enki::Packet& p)

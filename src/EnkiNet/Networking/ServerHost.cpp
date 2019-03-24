@@ -55,7 +55,7 @@ namespace enki
 		{
 			auto console = spdlog::get("EnkiNet");
 			console->info("Client {} Connected.", client.id);
-			Packet p({ PacketType::CONNECTED, 0, enet_time_get() });
+			Packet p({ PacketType::CONNECTED, enet_time_get() });
 			p.info.senderID = client.id;
 			p.info.timeReceived = enet_time_get();
 			pushPacket(std::move(p));
@@ -65,7 +65,7 @@ namespace enki
 		{
 			auto console = spdlog::get("EnkiNet");
 			console->info("Client {} Disconnected", client_uid);
-			Packet p({ PacketType::DISCONNECTED, 0, enet_time_get() });
+			Packet p({ PacketType::DISCONNECTED, enet_time_get() });
 			p.info.senderID = client_uid;
 			p.info.timeReceived = enet_time_get();
 			pushPacket(std::move(p));

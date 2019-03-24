@@ -106,6 +106,7 @@ void Game::update()
 
 			map_manager = std::make_unique<MapManager>(scenegraph.get(), network_manager.get());
 			custom_data->map_manager = map_manager.get();
+			map_manager->createMap();
 
 			scenegraph->createNetworkedEntity({ "Player", "Player 1" });
 
@@ -128,6 +129,9 @@ void Game::update()
 			networking = true;
 			network_manager->startClient();
 			scenegraph->enableNetworking();
+
+			map_manager = std::make_unique<MapManager>(scenegraph.get(), network_manager.get());
+			custom_data->map_manager = map_manager.get();
 		}
 	}
 

@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 #include <array>
+#include <numeric>
 
 namespace enki
 {
@@ -32,7 +33,6 @@ namespace enki
 	struct PacketHeader
 	{
 		PacketType type = PacketType::NONE;
-		std::uint8_t version = 0;
 		std::uint32_t timeSent = 0;
 	};
 
@@ -58,6 +58,9 @@ namespace enki
 		void resetReadPosition();
 		void clear();
 		bool isEmpty();
+		
+		template <typename... Args>
+		bool canDeserialize();
 
 		void setHeader(PacketHeader header);
 		const PacketHeader& getHeader() const;
@@ -205,5 +208,19 @@ namespace enki
 		memcpy(data, bytes.data() + bytes_read, size);
 		bytes_read += size;
 		bits_read = 8;
+	}
+
+	template <typename... Args>
+	bool Packet::canDeserialize()
+	{
+		constexpr std::array<std::size_t, sizeof...(Args)> sizes = { sizeof(Args)... };
+		int size = std::accumulate(sizes.begin(), sizes.end(), 0);
+
+		if (bytes_read + size > bytes.size())
+		{
+			return false;
+		}
+
+		return true;
 	}
 }

@@ -80,7 +80,10 @@ MapManager::MapManager(enki::Scenegraph* scenegraph, enki::NetworkManager* netwo
 		tiles += ";";
 		console->info(tiles);
 	}*/
+}
 
+void MapManager::createMap()
+{
 	if (network_manager->client->getID() == 1)
 	{
 		int y = 0;
@@ -95,19 +98,19 @@ MapManager::MapManager(enki::Scenegraph* scenegraph, enki::NetworkManager* netwo
 
 				switch (tile)
 				{
-					case Tile::Floor:
-					{
-						std::string name = std::string("Floor ") + std::to_string(x) + ", " + std::to_string(y);
-						scenegraph->createNetworkedEntity({ "Floor", name }, p);
-						break;
-					}
+				case Tile::Floor:
+				{
+					std::string name = std::string("Floor ") + std::to_string(x) + ", " + std::to_string(y);
+					scenegraph->createNetworkedEntity({ "Floor", name }, p);
+					break;
+				}
 
-					case Tile::Wall:
-					{
-						std::string name = std::string("Wall ") + std::to_string(x) + ", " + std::to_string(y);
-						scenegraph->createNetworkedEntity({ "Wall", name }, p);
-						break;
-					}
+				case Tile::Wall:
+				{
+					std::string name = std::string("Wall ") + std::to_string(x) + ", " + std::to_string(y);
+					scenegraph->createNetworkedEntity({ "Wall", name }, p);
+					break;
+				}
 				}
 
 				x++;
@@ -131,10 +134,20 @@ Tile MapManager::getTile(sf::Vector2i mapPos)
 
 sf::Vector2i MapManager::worldPosToMapPos(sf::Vector2f worldPos)
 {
-	return sf::Vector2i(static_cast<int>(worldPos.x) / tileSize, static_cast<int>(worldPos.y) / tileSize);
+	return sf::Vector2i(static_cast<int>(worldPos.x) / tile_size, static_cast<int>(worldPos.y) / tile_size);
 }
 
 sf::Vector2f MapManager::mapPosToWorldPos(sf::Vector2i mapPos)
 {
-	return sf::Vector2f(static_cast<float>(mapPos.x * tileSize), static_cast<float>(mapPos.y * tileSize));
+	return sf::Vector2f(static_cast<float>(mapPos.x * tile_size), static_cast<float>(mapPos.y * tile_size));
+}
+
+float MapManager::getWidth()
+{
+	return width * static_cast<float>(tile_size);
+}
+
+float MapManager::getHeight()
+{
+	return height * static_cast<float>(tile_size);
 }

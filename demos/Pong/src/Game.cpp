@@ -31,16 +31,16 @@ Game::Game()
 
 	scenegraph->registerEntity<PlayerText>("PlayerText2");
 	scenegraph->registerEntityChildren("PlayerText2",
-		std::make_pair<std::string, std::string>("PlayerText3", "my child :O" ));
+		enki::ChildEntityCreationInfo{ "PlayerText3", "my child :O" });
 
 	scenegraph->registerEntity<PlayerText>("PlayerText");
 	scenegraph->registerEntityChildren("PlayerText",
-		std::make_pair<std::string, std::string>("PlayerText2", "ayyy"));
+		enki::ChildEntityCreationInfo{ "PlayerText2", "ayyy" });
 
 	scenegraph->registerEntity<Paddle>("Paddle");
 	scenegraph->registerEntityChildren("Paddle",
-		std::make_pair<std::string, std::string>("PlayerText", "yeet"),
-		std::make_pair<std::string, std::string>("PlayerText", "yeet"));
+		enki::ChildEntityCreationInfo{ "PlayerText", "yeet" },
+		enki::ChildEntityCreationInfo{ "PlayerText", "yeet" });
 
 	//if the master calls it, every remote calls it
 	//if a remote tries to call it, nothing will happen
@@ -130,23 +130,26 @@ void Game::update()
 			mc2 = game_data->network_manager->client->on_packet_received.connect([](enki::Packet p)
 			{
 				auto console = spdlog::get("console");
-				if (p.info.timeReceived - p.getHeader().timeSent > 500)
+				if (p.info.timeReceived - p.getHeader().timeSent > 2000)
 				{
-					console->info("local client received {}. sent at {} and received at {}, delta of {}", p.getHeader().type, p.getHeader().timeSent, p.info.timeReceived, p.info.timeReceived - p.getHeader().timeSent);
+					console->error("local client received {}. sent at {} and received at {}, delta of {}", p.getHeader().type, p.getHeader().timeSent, p.info.timeReceived, p.info.timeReceived - p.getHeader().timeSent);
 				}
 			});
 
 			mc3 = game_data->network_manager->server->on_packet_received.connect([scenegraph = scenegraph.get()](enki::Packet p)
 			{
 				auto console = spdlog::get("console");
-				if (p.info.timeReceived - p.getHeader().timeSent > 500)
+				if (p.info.timeReceived - p.getHeader().timeSent > 2000)
 				{
-					console->info("server received {} from {}. sent at {} and received at {}, delta of {}", p.getHeader().type, p.info.senderID, p.getHeader().timeSent, p.info.timeReceived, p.info.timeReceived - p.getHeader().timeSent);
+					console->error("server received {} from {}. sent at {} and received at {}, delta of {}", p.getHeader().type, p.info.senderID, p.getHeader().timeSent, p.info.timeReceived, p.info.timeReceived - p.getHeader().timeSent);
 				}
 				
 				if (p.getHeader().type == enki::PacketType::CONNECTED)
 				{
-					scenegraph->createNetworkedEntity(enki::EntityInfo{ "Paddle", "Paddle 2", 0, p.info.senderID });
+					if (scenegraph->findEntityByName("Paddle 2") == nullptr)
+					{
+						scenegraph->createNetworkedEntity(enki::EntityInfo{ "Paddle", "Paddle 2", 0, p.info.senderID });
+					}
 				}
 			});
 		}
@@ -158,9 +161,9 @@ void Game::update()
 			mc2 = game_data->network_manager->client->on_packet_received.connect([](enki::Packet p)
 			{
 				auto console = spdlog::get("console");
-				if (p.info.timeReceived - p.getHeader().timeSent > 500)
+				if (p.info.timeReceived - p.getHeader().timeSent > 2000)
 				{
-					console->info("client received {}. sent at {} and received at {}, delta of {}", p.getHeader().type, p.getHeader().timeSent, p.info.timeReceived, p.info.timeReceived - p.getHeader().timeSent);
+					console->error("client received {}. sent at {} and received at {}, delta of {}", p.getHeader().type, p.getHeader().timeSent, p.info.timeReceived, p.info.timeReceived - p.getHeader().timeSent);
 				}
 			});
 		}

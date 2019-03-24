@@ -6,16 +6,22 @@ add_executable(Pong
 "main.cpp"
 
 "src/Ball.hpp"
-"src/Collision.hpp"
-"src/Game.hpp"
-"src/Paddle.hpp"
-"src/PlayerText.hpp"
-
 "src/Ball.cpp"
+
+"src/Collision.hpp"
 "src/Collision.cpp"
+
+"src/Game.hpp"
 "src/Game.cpp"
+
+"src/Paddle.hpp"
 "src/Paddle.cpp"
+
+"src/PlayerText.hpp"
 "src/PlayerText.cpp"
+
+"src/Score.hpp"
+"src/Score.cpp"
 )
 
 include(Settings)

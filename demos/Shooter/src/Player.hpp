@@ -17,7 +17,7 @@ class Player : public enki::Entity
 public:
 	Player(enki::EntityInfo info, enki::GameData* data, sf::RenderWindow* window);
 
-	void onSpawn([[maybe_unused]]enki::Packet& p) final;
+	void onSpawn(enki::Packet& p) final;
 
 	void update(float dt) final;
 	void draw(sf::RenderWindow& window) const final;
@@ -48,4 +48,7 @@ private:
 
 	enki::Timer shootTimer;
 	float shootDelay = 0.1f;
+
+	float mapWidth = 0;
+	float mapHeight = 0;
 };

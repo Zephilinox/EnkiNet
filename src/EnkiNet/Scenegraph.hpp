@@ -105,7 +105,7 @@ namespace enki
 
 		for (const auto& child_type : entities_child_types[type])
 		{
-			if (!builders.count(child_type.first))
+			if (!builders.count(child_type.type))
 			{
 				entities_child_types[type] = {};
 				console->error("aaaaaaaaaaaaaaaaaaaaa");

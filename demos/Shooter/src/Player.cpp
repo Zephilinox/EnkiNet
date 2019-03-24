@@ -15,9 +15,12 @@ Player::Player(enki::EntityInfo info, enki::GameData* data, sf::RenderWindow* wi
 {
 	network_tick_rate = 1;
 	game_data->scenegraph->rpc_man.add(enki::RPCType::RemoteAndLocal, "Player", "shoot", &Player::shoot);
+
+	mapWidth = static_cast<CustomData*>(game_data->custom)->map_manager->getWidth();
+	mapHeight = static_cast<CustomData*>(game_data->custom)->map_manager->getHeight();
 }
 
-void Player::onSpawn(enki::Packet& p)
+void Player::onSpawn([[maybe_unused]]enki::Packet& p)
 {
 	auto console = spdlog::get("console");
 	if (!texture.loadFromFile("resources/player.png"))
@@ -146,18 +149,15 @@ void Player::draw(sf::RenderWindow& window_) const
 
 void Player::serializeOnTick(enki::Packet& p)
 {
-	static int i = 0;
-	i++;
-	//15 bits vs 96 (3 floats)
-	p.writeCompressedFloat(sprite.getPosition().x, 0, 640, 0.01f);
-	p.writeCompressedFloat(sprite.getPosition().y, 0, 360, 0.01f);
+	p.writeCompressedFloat(sprite.getPosition().x, 0, mapWidth, 0.01f);
+	p.writeCompressedFloat(sprite.getPosition().y, 0, mapHeight, 0.01f);
 	p.writeCompressedFloat(sprite.getRotation(), 0, 360, 0.01f);
 }
 
 void Player::deserializeOnTick(enki::Packet& p)
 {
-	float x = p.readCompressedFloat(0, 640, 0.01f);
-	float y = p.readCompressedFloat(0, 360, 0.01f);
+	float x = p.readCompressedFloat(0, mapWidth, 0.01f);
+	float y = p.readCompressedFloat(0, mapHeight, 0.01f);
 	sprite.setPosition(x, y);
 	sprite.setRotation(p.readCompressedFloat(0, 360, 0.01f));
 }

@@ -13,7 +13,7 @@ Collision::Collision(enki::EntityInfo info, enki::GameData* game_data)
 {
 }
 
-void Collision::onSpawn()
+void Collision::onSpawn([[maybe_unused]] enki::Packet& p)
 {
 	ball_collider.height = 32;
 	ball_collider.width = 32;

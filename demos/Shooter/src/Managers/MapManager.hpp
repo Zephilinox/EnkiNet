@@ -21,17 +21,20 @@ class MapManager
 public:
 	MapManager(enki::Scenegraph* scenegraph, enki::NetworkManager* network_manager);
 
-	void draw(sf::RenderWindow& window) const;
-
+	void createMap();
+	
 	Tile getTile(sf::Vector2i mapPos);
 
 	sf::Vector2i worldPosToMapPos(sf::Vector2f);
 	sf::Vector2f mapPosToWorldPos(sf::Vector2i);
 
+	float getWidth();
+	float getHeight();
+
 private:
 	int width;
 	int height;
-	int tileSize = 64;
+	int tile_size = 64;
 	std::vector<std::vector<Tile>> map;
 	enki::Scenegraph* scenegraph;
 	enki::NetworkManager* network_manager;

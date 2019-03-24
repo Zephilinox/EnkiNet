@@ -14,7 +14,10 @@ Wall::Wall(enki::EntityInfo info, enki::GameData* game_data)
 
 void Wall::onSpawn(enki::Packet& p)
 {
-	deserializeOnConnection(p);
+	if (p.canDeserialize<float, float>())
+	{
+		deserializeOnConnection(p);
+	}
 }
 
 void Wall::draw(sf::RenderWindow& window) const

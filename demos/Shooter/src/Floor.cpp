@@ -14,7 +14,10 @@ Floor::Floor(enki::EntityInfo info, enki::GameData* game_data)
 
 void Floor::onSpawn(enki::Packet& p)
 {
-	deserializeOnConnection(p);
+	if (p.canDeserialize<float, float>())
+	{
+		deserializeOnConnection(p);
+	}
 }
 
 void Floor::draw(sf::RenderWindow& window) const

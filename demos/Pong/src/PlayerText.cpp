@@ -13,7 +13,7 @@ PlayerText::PlayerText(enki::EntityInfo info, enki::GameData* game_data)
 {
 }
 
-void PlayerText::onSpawn()
+void PlayerText::onSpawn([[maybe_unused]] enki::Packet& p)
 {
 	if (!font.loadFromFile("resources/arial.ttf"))
 	{
