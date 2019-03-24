@@ -72,12 +72,16 @@ namespace enki
 
 		virtual ~Entity() = default;
 
-		virtual void onSpawn() {};
+		virtual void onSpawn([[maybe_unused]]Packet& p) {};
 		virtual void input([[maybe_unused]]sf::Event& e) {};
 		virtual void update([[maybe_unused]]float dt) {};
 		virtual void draw([[maybe_unused]]sf::RenderWindow& window) const {};
-		virtual void serialize([[maybe_unused]]Packet& p) {}
-		virtual void deserialize([[maybe_unused]]Packet& p) {}
+
+		virtual void serializeOnConnection(Packet& p) { serializeOnTick(p); }
+		virtual void deserializeOnConnection(Packet& p) { deserializeOnTick(p); }
+
+		virtual void serializeOnTick([[maybe_unused]]Packet& p) {}
+		virtual void deserializeOnTick([[maybe_unused]]Packet& p) {}
 
 		inline bool isOwner() const
 		{

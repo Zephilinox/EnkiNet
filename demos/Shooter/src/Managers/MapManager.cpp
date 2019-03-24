@@ -3,6 +3,11 @@
 //LIBS
 #include <SFML/Graphics.hpp>
 #include <spdlog/spdlog.h>
+#include <EnkiNet/Entity.hpp>
+
+//SELF
+#include "Floor.hpp"
+#include "Wall.hpp"
 
 MapManager::MapManager(enki::Scenegraph* scenegraph, enki::NetworkManager* network_manager)
 	: scenegraph(scenegraph)
@@ -27,7 +32,7 @@ MapManager::MapManager(enki::Scenegraph* scenegraph, enki::NetworkManager* netwo
 		row.resize(image.getSize().x);
 	}
 
-	for (int pixel = 0; pixel < image.getSize().x * image.getSize().y * 4; pixel += 4)
+	for (unsigned int pixel = 0; pixel < image.getSize().x * image.getSize().y * 4; pixel += 4)
 	{
 		sf::Color c(pixels[pixel], pixels[pixel + 1], pixels[pixel + 2], pixels[pixel + 3]);
 
@@ -76,29 +81,33 @@ MapManager::MapManager(enki::Scenegraph* scenegraph, enki::NetworkManager* netwo
 		console->info(tiles);
 	}*/
 
-	if (network_manager->client->getID == 1)
+	if (network_manager->client->getID() == 1)
 	{
+		int y = 0;
 		for (auto& row : map)
 		{
-			int y = 0;
-
+			int x = 0;
 			for (auto& tile : row)
 			{
-				int x = 0;
+				enki::Packet p;
+				sf::Vector2f pos = mapPosToWorldPos(sf::Vector2i(x, y));
+				p << pos.x << pos.y;
 
 				switch (tile)
 				{
 					case Tile::Floor:
 					{
-						scenegraph->createNetworkedEntity({ "Floor",
-							std::string("Floor ") + std::to_string(x) + ", " + std::to_string(y) });
+						std::string name = std::string("Floor ") + std::to_string(x) + ", " + std::to_string(y);
+						scenegraph->createNetworkedEntity({ "Floor", name }, p);
+						class Floor* ent = scenegraph->findEntityByName<class Floor>(name);
 						break;
 					}
 
 					case Tile::Wall:
 					{
-						scenegraph->createNetworkedEntity({ "Wall",
-							std::string("Wall ") + std::to_string(x) + ", " + std::to_string(y) });
+						std::string name = std::string("Wall ") + std::to_string(x) + ", " + std::to_string(y);
+						scenegraph->createNetworkedEntity({ "Wall", name }, p);
+						class Wall *ent = scenegraph->findEntityByName<class Wall>(name);
 						break;
 					}
 				}

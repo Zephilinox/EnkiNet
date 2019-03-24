@@ -91,7 +91,8 @@ void InputManager::update()
 		
 	}
 
-	mouse_pos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(*window));
+	mouse_desktop_pos = static_cast<sf::Vector2f>(sf::Mouse::getPosition());
+	mouse_screen_pos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(*window));
 }
 
 bool InputManager::isKeyUp(int key)
@@ -134,7 +135,17 @@ bool InputManager::isMouseButtonDown(int button)
 	return (mouse_buttons_this_frame[button] == InputState::Down || mouse_buttons_this_frame[button] == InputState::Pressed);
 }
 
-sf::Vector2f InputManager::getMousePosition()
+sf::Vector2f InputManager::getMouseDesktopPos()
 {
-	return mouse_pos;
+	return mouse_desktop_pos;
+}
+
+sf::Vector2f InputManager::getMouseScreenPos()
+{
+	return mouse_screen_pos;
+}
+
+sf::Vector2f InputManager::getMouseWorldPos()
+{
+	return window->mapPixelToCoords(static_cast<sf::Vector2i>(mouse_screen_pos));
 }

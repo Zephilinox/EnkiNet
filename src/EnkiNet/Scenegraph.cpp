@@ -40,8 +40,13 @@ namespace enki
 				if (p.getHeader().type == ENTITY_CREATION)
 				{
 					auto info = p.read<EntityInfo>();
+					auto spawnInfo = p.read<Packet>();
 					info.ownerID = p.info.senderID;
-					createNetworkedEntity(info);
+					createNetworkedEntity(info, spawnInfo);
+				}
+				if (p.getHeader().type == ENTITY_CREATION_ON_CONNECTION)
+				{
+					console->error("Server received ENTITY_CREATION_ON_CONNECTION");
 				}
 				else if (p.getHeader().type == CONNECTED)
 				{
@@ -129,8 +134,14 @@ namespace enki
 				if (p.getHeader().type == ENTITY_CREATION)
 				{
 					auto info = p.read<EntityInfo>();
-					createEntity(info);
-					//todo on ent creation also serialize all its stuff?
+					auto spawnInfo = p.read<Packet>();
+					createEntity(info, spawnInfo);
+				}
+				else if (p.getHeader().type == ENTITY_CREATION_ON_CONNECTION)
+				{
+					auto info = p.read<EntityInfo>();
+					auto ent = createEntity(info);
+					ent->deserializeOnConnection(p);
 				}
 				else if (p.getHeader().type == ENTITY_UPDATE)
 				{
@@ -140,7 +151,7 @@ namespace enki
 						auto ent = getEntity(info.ID);
 						if (info == ent->info)
 						{
-							ent->deserialize(p);
+							ent->deserializeOnTick(p);
 						}
 						else
 						{
@@ -193,7 +204,7 @@ namespace enki
 					{
 						p.clear();
 						p << ent.second->info;
-						ent.second->serialize(p);
+						ent.second->serializeOnTick(p);
 						this->game_data->network_manager->client->sendPacket(0, &p);
 					}
 				}
@@ -244,9 +255,28 @@ namespace enki
 
 	Entity* Scenegraph::createEntity(EntityInfo info)
 	{
+		Packet p;
+		return createEntity(info, p);
+	}
+
+	void Scenegraph::createNetworkedEntity(EntityInfo info)
+	{
+		Packet p;
+		createNetworkedEntity(info, p);
+	}
+
+	Entity* Scenegraph::createEntity(EntityInfo info, Packet& spawnInfo)
+	{
 		if (info.name == "" || info.type == "")
 		{
 			console->error("Invalid info when creating entity.\n\t{}", info);
+			return nullptr;
+		}
+
+		if (!builders.count(info.type))
+		{
+			console->error("Tried to create entity without registering it first.\n\t{}", info);
+			return nullptr;
 		}
 
 		if (info.ID == 0)
@@ -256,12 +286,12 @@ namespace enki
 
 		//info gets assigned to the entity here through being passed to the Entity base class constructor
 		entities[info.ID] = builders.at(info.type)(info);
-		entities[info.ID]->onSpawn();
+		entities[info.ID]->onSpawn(spawnInfo);
 
 		return entities[info.ID].get();
 	}
 
-	void Scenegraph::createNetworkedEntity(EntityInfo info)
+	void Scenegraph::createNetworkedEntity(EntityInfo info, Packet& spawnInfo)
 	{
 		auto net_man = game_data->network_manager;
 
@@ -271,14 +301,20 @@ namespace enki
 			return;
 		}
 
+		if (!builders.count(info.type))
+		{
+			console->error("Tried to create entity without registering it first.\n\t{}", info);
+			return;
+		}
+
 		if (net_man->server && info.ID == 0)
 		{
 			info.ID = ID++;
 		}
 
-		for (const auto& child_type : entities_child_types[info.type])
+		for (auto& child_info : entities_child_types[info.type])
 		{
-			createNetworkedEntity({ child_type.first, child_type.second, 0, info.ownerID, info.ID });
+			createNetworkedEntity({ child_info.type, child_info.name, 0, info.ownerID, info.ID }, child_info.spawnInfo);
 		}
 
 		if (info.ownerID == 0 && network_ready)
@@ -297,6 +333,7 @@ namespace enki
 		{
 			Packet p({ PacketType::ENTITY_CREATION });
 			p << info;
+			p << spawnInfo;
 
 			if (net_man->server)
 			{
@@ -338,15 +375,9 @@ namespace enki
 				}
 
 				{
-					Packet p({ PacketType::ENTITY_CREATION });
+					Packet p({ PacketType::ENTITY_CREATION_ON_CONNECTION });
 					p << info;
-					game_data->network_manager->server->sendPacketToOneClient(client_id, 0, &p);
-				}
-
-				{
-					Packet p({ PacketType::ENTITY_UPDATE });
-					p << info;
-					ent.second->serialize(p);
+					ent.second->serializeOnConnection(p);
 					game_data->network_manager->server->sendPacketToOneClient(client_id, 0, &p);
 				}
 			}

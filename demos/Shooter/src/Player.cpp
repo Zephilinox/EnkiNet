@@ -9,13 +9,15 @@
 //SELF
 #include "CustomData.hpp"
 
-Player::Player(enki::EntityInfo info, enki::GameData* data)
+Player::Player(enki::EntityInfo info, enki::GameData* data, sf::RenderWindow* window)
 	: Entity(info, data)
+	, window(window)
 {
 	network_tick_rate = 1;
+	game_data->scenegraph->rpc_man.add(enki::RPCType::RemoteAndLocal, "Player", "shoot", &Player::shoot);
 }
 
-void Player::onSpawn()
+void Player::onSpawn(enki::Packet& p)
 {
 	auto console = spdlog::get("console");
 	if (!texture.loadFromFile("resources/player.png"))
@@ -50,7 +52,7 @@ void Player::onSpawn()
 		playerName.setFillColor(sf::Color(200, 60, 60));
 	}
 
-	game_data->scenegraph->rpc_man.add(enki::RPCType::RemoteAndLocal, "Player", "shoot", &Player::shoot);
+	view = window->getDefaultView();
 }
 
 void Player::update(float dt)
@@ -81,7 +83,7 @@ void Player::update(float dt)
 	{
 		if (shootTimer.getElapsedTime() > shootDelay)
 		{
-			sf::Vector2f pos = static_cast<CustomData*>(game_data->custom)->input_manager->getMousePosition();
+			sf::Vector2f pos = static_cast<CustomData*>(game_data->custom)->input_manager->getMouseWorldPos();
 			game_data->scenegraph->rpc_man.call(&Player::shoot, "shoot", game_data->network_manager, this, pos.x, pos.y);
 			shootTimer.restart();
 		}
@@ -116,12 +118,15 @@ void Player::update(float dt)
 		sprite.move(dir * speed * dt);
 	}
 
-	auto mousePos = input_manager->getMousePosition();
+	auto mousePos = input_manager->getMouseWorldPos();
 	auto distance = static_cast<sf::Vector2f>(mousePos) - sprite.getPosition();
 	float length = std::sqrtf((distance.x * distance.x) + (distance.y * distance.y));
 	distance /= length;
 	float rads = std::atan2(distance.y, distance.x);
 	sprite.setRotation((rads * 180.0f) / 3.1415f);
+
+	view.setCenter(sprite.getPosition());
+	window->setView(view);
 }
 
 void Player::draw(sf::RenderWindow& window_) const
@@ -139,7 +144,7 @@ void Player::draw(sf::RenderWindow& window_) const
 	}
 }
 
-void Player::serialize(enki::Packet& p)
+void Player::serializeOnTick(enki::Packet& p)
 {
 	static int i = 0;
 	i++;
@@ -149,7 +154,7 @@ void Player::serialize(enki::Packet& p)
 	p.writeCompressedFloat(sprite.getRotation(), 0, 360, 0.01f);
 }
 
-void Player::deserialize(enki::Packet& p)
+void Player::deserializeOnTick(enki::Packet& p)
 {
 	float x = p.readCompressedFloat(0, 640, 0.01f);
 	float y = p.readCompressedFloat(0, 360, 0.01f);

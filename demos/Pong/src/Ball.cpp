@@ -101,12 +101,12 @@ void Ball::draw(sf::RenderWindow& window) const
 	window.draw(sprite);
 }
 
-void Ball::serialize(enki::Packet& p)
+void Ball::serializeOnTick(enki::Packet& p)
 {
 	p << sprite.getPosition().x << sprite.getPosition().y;
 }
 
-void Ball::deserialize(enki::Packet& p)
+void Ball::deserializeOnTick(enki::Packet& p)
 {
 	float x = p.read<float>();
 	float y = p.read<float>();

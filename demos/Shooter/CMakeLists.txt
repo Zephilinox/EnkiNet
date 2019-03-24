@@ -10,14 +10,17 @@ add_executable(Shooter
 "src/Managers/MapManager.hpp"
 "src/Managers/MapManager.cpp"
 
+"src/CustomData.hpp"
+
 "src/Game.hpp"
 "src/Game.cpp"
 
 "src/Player.hpp"
 "src/Player.cpp"
 
-"src/CustomData.hpp"
-"src/CustomData.cpp"
+"src/Floor.hpp"
+"src/Floor.cpp"
+
 )
 
 include(Settings)
@@ -34,7 +37,8 @@ set_target_properties(
 
 target_link_libraries(Shooter EnkiNet)
 
-include_directories(${CMAKE_SOURCE_DIR}/src)
+target_include_directories(Shooter PUBLIC ${CMAKE_SOURCE_DIR}/src)
+target_include_directories(Shooter PRIVATE ${CMAKE_SOURCE_DIR}/demos/Shooter/src/)
 
 #remove old resources
 file(REMOVE_RECURSE "${CMAKE_SOURCE_DIR}/bin/Shooter/Debug/resources/")

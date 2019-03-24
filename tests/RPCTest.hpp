@@ -20,7 +20,7 @@ void test(int i, double d, float s, int ii)
 TEST_CASE("RPC")
 {
 	enki::RPCManager rpcm;
-	rpcm.add("test", test);
+	rpcm.add(enki::RPCType::All, "test", test);
 
 	std::cout << "\n";
 

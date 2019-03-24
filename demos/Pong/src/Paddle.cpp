@@ -126,12 +126,12 @@ void Paddle::draw(sf::RenderWindow& window) const
 	}
 }
 
-void Paddle::serialize(enki::Packet& p)
+void Paddle::serializeOnTick(enki::Packet& p)
 {
 	p << sprite.getPosition().x << sprite.getPosition().y;
 }
 
-void Paddle::deserialize(enki::Packet& p)
+void Paddle::deserializeOnTick(enki::Packet& p)
 {
 	float x = p.read<float>();
 

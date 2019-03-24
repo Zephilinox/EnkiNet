@@ -24,6 +24,7 @@ namespace enki
 		ENTITY_RPC,
 
 		ENTITY_CREATION,
+		ENTITY_CREATION_ON_CONNECTION,
 		ENTITY_UPDATE,
 		ENTITY_DELETION
 	};
@@ -44,8 +45,10 @@ namespace enki
 	class Packet
 	{
 	public:
-		Packet(PacketHeader = {});
-		Packet(const unsigned char* data, std::size_t size);
+		Packet();
+		explicit Packet(PacketHeader);
+		explicit Packet(const unsigned char* data, std::size_t size);
+		explicit Packet(std::byte* data, std::size_t size);
 
 		void writeBits(int data, int bits_to_write, int offset = 0);
 		[[nodiscard]] int readBits(int bits_to_read, int offset = 0);
@@ -54,12 +57,16 @@ namespace enki
 
 		void resetReadPosition();
 		void clear();
+		bool isEmpty();
 
 		void setHeader(PacketHeader header);
 		const PacketHeader& getHeader() const;
 		const std::vector<std::byte>& getBytes() const;
 		std::size_t getSize() const;
 		std::size_t getBytesRead() const;
+
+		Packet& operator <<(Packet& data);
+		Packet& operator >>(Packet& data);
 
 		Packet& operator <<(std::string data);
 		Packet& operator >>(std::string& data);

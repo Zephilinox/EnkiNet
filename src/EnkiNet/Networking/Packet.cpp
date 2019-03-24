@@ -7,6 +7,17 @@
 
 namespace enki
 {
+	Packet::Packet()
+		: bytes(sizeof(PacketHeader))
+		, bytes_written(sizeof(PacketHeader))
+		, bytes_read(sizeof(PacketHeader))
+		, bits_written(8)
+		, bits_read(8)
+	{
+		bytes.reserve(1400);
+		memcpy(bytes.data(), &header, sizeof(PacketHeader));
+	}
+
 	Packet::Packet(PacketHeader p_header)
 		: header(p_header)
 		, bytes(sizeof(PacketHeader))
@@ -20,6 +31,18 @@ namespace enki
 	}
 
 	Packet::Packet(const unsigned char* data, std::size_t size)
+		: bytes(size)
+		, bytes_written(size)
+		, bytes_read(sizeof(PacketHeader))
+		, bits_written(8)
+		, bits_read(8)
+	{
+		bytes.reserve(1400);
+		memcpy(bytes.data(), data, size);
+		memcpy(&header, bytes.data(), sizeof(PacketHeader));
+	}
+
+	Packet::Packet(std::byte* data, std::size_t size)
 		: bytes(size)
 		, bytes_written(size)
 		, bytes_read(sizeof(PacketHeader))
@@ -249,6 +272,11 @@ namespace enki
 		bits_written = 8;
 	}
 
+	bool Packet::isEmpty()
+	{
+		return bytes.size() == sizeof(PacketHeader);
+	}
+
 	void Packet::setHeader(PacketHeader p_header)
 	{
 		header = p_header;
@@ -273,6 +301,20 @@ namespace enki
 	std::size_t Packet::getBytesRead() const
 	{
 		return bytes_read;
+	}
+
+	Packet& Packet::operator<<(Packet& data)
+	{
+		*this << data.bytes;
+		return *this;
+	}
+
+	Packet& Packet::operator>>(Packet& data)
+	{
+		std::vector<std::byte> b;
+		*this >> b;
+		data = Packet(b.data(), b.size());
+		return *this;
 	}
 
 	Packet& Packet::operator <<(std::string data)

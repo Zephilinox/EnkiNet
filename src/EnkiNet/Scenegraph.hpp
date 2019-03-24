@@ -15,6 +15,13 @@
 
 namespace enki
 {
+	struct ChildEntityCreationInfo
+	{
+		std::string type;
+		std::string name;
+		Packet spawnInfo;
+	};
+
 	class Scenegraph
 	{
 	public:
@@ -38,6 +45,9 @@ namespace enki
 		Entity* createEntity(EntityInfo info);
 		void createNetworkedEntity(EntityInfo info);
 
+		Entity* createEntity(EntityInfo info, Packet& spawnInfo);
+		void createNetworkedEntity(EntityInfo info, Packet& spawnInfo);
+
 		Entity* getEntity(EntityID entityID);
 		bool entityExists(EntityID entityID);
 
@@ -48,47 +58,14 @@ namespace enki
 		std::vector<Entity*> findEntitiesByParent(EntityID parent) const;
 		std::vector<Entity*> findEntitiesByPredicate(std::function<bool(const Entity&)> predicate) const;
 
-		template <typename T>
-		T* findEntityByType(std::string type) const
-		{
-			for (const auto& ent : entities)
-			{
-				if (ent.second->info.type == type)
-				{
-					return static_cast<T*>(ent.second.get());
-				}
-			}
+		template <typename T = Entity>
+		T* findEntityByType(std::string type) const;
 
-			return nullptr;
-		}
+		template <typename T = Entity>
+		T* findEntityByName(std::string name) const;
 
-		template <typename T>
-		T* findEntityByName(std::string name) const
-		{
-			for (const auto& ent : entities)
-			{
-				if (ent.second->info.name == name)
-				{
-					return static_cast<T*>(ent.second.get());
-				}
-			}
-
-			return nullptr;
-		}
-
-		template <typename T>
-		T* findEntityByPredicate(std::function<bool(const Entity&)> predicate) const
-		{
-			for (const auto& ent : entities)
-			{
-				if (predicate(*ent.second.get()))
-				{
-					return static_cast<T*>(ent.second.get());
-				}
-			}
-
-			return nullptr;
-		}
+		template <typename T = Entity>
+		T* findEntityByPredicate(std::function<bool(const Entity&)> predicate) const;
 
 		RPCManager rpc_man;
 
@@ -96,7 +73,7 @@ namespace enki
 		void sendAllNetworkedEntitiesToClient(ClientID client_id);
 
 		std::map<EntityID, std::unique_ptr<Entity>> entities;
-		std::map<std::string, std::vector<std::pair<std::string, std::string>>> entities_child_types;
+		std::map<std::string, std::vector<ChildEntityCreationInfo>> entities_child_types;
 		std::map<std::string, BuilderFunction> builders;
 
 		EntityID ID = 1;
@@ -124,7 +101,6 @@ namespace enki
 	template <typename... Args>
 	void Scenegraph::registerEntityChildren(std::string type, Args... args)
 	{
-		//todo: names of child entities
 		entities_child_types[type] = { args... };
 
 		for (const auto& child_type : entities_child_types[type])
@@ -137,5 +113,47 @@ namespace enki
 				//etc
 			}
 		}
+	}
+
+	template <typename T>
+	T* Scenegraph::findEntityByType(std::string type) const
+	{
+		for (const auto& ent : entities)
+		{
+			if (ent.second->info.type == type)
+			{
+				return static_cast<T*>(ent.second.get());
+			}
+		}
+
+		return nullptr;
+	}
+
+	template <typename T>
+	T* Scenegraph::findEntityByName(std::string name) const
+	{
+		for (const auto& ent : entities)
+		{
+			if (ent.second->info.name == name)
+			{
+				return static_cast<T*>(ent.second.get());
+			}
+		}
+
+		return nullptr;
+	}
+
+	template <typename T>
+	T* Scenegraph::findEntityByPredicate(std::function<bool(const Entity&)> predicate) const
+	{
+		for (const auto& ent : entities)
+		{
+			if (predicate(*ent.second.get()))
+			{
+				return static_cast<T*>(ent.second.get());
+			}
+		}
+
+		return nullptr;
 	}
 }

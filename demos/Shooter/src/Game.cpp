@@ -12,13 +12,15 @@
 //SELF
 #include "Player.hpp"
 #include "Managers/MapManager.hpp"
+#include "Floor.hpp"
+#include "Wall.hpp"
 
 Game::Game()
 {
 	spdlog::stdout_color_mt("console");
 	auto console = spdlog::get("console");
 
-	window = std::make_unique<sf::RenderWindow>(sf::VideoMode(640, 360), "EnkiNet");
+	window = std::make_unique<sf::RenderWindow>(sf::VideoMode(1280, 720), "EnkiNet");
 	input_manager.window = window.get();
 
 	game_data = std::make_unique<enki::GameData>();
@@ -28,7 +30,7 @@ Game::Game()
 
 	scenegraph = std::make_unique<enki::Scenegraph>(game_data.get());
 	auto enki_logger = spdlog::get("EnkiNet");
-	enki_logger->set_level(spdlog::level::off);
+	enki_logger->set_level(spdlog::level::err);
 
 	network_manager = std::make_unique<enki::NetworkManager>();
 
@@ -37,6 +39,8 @@ Game::Game()
 	game_data->custom = custom_data.get();
 
 	scenegraph->registerEntity<Player>("Player", window.get());
+	scenegraph->registerEntity<class Floor>("Floor");
+	scenegraph->registerEntity<class Wall>("Wall");
 
 	run();
 }
@@ -105,11 +109,6 @@ void Game::update()
 
 			scenegraph->createNetworkedEntity({ "Player", "Player 1" });
 
-			for (int i = 0; i < 100; ++i)
-			{
-				scenegraph->createNetworkedEntity({ "Player", "Player X" });
-			}
-
 			mc1 = network_manager->server->on_packet_received.connect([this](enki::Packet p)
 			{
 				if (p.getHeader().type == enki::PacketType::CONNECTED)
@@ -117,7 +116,7 @@ void Game::update()
 					//not already part of the game
 					if (!players.count(p.info.senderID))
 					{
-						scenegraph->createNetworkedEntity({ "Player", "Player " + p.info.senderID, 0, p.info.senderID });
+						scenegraph->createNetworkedEntity({ "Player", "Player " + std::to_string(p.info.senderID), 0, p.info.senderID });
 						players.insert(p.info.senderID);
 					}
 				}
@@ -137,7 +136,7 @@ void Game::update()
 
 void Game::draw() const
 {
-	window->clear({ 230, 230, 230, 255 });
+	window->clear({ 0, 0, 0, 255 });
 	scenegraph->draw(*window.get());
 	window->display();
 }

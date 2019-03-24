@@ -14,8 +14,8 @@ public:
 	void input(sf::Event& e) final;
 	void update(float dt) final;
 	void draw(sf::RenderWindow& window) const final;
-	void serialize(enki::Packet& p) final;
-	void deserialize(enki::Packet& p) final;
+	void serializeOnTick(enki::Packet& p) final;
+	void deserializeOnTick(enki::Packet& p) final;
 
 	sf::Sprite sprite;
 	sf::Texture texture;

@@ -15,18 +15,21 @@ struct Line
 class Player : public enki::Entity
 {
 public:
-	Player(enki::EntityInfo info, enki::GameData* data);
+	Player(enki::EntityInfo info, enki::GameData* data, sf::RenderWindow* window);
 
-	void onSpawn();
+	void onSpawn([[maybe_unused]]enki::Packet& p) final;
 
-	void update(float dt);
-	void draw(sf::RenderWindow& window) const;
+	void update(float dt) final;
+	void draw(sf::RenderWindow& window) const final;
 
-	void serialize(enki::Packet& p);
-	void deserialize(enki::Packet& p);
+	void serializeOnTick(enki::Packet& p) final;
+	void deserializeOnTick(enki::Packet& p) final;
 
 private:
 	void shoot(float x, float y);
+
+	sf::RenderWindow* window;
+	sf::View view;
 
 	sf::Texture texture;
 	sf::Sprite sprite;

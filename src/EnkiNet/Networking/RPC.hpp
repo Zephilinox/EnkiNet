@@ -415,7 +415,7 @@ namespace enki
 		{
 			if (!global_rpcs.count(name))
 			{
-				return
+				return;
 			}
 
 			Packet p;

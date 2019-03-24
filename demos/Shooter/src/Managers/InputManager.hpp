@@ -35,7 +35,9 @@ public:
 	bool isMouseButtonReleased(int button);
 	bool isMouseButtonDown(int button);
 	
-	sf::Vector2f getMousePosition();
+	sf::Vector2f getMouseDesktopPos();
+	sf::Vector2f getMouseScreenPos();
+	sf::Vector2f getMouseWorldPos();
 
 	sf::RenderWindow* window;
 
@@ -48,5 +50,6 @@ private:
 	std::array<int, sf::Mouse::Button::ButtonCount> mouse_buttons_last_frame;
 	std::array<int, sf::Mouse::Button::ButtonCount> mouse_buttons_this_frame;
 
-	sf::Vector2f mouse_pos;
+	sf::Vector2f mouse_desktop_pos;
+	sf::Vector2f mouse_screen_pos;
 };

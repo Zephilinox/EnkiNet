@@ -81,7 +81,7 @@ target_include_directories(EnkiNet PUBLIC
 	"${CMAKE_SOURCE_DIR}/src/"
 )
 
-target_include_directories(EnkiNet PRIVATE
+target_include_directories(EnkiNet PUBLIC
 	"${CMAKE_SOURCE_DIR}/src/EnkiNet"
 )
 
