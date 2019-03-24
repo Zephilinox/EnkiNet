@@ -99,7 +99,6 @@ MapManager::MapManager(enki::Scenegraph* scenegraph, enki::NetworkManager* netwo
 					{
 						std::string name = std::string("Floor ") + std::to_string(x) + ", " + std::to_string(y);
 						scenegraph->createNetworkedEntity({ "Floor", name }, p);
-						class Floor* ent = scenegraph->findEntityByName<class Floor>(name);
 						break;
 					}
 
@@ -107,7 +106,6 @@ MapManager::MapManager(enki::Scenegraph* scenegraph, enki::NetworkManager* netwo
 					{
 						std::string name = std::string("Wall ") + std::to_string(x) + ", " + std::to_string(y);
 						scenegraph->createNetworkedEntity({ "Wall", name }, p);
-						class Wall *ent = scenegraph->findEntityByName<class Wall>(name);
 						break;
 					}
 				}
@@ -133,10 +131,10 @@ Tile MapManager::getTile(sf::Vector2i mapPos)
 
 sf::Vector2i MapManager::worldPosToMapPos(sf::Vector2f worldPos)
 {
-	return sf::Vector2i(worldPos.x / tileSize, worldPos.y / tileSize);
+	return sf::Vector2i(static_cast<int>(worldPos.x) / tileSize, static_cast<int>(worldPos.y) / tileSize);
 }
 
 sf::Vector2f MapManager::mapPosToWorldPos(sf::Vector2i mapPos)
 {
-	return sf::Vector2f(mapPos.x * tileSize, mapPos.y * tileSize);
+	return sf::Vector2f(static_cast<float>(mapPos.x * tileSize), static_cast<float>(mapPos.y * tileSize));
 }

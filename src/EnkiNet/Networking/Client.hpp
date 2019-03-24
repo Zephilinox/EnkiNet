@@ -8,9 +8,9 @@
 #include <spdlog/spdlog.h>
 
 //SELF
-#include "Signals/Signal.hpp"
-#include "Networking/Packet.hpp"
-#include "Timer.hpp"
+#include "EnkiNet/Signals/Signal.hpp"
+#include "EnkiNet/Networking/Packet.hpp"
+#include "EnkiNet/Timer.hpp"
 
 namespace enki
 {

@@ -7,9 +7,9 @@
 //LIBS
 
 //SELF
-#include "Networking/ServerHost.hpp"
-#include "Networking/ClientHost.hpp"
-#include "Networking/ClientStandard.hpp"
+#include "EnkiNet/Networking/ServerHost.hpp"
+#include "EnkiNet/Networking/ClientHost.hpp"
+#include "EnkiNet/Networking/ClientStandard.hpp"
 
 namespace enki
 {

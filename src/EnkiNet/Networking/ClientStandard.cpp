@@ -4,7 +4,7 @@
 #include <iostream>
 
 //SELF
-#include "Entity.hpp"
+#include "EnkiNet/Entity.hpp"
 
 namespace enki
 {

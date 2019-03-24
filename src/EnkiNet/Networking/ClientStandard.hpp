@@ -4,8 +4,8 @@
 #include <enetpp/client.h>
 
 //SELF
-#include "Client.hpp"
-#include "GameData.hpp"
+#include "EnkiNet/Networking/Client.hpp"
+#include "EnkiNet/GameData.hpp"
 
 namespace enki
 {

@@ -4,9 +4,9 @@
 #include <experimental/vector>
 
 //SELF
-#include "Connection.hpp"
-#include "Slot.hpp"
-#include "Disconnector.hpp"
+#include "EnkiNet/Signals/Connection.hpp"
+#include "EnkiNet/Signals/Slot.hpp"
+#include "EnkiNet/Signals/Disconnector.hpp"
 
 //todo: fix signal implementation to be r-values?
 //currently too much being copied around, use pointers for non-POD

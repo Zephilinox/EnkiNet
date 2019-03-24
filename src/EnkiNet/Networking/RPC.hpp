@@ -4,10 +4,10 @@
 #include <iostream>
 
 //SELF
-#include "Packet.hpp"
-#include "Networking/ServerHost.hpp"
-#include "Networking/ClientStandard.hpp"
-#include "../Entity.hpp"
+#include "EnkiNet/Networking/Packet.hpp"
+#include "EnkiNet/Networking/ServerHost.hpp"
+#include "EnkiNet/Networking/ClientStandard.hpp"
+#include "EnkiNet/Entity.hpp"
 
 namespace enki
 {

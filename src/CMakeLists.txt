@@ -81,11 +81,6 @@ target_include_directories(EnkiNet PUBLIC
 	"${CMAKE_SOURCE_DIR}/src/"
 )
 
-target_include_directories(EnkiNet PUBLIC
-	"${CMAKE_SOURCE_DIR}/src/EnkiNet"
-)
-
-
 #couldn't figure out a better way to do this, don't really want to use install targets
 #remove old headers
 file(REMOVE_RECURSE "${CMAKE_SOURCE_DIR}/bin/EnkiNet/include")

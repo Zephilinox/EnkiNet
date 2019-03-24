@@ -21,6 +21,8 @@ add_executable(Shooter
 "src/Floor.hpp"
 "src/Floor.cpp"
 
+"src/Wall.hpp"
+"src/Wall.cpp"
 )
 
 include(Settings)
@@ -37,7 +39,6 @@ set_target_properties(
 
 target_link_libraries(Shooter EnkiNet)
 
-target_include_directories(Shooter PUBLIC ${CMAKE_SOURCE_DIR}/src)
 target_include_directories(Shooter PRIVATE ${CMAKE_SOURCE_DIR}/demos/Shooter/src/)
 
 #remove old resources

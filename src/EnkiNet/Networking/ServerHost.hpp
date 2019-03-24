@@ -7,8 +7,8 @@
 #include <enetpp/server.h>
 
 //SELF
-#include "Client.hpp"
-#include "Server.hpp"
+#include "EnkiNet/Networking/Client.hpp"
+#include "EnkiNet/Networking/Server.hpp"
 
 namespace enki
 {

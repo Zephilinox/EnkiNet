@@ -4,9 +4,9 @@
 #include <enetpp/client.h>
 
 //SELF
-#include "Client.hpp"
-#include "ServerHost.hpp"
-#include "GameData.hpp"
+#include "EnkiNet/Networking/Client.hpp"
+#include "EnkiNet/Networking/ServerHost.hpp"
+#include "EnkiNet/GameData.hpp"
 
 namespace enki
 {

@@ -9,9 +9,9 @@
 #include <spdlog/spdlog.h>
 
 //SELF
-#include "Entity.hpp"
-#include "GameData.hpp"
-#include "Networking/RPC.hpp"
+#include "EnkiNet/Entity.hpp"
+#include "EnkiNet/GameData.hpp"
+#include "EnkiNet/Networking/RPC.hpp"
 
 namespace enki
 {
