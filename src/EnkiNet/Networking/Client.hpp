@@ -17,7 +17,6 @@ namespace enki
 	class Client
 	{
 	public:
-		Client() = default;
 		virtual ~Client() = default;
 
 		virtual void processPackets() = 0;
@@ -27,32 +26,8 @@ namespace enki
 		virtual bool isConnected() const = 0;
 		virtual bool isConnecting() const = 0;
 
-		inline void update()
-		{
-			std::lock_guard<std::mutex> guard(mutex);
-
-			packetsReceived += packets.size();
-
-			if (packetsTimer.getElapsedTime() > 10)
-			{
-				auto console = spdlog::get("EnkiNet");
-				packetsTimer.restart();
-				console->info("client received {} packets in the last 10 seconds", packetsReceived);
-				packetsReceived = 0;
-			}
-
-			while (!packets.empty())
-			{
-				on_packet_received.emit(packets.front());
-				packets.pop();
-			}
-		}
-
-		inline void pushPacket(Packet&& p)
-		{
-			std::lock_guard<std::mutex> lock(mutex);
-			packets.push(std::move(p));
-		}
+		void update();
+		void pushPacket(Packet&& p);
 
 		inline ClientID getID() const
 		{
@@ -62,6 +37,7 @@ namespace enki
 		Signal<Packet> on_packet_received;
 
 	protected:
+		Client() = default;
 		ClientID id = 0;
 
 	private:

@@ -5,6 +5,7 @@ project(EnkiNet)
 set(EnkiNet_HEADERS 
 	"EnkiNet/Networking/Packet.hpp"
 	"EnkiNet/Networking/RPC.hpp"
+	"EnkiNet/Networking/RPCManager.hpp"
 	"EnkiNet/Networking/Client.hpp"
 	"EnkiNet/Networking/ClientHost.hpp"
 	"EnkiNet/Networking/ClientStandard.hpp"
@@ -29,6 +30,9 @@ set (EnkiNet_SRC
 	"EnkiNet/Networking/ClientHost.cpp"
 	"EnkiNet/Networking/ClientStandard.cpp"
 	"EnkiNet/Networking/ServerHost.cpp"
+	"EnkiNet/Networking/RPCManager.cpp"
+	"EnkiNet/Networking/Client.cpp"
+	"EnkiNet/Networking/Server.cpp"
 	
 	"EnkiNet/Managers/NetworkManager.cpp"
 	

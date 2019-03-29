@@ -23,6 +23,7 @@ namespace enki
 
 		GLOBAL_RPC,
 		ENTITY_RPC,
+		CLASS_RPC,
 
 		ENTITY_CREATION,
 		ENTITY_CREATION_ON_CONNECTION,
@@ -57,7 +58,7 @@ namespace enki
 
 		void resetReadPosition();
 		void clear();
-		bool isEmpty();
+		bool isEmpty() const;
 		
 		template <typename... Args>
 		bool canDeserialize();
@@ -168,8 +169,7 @@ namespace enki
 		}
 		else
 		{
-			//todo: do I really want to use exceptions?
-			throw std::exception();
+			throw std::runtime_error("Failed to read std::array from packet, sizes don't match");
 		}
 
 		return *this;
@@ -201,8 +201,7 @@ namespace enki
 	{
 		if (bytes_read + size > bytes.size())
 		{
-			//todo: do I really want to use exceptions?
-			throw std::exception();
+			throw std::runtime_error("Failed to deserialize info in packet, would be reading past end of packet buffer");
 		}
 
 		memcpy(data, bytes.data() + bytes_read, size);

@@ -25,7 +25,7 @@ namespace enki
 		p->setHeader(header);
 
 		auto console = spdlog::get("EnkiNet");
-		//console->info("client sending packet");
+
 		p->info.senderID = id;
 		p->info.timeReceived = enet_time_get();
 		server->on_packet_received.emit(*p);

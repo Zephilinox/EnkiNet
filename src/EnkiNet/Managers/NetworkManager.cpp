@@ -99,6 +99,7 @@ namespace enki
 
 		if (network_process_timer.getElapsedTime() > 1.0f / float(network_send_rate))
 		{
+			//Only emit the signal when there's someone else connected
 			if ((server && (!server->getConnectedClients().empty() || client)) ||
 				!server && client && client->isConnected())
 			{

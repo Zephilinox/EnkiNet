@@ -23,6 +23,9 @@ add_executable(Shooter
 
 "src/Wall.hpp"
 "src/Wall.cpp"
+
+"src/HealthSpawner.hpp"
+"src/HealthSpawner.cpp"
 )
 
 include(Settings)

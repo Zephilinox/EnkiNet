@@ -12,6 +12,7 @@
 #include "EnkiNet/Entity.hpp"
 #include "EnkiNet/GameData.hpp"
 #include "EnkiNet/Networking/RPC.hpp"
+#include "EnkiNet/Networking/RPCManager.hpp"
 
 namespace enki
 {
