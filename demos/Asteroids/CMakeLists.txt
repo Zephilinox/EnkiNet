@@ -15,6 +15,9 @@ add_executable(Asteroids
 
 "src/Player.hpp"
 "src/Player.cpp"
+
+"src/Asteroid.hpp"
+"src/Asteroid.cpp"
 )
 
 include(Settings)

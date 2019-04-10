@@ -95,9 +95,9 @@ void Player::update(float dt)
 
 	float length = std::sqrtf((velocity.x * velocity.x) + (velocity.y * velocity.y));
 
-	if (input_manager->isKeyPressed(sf::Keyboard::Key::LShift))
+	if (input_manager->isKeyDown(sf::Keyboard::Key::LShift))
 	{
-		if (length > 5)
+		if (length > 5 && velocity.x != 0 && velocity.y != 0)
 		{
 			sf::Vector2f normVelocity;
 			if (length != 0)
@@ -126,15 +126,43 @@ void Player::update(float dt)
 
 	ship.move(velocity * dt);
 
-	//view.setCenter(ship.getPosition());
-	window->setView(view);
+	if (ship.getPosition().x + (ship_tex.getSize().x / 2) <= 0)
+	{
+		ship.setPosition(window->getView().getSize().x, ship.getPosition().y);
+	}
+	else if (ship.getPosition().x - (ship_tex.getSize().x / 2) >= window->getView().getSize().x)
+	{
+		ship.setPosition(0, ship.getPosition().y);
+	}
+	else if (ship.getPosition().y + (ship_tex.getSize().y / 2) <= 0)
+	{
+		ship.setPosition(ship.getPosition().x, window->getView().getSize().y);
+	}
+	else if (ship.getPosition().y - (ship_tex.getSize().y / 2) >= window->getView().getSize().y)
+	{
+		ship.setPosition(ship.getPosition().x, 0);
+	}
+
+	if (input_manager->isKeyDown(sf::Keyboard::Key::F1))
+	{
+		handleCollision();
+	}
 }
 
 void Player::draw(sf::RenderWindow& window_) const
 {
 	window_.draw(ship);
-	//window_.draw(playerName);
-	//window_.draw(hpText);
+
+	if (was_damaged && flashing_timer.getElapsedTime() < flashing_duration)
+	{
+		int milli = flashing_timer.getElapsedTime<enki::Timer::milliseconds>();
+		int percentage = 20;
+		int rem_milli = milli % 1000 % (percentage * 10); //ignore seconds and get a percentage of the remainder
+		if (rem_milli < percentage * 5)
+		{
+			window_.draw(ship);
+		}
+	}
 }
 
 void Player::serializeOnTick(enki::Packet& p)
@@ -150,4 +178,30 @@ void Player::deserializeOnTick(enki::Packet& p)
 	float y = p.readCompressedFloat(0, 720, 0.01f);
 	ship.setPosition(x, y);
 	ship.setRotation(p.readCompressedFloat(0, 360, 0.01f));
+}
+
+sf::Vector2f Player::getPosition() const
+{
+	return ship.getPosition();
+}
+
+bool Player::isInvincible() const
+{
+	return was_damaged;
+}
+
+int Player::getLives() const
+{
+	return lives;
+}
+
+void Player::handleCollision()
+{
+	if (lives > 0)
+	{
+		lives--;
+	}
+
+	was_damaged = true;
+	flashing_timer.restart();
 }

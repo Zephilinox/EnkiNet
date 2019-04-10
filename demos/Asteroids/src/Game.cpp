@@ -11,6 +11,7 @@
 
 //SELF
 #include "Player.hpp"
+#include "Asteroid.hpp"
 #include "CustomData.hpp"
 
 Game::Game()
@@ -36,6 +37,7 @@ Game::Game()
 	game_data->network_manager = network_manager.get();
 
 	scenegraph->registerEntity<Player>("Player", custom_data.get(), window.get());
+	scenegraph->registerEntity<Asteroid>("Asteroid", custom_data.get(), window.get());
 
 	run();
 }
@@ -91,6 +93,17 @@ void Game::update()
 
 	static bool networking = false;
 
+	if (network_manager->server &&
+		input_manager.isKeyPressed(sf::Keyboard::Key::F2))
+	{
+		enki::Packet p;
+		p << (std::rand() % 8) + 5
+			<< static_cast<float>(std::rand() % 1280)
+			<< static_cast<float>(std::rand() % 720)
+			<< static_cast<float>((std::rand() % 200) + 50);
+		scenegraph->createNetworkedEntity({ "Asteroid", "Asteroid"}, p);
+	}
+
 	if (!networking && custom_data->window_active)
 	{
 		if (input_manager.isKeyPressed(sf::Keyboard::Key::S))
@@ -131,7 +144,7 @@ void Game::update()
 
 void Game::draw() const
 {
-	window->clear({ 0, 0, 0, 255 });
+	window->clear({ 40, 40, 40, 255 });
 	scenegraph->draw(*window.get());
 	window->display();
 }

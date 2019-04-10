@@ -8,10 +8,10 @@
 //SELF
 #include "CustomData.hpp"
 
-class Player : public enki::Entity
+class Asteroid : public enki::Entity
 {
 public:
-	Player(enki::EntityInfo info, enki::GameData* data, CustomData* custom_data, sf::RenderWindow* window);
+	Asteroid(enki::EntityInfo info, enki::GameData* data, CustomData* custom_data, sf::RenderWindow* window);
 
 	void onSpawn(enki::Packet& p) final;
 
@@ -22,28 +22,26 @@ public:
 	void deserializeOnTick(enki::Packet& p) final;
 	
 	void handleCollision();
+	void split();
 
+	bool isAlive() const;
+	bool canSplit() const;
 	sf::Vector2f getPosition() const;
-	bool isInvincible() const;
-	int getLives() const;
+	float getRadius() const;
+	float getRotation() const;
 
 private:
+	void createShape(unsigned sides);
+
+	sf::ConvexShape shape;
+
 	CustomData* custom_data;
 	sf::RenderWindow* window;
-	sf::View view;
 
-	sf::Texture ship_tex;
-	sf::Sprite ship;
-
-	sf::Vector2f velocity;
 	float speed = 300;
-	float max_velocity_length = 600;
-	int lives = 10;
-	bool was_damaged = false;
-
-	enki::Timer flashing_timer;
-	float flashing_duration = 1.0f;
-
-	enki::Timer shootTimer;
-	float shootDelay = 0.1f;
+	float radius = 10;
+	float rotation_speed = 200;
+	sf::Vector2f velocity = {1, 1};
+	bool colliding = false;
+	bool alive = true;
 };
