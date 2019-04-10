@@ -15,7 +15,10 @@ namespace enki
 		ClientStandard(std::uint8_t channel_count, std::string server_ip, std::uint16_t server_port);
 		~ClientStandard() final;
 
+		//Called by the network manager in a different thread
 		void processPackets() final;
+
+		//Send a packet to the server
 		void sendPacket(enet_uint8 channel_id, Packet* p, enet_uint32 flags = ENET_PACKET_FLAG_RELIABLE) final;
 
 		inline bool isConnected() const final

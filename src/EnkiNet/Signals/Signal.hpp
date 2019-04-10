@@ -139,7 +139,7 @@ namespace enki
 				: signal(signal)
 			{}
 
-			bool disconnect(Connection& c) override final
+			bool disconnect(Connection& c) final
 			{
 				if (signal)
 				{

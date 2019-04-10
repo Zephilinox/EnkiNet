@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="enet"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="msvc8"/>
+		<Option virtualFolders="CMake Files\;CMake Files\src\;CMake Files\cmake\;CMake Files\..\;CMake Files\..\SFML-2.5.1\;CMake Files\..\SFML-2.5.1\lib\;CMake Files\..\SFML-2.5.1\lib\cmake\;CMake Files\..\SFML-2.5.1\lib\cmake\SFML\;CMake Files\third_party\;CMake Files\third_party\doctest\;CMake Files\third_party\enet\;CMake Files\third_party\spdlog\;CMake Files\third_party\spdlog\cmake\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="Z:/Programming/C++/EnkiNet/cmake-build-debug/third_party/enet"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f Z:\Programming\C++\EnkiNet\cmake-build-debug\third_party\enet\Makefile VERBOSE=1 all"/>
+					<CompileFile command="nmake /NOLOGO /f Z:\Programming\C++\EnkiNet\cmake-build-debug\third_party\enet\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f Z:\Programming\C++\EnkiNet\cmake-build-debug\third_party\enet\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f Z:\Programming\C++\EnkiNet\cmake-build-debug\third_party\enet\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="enet">
+				<Option output="Z:/Programming/C++/EnkiNet/cmake-build-debug/third_party/enet/enet.lib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="Z:/Programming/C++/EnkiNet/cmake-build-debug/third_party/enet"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="msvc8"/>
+				<Compiler>
+					<Add directory="Z:/Programming/C++/EnkiNet/third_party/enet/include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\ATLMFC\include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\include"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\ucrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\shared"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\winrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\cppwinrt"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f Z:\Programming\C++\EnkiNet\cmake-build-debug\third_party\enet\Makefile VERBOSE=1 enet"/>
+					<CompileFile command="nmake /NOLOGO /f Z:\Programming\C++\EnkiNet\cmake-build-debug\third_party\enet\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f Z:\Programming\C++\EnkiNet\cmake-build-debug\third_party\enet\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f Z:\Programming\C++\EnkiNet\cmake-build-debug\third_party\enet\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="enet/fast">
+				<Option output="Z:/Programming/C++/EnkiNet/cmake-build-debug/third_party/enet/enet.lib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="Z:/Programming/C++/EnkiNet/cmake-build-debug/third_party/enet"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="msvc8"/>
+				<Compiler>
+					<Add directory="Z:/Programming/C++/EnkiNet/third_party/enet/include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\ATLMFC\include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\include"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\ucrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\shared"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\winrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.17763.0\cppwinrt"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f Z:\Programming\C++\EnkiNet\cmake-build-debug\third_party\enet\Makefile VERBOSE=1 enet/fast"/>
+					<CompileFile command="nmake /NOLOGO /f Z:\Programming\C++\EnkiNet\cmake-build-debug\third_party\enet\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f Z:\Programming\C++\EnkiNet\cmake-build-debug\third_party\enet\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f Z:\Programming\C++\EnkiNet\cmake-build-debug\third_party\enet\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="Z:/Programming/C++/EnkiNet/third_party/enet/callbacks.c">
+			<Option target="enet"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/third_party/enet/compress.c">
+			<Option target="enet"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/third_party/enet/host.c">
+			<Option target="enet"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/third_party/enet/include/enet/callbacks.h">
+			<Option target="enet"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/third_party/enet/include/enet/enet.h">
+			<Option target="enet"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/third_party/enet/include/enet/list.h">
+			<Option target="enet"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/third_party/enet/include/enet/protocol.h">
+			<Option target="enet"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/third_party/enet/include/enet/time.h">
+			<Option target="enet"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/third_party/enet/include/enet/types.h">
+			<Option target="enet"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/third_party/enet/include/enet/unix.h">
+			<Option target="enet"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/third_party/enet/include/enet/utility.h">
+			<Option target="enet"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/third_party/enet/include/enet/win32.h">
+			<Option target="enet"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/third_party/enet/list.c">
+			<Option target="enet"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/third_party/enet/packet.c">
+			<Option target="enet"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/third_party/enet/peer.c">
+			<Option target="enet"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/third_party/enet/protocol.c">
+			<Option target="enet"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/third_party/enet/unix.c">
+			<Option target="enet"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/third_party/enet/win32.c">
+			<Option target="enet"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/src/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\src\"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/cmake/FilesystemSourceGroup.cmake">
+			<Option virtualFolder="CMake Files\cmake\"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/cmake/Settings.cmake">
+			<Option virtualFolder="CMake Files\cmake\"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/../SFML-2.5.1/lib/cmake/SFML/SFMLConfig.cmake">
+			<Option virtualFolder="CMake Files\..\SFML-2.5.1\lib\cmake\SFML\"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/../SFML-2.5.1/lib/cmake/SFML/SFMLConfigDependencies.cmake">
+			<Option virtualFolder="CMake Files\..\SFML-2.5.1\lib\cmake\SFML\"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/../SFML-2.5.1/lib/cmake/SFML/SFMLConfigVersion.cmake">
+			<Option virtualFolder="CMake Files\..\SFML-2.5.1\lib\cmake\SFML\"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/../SFML-2.5.1/lib/cmake/SFML/SFMLStaticTargets-debug.cmake">
+			<Option virtualFolder="CMake Files\..\SFML-2.5.1\lib\cmake\SFML\"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/../SFML-2.5.1/lib/cmake/SFML/SFMLStaticTargets-release.cmake">
+			<Option virtualFolder="CMake Files\..\SFML-2.5.1\lib\cmake\SFML\"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/../SFML-2.5.1/lib/cmake/SFML/SFMLStaticTargets.cmake">
+			<Option virtualFolder="CMake Files\..\SFML-2.5.1\lib\cmake\SFML\"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/third_party/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\third_party\"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/third_party/doctest/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\third_party\doctest\"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/third_party/enet/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\third_party\enet\"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/third_party/spdlog/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\third_party\spdlog\"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/third_party/spdlog/cmake/sanitizers.cmake">
+			<Option virtualFolder="CMake Files\third_party\spdlog\cmake\"/>
+		</Unit>
+		<Unit filename="Z:/Programming/C++/EnkiNet/third_party/spdlog/cmake/spdlog.pc.in">
+			<Option virtualFolder="CMake Files\third_party\spdlog\cmake\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

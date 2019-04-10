@@ -67,6 +67,7 @@ namespace enki
 	}
 
 	//Used for storing member function RPC's for classes not derived from Entity*
+	//Might also be able to use variadic variables instead
 	template <class Wrapee>
 	class RPCWrapper
 	{
@@ -82,12 +83,15 @@ namespace enki
 	};
 
 	template <class Wrapee>
-	std::map<std::string, typename RPCWrapper<Wrapee>::ClassRPC> RPCWrapper<Wrapee>::class_rpcs;
+	std::map<std::string, typename RPCWrapper<Wrapee>::ClassRPC>
+	RPCWrapper<Wrapee>::class_rpcs;
 
-	//Used for getting type info from functions, and having that info available in the wrapped RPC functions
+	//Used for getting type info from functions
+	//and having that info available in the wrapped RPC functions
 	template <typename not_important>
 	struct RPCUtil;
 
+	//For free-standing functions
 	template <typename Return, typename... Parameters>
 	struct RPCUtil<Return(Parameters...)>
 	{
@@ -96,12 +100,20 @@ namespace enki
 		template <typename F>
 		static std::function<void(Packet)> wrap(F f)
 		{
+			//Wrapping the function for later when we have the parameters available
+			//This is an alternative method to std::bind with a nicer interface
 			return [f](Packet p)
 			{
+				//Using parameter pack expansion within the call site
+				//Remember lambdas can use template types
+				//that are available when defined
 				f(p.read<Parameters>()...);
 			};
 		}
 
+		//Ensure the parameters of the function match
+		//the template arguments of this call
+		//Used for compile-time type-safety when calling RPC's
 		template <typename... Args>
 		constexpr static bool matchesArgs()
 		{
@@ -109,6 +121,7 @@ namespace enki
 		}
 	};
 
+	//For member functions
 	template <typename Return, typename Class, typename... Parameters>
 	struct RPCUtil<Return((Class::*)(Parameters...))>
 	{
@@ -123,6 +136,7 @@ namespace enki
 			};
 		}
 
+		//Special case, used for classes derived from Entity's for Entity RPC's
 		template <typename F>
 		static std::function<void(Packet, Entity*)> wrapEntity(F f)
 		{

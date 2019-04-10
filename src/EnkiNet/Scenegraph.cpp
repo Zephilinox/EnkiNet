@@ -28,6 +28,18 @@ namespace enki
 	{
 		if (network_ready)
 		{
+			console->error(
+				"Tried to enable networking for scenegraph "
+				"but networking is already enabled");
+			return;
+		}
+
+		if (!game_data->network_manager->server &&
+			!game_data->network_manager->client)
+		{
+			console->error(
+				"Tried to enable networking for scenegraph "
+				"but neither the server nor the client have been started");
 			return;
 		}
 
@@ -37,6 +49,8 @@ namespace enki
 		{
 			mc1 = game_data->network_manager->server->on_packet_received.connect([this](Packet p)
 			{
+				auto server = game_data->network_manager->server.get();
+
 				if (p.getHeader().type == ENTITY_CREATION)
 				{
 					auto info = p.read<EntityInfo>();
@@ -55,7 +69,7 @@ namespace enki
 				else if (p.getHeader().type == ENTITY_UPDATE)
 				{
 					//Don't send entity updates back to the sender
-					game_data->network_manager->server->sendPacketToAllExceptOneClient(p.info.senderID, 0, &p);
+					server->sendPacketToAllExceptOneClient(p.info.senderID, 0, &p);
 				}
 				else if (p.getHeader().type == ENTITY_RPC)
 				{
@@ -70,20 +84,26 @@ namespace enki
 						{
 							if (rpctype == Local)
 							{
-								console->error("ytho1");
-								//ytho
+								console->error(
+									"Received a request for a "
+									"Local Entity RPC call from {} "
+									"but local calls shouldn't be "
+									"sent over the network", p.info.senderID);
 							}
 							else if (rpctype == Master)
 							{
 								if (info.ownerID == p.info.senderID)
 								{
-									console->error("ytho2");
-									//ytho
+									console->error(
+										"Received a request for a "
+										"Master Entity RPC call from {} "
+										"but the sender is the master of {}",
+										p.info.senderID, info);
 								}
 								else
 								{
 									//only send packet to master
-									game_data->network_manager->server->sendPacketToOneClient(info.ownerID, 0, &p);
+									server->sendPacketToOneClient(info.ownerID, 0, &p);
 								}
 							}
 							else if (rpctype == Remote || rpctype == RemoteAndLocal)
@@ -91,23 +111,31 @@ namespace enki
 								if (info.ownerID == p.info.senderID)
 								{
 									//only send packets to non-owners, which must be all except sender
-									game_data->network_manager->server->sendPacketToAllExceptOneClient(p.info.senderID, 0, &p);
+									server->sendPacketToAllExceptOneClient(
+										p.info.senderID, 0, &p);
 								}
 								else
 								{
-									console->error("ytho3");
-									//ytho
+									console->error(
+										"Received request for Remote "
+										"or RemoteAndLocal RPC call from {} "
+										"but the sent entity's owner ID "
+										"doesn't match the sender's ID. "
+										"Entity is {}", info);
 								}
 							}
 							else if (rpctype == MasterAndRemote || rpctype == All)
 							{
 								//send to everyone else
-								game_data->network_manager->server->sendPacketToAllExceptOneClient(p.info.senderID, 0, &p);
+								server->sendPacketToAllExceptOneClient(
+									p.info.senderID, 0, &p);
 							}
 							else
 							{
-								console->error("ytho4");
-								//ytho
+								console->error(
+									"Received request for an Entity RPC "
+									"from {} but the RPC type is invalid",
+									p.info.senderID);
 							}
 						}
 					}
@@ -122,6 +150,18 @@ namespace enki
 						{
 							game_data->network_manager->server->sendPacketToAllClients(0, &p);
 						}
+						else
+						{
+							console->error(
+								"Received request to delete entity {} "
+								"but the sender {} isn't the owner");
+						}
+					}
+					else
+					{
+						console->error(
+							"Received request to delete entity {} "
+							"but it doesn't exist");
 					}
 				}
 			});
@@ -155,12 +195,20 @@ namespace enki
 						}
 						else
 						{
-							console->error("Received entity update with invalid info.\n\t{}\n\tVS\n\t{}\n\tSender ID = {}, Client ID = {}", info, ent->info, p.info.senderID, game_data->network_manager->client->getID());
+							console->error(
+								"Received entity update with "
+								"invalid info.\n\t{}\n\tVS\n\t{}"
+								"\n\tSender ID = {}, Client ID = {}",
+								info, ent->info,
+								p.info.senderID,
+								game_data->network_manager->client->getID());
 						}
 					}
 					else
 					{
-						console->error("Received entity update for nonexistant entity.\n\t{}", info);
+						console->error(
+							"Received entity update for nonexistant entity."
+							"\n\t{}", info);
 					}
 				}
 				else if (p.getHeader().type == ENTITY_RPC)
@@ -174,10 +222,21 @@ namespace enki
 							p.resetReadPosition();
 							rpc_man.receive(p, ent);
 						}
+						else
+						{
+							console->error(
+								"Received an RPC packet from {} for an entity "
+								"that does not match our version."
+								"\nTheirs: \t{}"
+								"\nOurs: \t{}", p.info.senderID, info, ent->info);
+						}
 					}
 					else
 					{
-						console->error("Received an RPC packet for an entity that does not exist.\n\t{}", info);
+						console->error(
+							"Received an RPC packet from {} "
+							"for an entity that does not exist."
+							"\n\t{}", p.info.senderID, info);
 					}
 				}
 				else if (p.getHeader().type == ENTITY_DELETION)
@@ -186,6 +245,13 @@ namespace enki
 					if (entityExists(entID))
 					{
 						entities[entID]->remove = true;
+					}
+					else
+					{
+						console->error(
+							"Received a request for entity deletion from {} "
+							"but an entity with ID {} does not exist.",
+							entID);
 					}
 				}
 			});
@@ -198,6 +264,7 @@ namespace enki
 
 				for (auto& ent : entities)
 				{
+					//Serialize our entities based on their specific tick rates
 					if (ent.second->isOwner() &&
 						ent.second->network_tick_rate > 0 &&
 						total_network_ticks % ent.second->network_tick_rate == 0)
@@ -205,7 +272,7 @@ namespace enki
 						p.clear();
 						p << ent.second->info;
 						ent.second->serializeOnTick(p);
-						this->game_data->network_manager->client->sendPacket(0, &p);
+						game_data->network_manager->client->sendPacket(0, &p);
 					}
 				}
 			});
@@ -224,12 +291,16 @@ namespace enki
 	{
 		for (auto& ent : entities)
 		{
-			if (ent.second->info.parentID == 0 || entities.count(ent.second->info.parentID))
+			//If entity has no parent or if it has one and it exists, then update it
+			//If the parent doesn't exist it's because it was deleted and we haven't deleted the child yet
+			if (ent.second->info.parentID == 0 ||
+				entities.count(ent.second->info.parentID))
 			{
 				ent.second->update(dt);
 			}
 			else
 			{
+				//this marks them for deletion, we can't delete while iterating the container
 				deleteEntity(ent.second->info.ID);
 			}
 		}

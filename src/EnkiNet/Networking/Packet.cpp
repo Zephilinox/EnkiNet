@@ -65,9 +65,13 @@ namespace enki
 
 		if (sizeof(data) * 8 < bits_to_write + offset)
 		{
-			throw std::runtime_error("Writing these bits with this offset would cause an overflow of the data passed in");
+			throw std::runtime_error(
+				"Writing these bits with this offset "
+				"would cause an overflow of the data passed in");
 		}
 
+		//calculate how much space we need and then resize the buffer
+		//to accomodate it
 		int bits_available = 8 - bits_written;
 		int bits_needed = bits_to_write - bits_available;
 		int bytes_needed = static_cast<int>(std::ceil(static_cast<float>(bits_needed) / 8.0f));
@@ -95,6 +99,20 @@ namespace enki
 			}
 		};
 
+		/*This seems a bit messy, there's probably a better way
+		We keep track of how many bits we have left to write
+		and how many bits are available
+
+		If there isn't a full byte available in the buffer
+		because we've got a half-written byte right now
+		then write as many bits as we can to fill it
+
+		If the number of bits left is a byte or more
+		then write a byte at a time
+
+		If the number of bits left is less than a byte
+		then write all the remaining bits in to our last byte of free space
+		*/
 		int bits_left = bits_to_write;
 		while (bits_left > 0)
 		{
@@ -138,12 +156,16 @@ namespace enki
 
 		if (sizeof(data) * 8 < bits_to_read + offset)
 		{
-			throw std::runtime_error("Reading these bits with this offset would cause an overflow of the return value");
+			throw std::runtime_error(
+				"Reading these bits with this offset "
+				"would cause an overflow of the return value");
 		}
 
 		if (bytes_read + bytes_needed - 1 > bytes.size())
 		{
-			throw std::runtime_error("Tried to read past the packet buffer, not enough bytes written");
+			throw std::runtime_error(
+				"Tried to read past the packet buffer, "
+				"not enough bytes written");
 		}
 
 		const auto read_bits = [&](int bits, int extra_offset)
@@ -258,7 +280,7 @@ namespace enki
 		return bytes;
 	}
 
-	std::size_t Packet::getSize() const
+	std::size_t Packet::getBytesWritten() const
 	{
 		return bytes_written;
 	}

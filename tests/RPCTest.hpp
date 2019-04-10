@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <EnkiNet/Networking/RPC.hpp>
+#include <EnkiNet/Networking/RPCManager.hpp>
 
 struct ent
 {

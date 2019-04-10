@@ -4,7 +4,12 @@ namespace enki
 {
 	RPCManager::RPCManager()
 	{
-		console = spdlog::get("Enkinet");
+		console = spdlog::get("EnkiNet");
+		if (console == nullptr)
+		{
+			spdlog::stdout_color_mt("EnkiNet");
+			console = spdlog::get("EnkiNet");
+		}
 	}
 
 	void RPCManager::receive(Packet p)

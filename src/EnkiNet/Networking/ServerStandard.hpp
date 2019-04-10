@@ -12,11 +12,11 @@
 
 namespace enki
 {
-	class ServerHost : public Server
+	class ServerStandard : public Server
 	{
 	public:
-		ServerHost(std::uint32_t max_clients, std::uint8_t channel_count, std::uint16_t server_port);
-		~ServerHost() final;
+		ServerStandard(std::uint32_t max_clients, std::uint8_t channel_count, std::uint16_t server_port);
+		~ServerStandard() final;
 
 		void processPackets() final;
 
@@ -34,11 +34,6 @@ namespace enki
 		{
 			return server.get_connected_clients();
 		}
-
-		//This must be assigned after creating a ServerHost
-		//Used to send packets to the local client directly
-		//Cannot be passed through in constructor due to ClientHost requiring access to the server
-		Client* client;
 
 	private:
 		ClientID getNextUID();

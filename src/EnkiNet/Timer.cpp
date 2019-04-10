@@ -2,22 +2,22 @@
 
 namespace enki
 {
-	Timer::Timer() noexcept
+	Timer::Timer()
 	{
 		restart();
 	}
 
-	float Timer::getElapsedTime() const noexcept
+	float Timer::getElapsedTime() const
 	{
 		return getElapsedTime<seconds>();
 	}
 
-	Timer::nanoseconds Timer::getChronoElapsedTime() const noexcept
+	Timer::nanoseconds Timer::getChronoElapsedTime() const
 	{
 		return clock::now() - start_time;
 	}
 
-	void Timer::restart() noexcept
+	void Timer::restart()
 	{
 		start_time = clock::now();
 	}

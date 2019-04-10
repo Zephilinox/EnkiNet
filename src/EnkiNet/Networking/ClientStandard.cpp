@@ -89,6 +89,6 @@ namespace enki
 		auto console = spdlog::get("EnkiNet");
 		//console->info("Client sending packet");
 		auto data = reinterpret_cast<const enet_uint8*>(p->getBytes().data());
-		client.send_packet(channel_id, data, p->getSize(), flags);
+		client.send_packet(channel_id, data, p->getBytesWritten(), flags);
 	}
 }

@@ -27,6 +27,8 @@ namespace enki
 		virtual bool isConnecting() const = 0;
 
 		void update();
+		//Push a packet on to the queue for later emission
+		//thread safe
 		void pushPacket(Packet&& p);
 
 		inline ClientID getID() const
@@ -34,6 +36,7 @@ namespace enki
 			return id;
 		}
 
+		//Connect to this signal to be notified when a packet is received
 		Signal<Packet> on_packet_received;
 
 	protected:

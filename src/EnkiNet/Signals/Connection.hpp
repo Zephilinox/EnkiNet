@@ -78,7 +78,7 @@ namespace enki
 		//Not Required?
 		//ManagedConnection(ManagedConnection&& c) noexcept = default;
 
-		virtual ~ManagedConnection() noexcept override final;
+		~ManagedConnection() noexcept final;
 
 		//Not Required?
 		//ManagedConnection& operator=(const ManagedConnection& c) = default;

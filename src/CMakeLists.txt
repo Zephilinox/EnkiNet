@@ -11,6 +11,7 @@ set(EnkiNet_HEADERS
 	"EnkiNet/Networking/ClientStandard.hpp"
 	"EnkiNet/Networking/Server.hpp"
 	"EnkiNet/Networking/ServerHost.hpp"
+	"EnkiNet/Networking/ServerStandard.hpp"
 	
 	"EnkiNet/Managers/NetworkManager.hpp"
 	
@@ -30,6 +31,7 @@ set (EnkiNet_SRC
 	"EnkiNet/Networking/ClientHost.cpp"
 	"EnkiNet/Networking/ClientStandard.cpp"
 	"EnkiNet/Networking/ServerHost.cpp"
+	"EnkiNet/Networking/ServerStandard.cpp"
 	"EnkiNet/Networking/RPCManager.cpp"
 	"EnkiNet/Networking/Client.cpp"
 	"EnkiNet/Networking/Server.cpp"

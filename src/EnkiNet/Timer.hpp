@@ -19,21 +19,23 @@ namespace enki
 		using nanoseconds_float = std::chrono::duration<float, nanoseconds::period>;
 		using microseconds_float = std::chrono::duration<float, microseconds::period>;
 		using milliseconds_float = std::chrono::duration<float, milliseconds::period>;
+		//Most likely to be used duration. Used by EnkiNet for delta time.
 		using seconds_float = std::chrono::duration<float, seconds::period>;
 
-		Timer() noexcept;
+		Timer();
 
-		float getElapsedTime() const noexcept;
-		nanoseconds getChronoElapsedTime() const noexcept;
+		//in seconds
+		float getElapsedTime() const;
+		//for further chrono operations, returns std::chrono::nanoseconds for std::chrono::duration functionality
+		nanoseconds getChronoElapsedTime() const;
+		void restart();
 
+		//use with various chrono durations for desired time period, returns a float.
 		template <class T>
 		float getElapsedTime() const;
 
-		void restart() noexcept;
-
 	private:
 		bool isPaused = false;
-
 		clock::time_point start_time;
 	};
 

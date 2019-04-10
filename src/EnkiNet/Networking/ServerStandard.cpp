@@ -1,12 +1,11 @@
-#include "ServerHost.hpp"
+#include "ServerStandard.hpp"
 
 //LIBS
 #include <spdlog/spdlog.h>
 
 namespace enki
 {
-	ServerHost::ServerHost(std::uint32_t max_clients, std::uint8_t channel_count, std::uint16_t server_port)
-		: client(client)
+	ServerStandard::ServerStandard(std::uint32_t max_clients, std::uint8_t channel_count, std::uint16_t server_port)
 	{
 		auto console = spdlog::get("EnkiNet");
 		console->info("Server Initialized");
@@ -29,7 +28,7 @@ namespace enki
 			{
 				free_ids.push(p.info.senderID);
 				auto console = spdlog::get("EnkiNet");
-				console->info("ServerHost:\tpushed new free id {}", p.info.senderID);
+				console->info("ServerStandard:\tpushed new free id {}", p.info.senderID);
 			}
 		});
 
@@ -40,7 +39,7 @@ namespace enki
 			.set_initialize_client_function(std::move(client_init)));
 	}
 
-	ServerHost::~ServerHost()
+	ServerStandard::~ServerStandard()
 	{
 		auto console = spdlog::get("EnkiNet");
 		console->info("Server Deinitialized");
@@ -49,7 +48,7 @@ namespace enki
 		server.stop_listening();
 	}
 
-	void ServerHost::processPackets()
+	void ServerStandard::processPackets()
 	{
 		auto on_client_connected = [&](ClientInfo& client)
 		{
@@ -94,25 +93,17 @@ namespace enki
 			std::move(on_client_data_received));
 	}
 
-	void ServerHost::sendPacketToOneClient(ClientID client_id, enet_uint8 channel_id, Packet* p, enet_uint32 flags)
+	void ServerStandard::sendPacketToOneClient(ClientID client_id, enet_uint8 channel_id, Packet* p, enet_uint32 flags)
 	{
 		auto header = p->getHeader();
 		header.timeSent = enet_time_get();
 		p->setHeader(header);
 
-		if (client_id != 1)
-		{
-			auto data = reinterpret_cast<const enet_uint8*>(p->getBytes().data());
-			server.send_packet_to(client_id, channel_id, data, p->getBytesWritten(), flags);
-		}
-		else
-		{
-			p->resetReadPosition();
-			client->on_packet_received.emit(*p);
-		}
+		auto data = reinterpret_cast<const enet_uint8*>(p->getBytes().data());
+		server.send_packet_to(client_id, channel_id, data, p->getBytesWritten(), flags);
 	}
 
-	void ServerHost::sendPacketToAllClients(enet_uint8 channel_id, Packet* p, enet_uint32 flags)
+	void ServerStandard::sendPacketToAllClients(enet_uint8 channel_id, Packet* p, enet_uint32 flags)
 	{
 		auto header = p->getHeader();
 		header.timeSent = enet_time_get();
@@ -126,14 +117,9 @@ namespace enki
 			server.send_packet_to_all_if(channel_id, data, p->getBytesWritten(), flags, []([[maybe_unused]]const ClientInfo& client) {return true; });
 #pragma warning (pop)
 		}
-
-		p->resetReadPosition();
-		p->info.timeReceived = header.timeSent;
-		p->info.senderID = 1;
-		client->on_packet_received.emit(*p);
 	}
 
-	void ServerHost::sendPacketToSomeClients(enet_uint8 channel_id, Packet* p, enet_uint32 flags, std::function<bool(const ClientInfo& client)> predicate)
+	void ServerStandard::sendPacketToSomeClients(enet_uint8 channel_id, Packet* p, enet_uint32 flags, std::function<bool(const ClientInfo& client)> predicate)
 	{
 		auto header = p->getHeader();
 		header.timeSent = enet_time_get();
@@ -145,17 +131,9 @@ namespace enki
 			auto data = reinterpret_cast<const enet_uint8*>(p->getBytes().data());
 			server.send_packet_to_all_if(channel_id, data, p->getBytesWritten(), flags, predicate);
 		}
-
-		if (predicate({ 1 }))
-		{
-			p->resetReadPosition();
-			p->info.timeReceived = header.timeSent;
-			p->info.senderID = 1;
-			client->on_packet_received.emit(*p);
-		}
 	}
 
-	void ServerHost::sendPacketToAllExceptOneClient(ClientID client_id_excluded, enet_uint8 channel_id, Packet* p, enet_uint32 flags)
+	void ServerStandard::sendPacketToAllExceptOneClient(ClientID client_id_excluded, enet_uint8 channel_id, Packet* p, enet_uint32 flags)
 	{
 		auto header = p->getHeader();
 		header.timeSent = enet_time_get();
@@ -169,28 +147,20 @@ namespace enki
 				return client.id != client_id_excluded;
 			});
 		}
-
-		if (client_id_excluded != 1)
-		{
-			p->resetReadPosition();
-			p->info.timeReceived = header.timeSent;
-			p->info.senderID = 1;
-			client->on_packet_received.emit(*p);
-		}
 	}
 
-	ClientID ServerHost::getNextUID()
+	ClientID ServerStandard::getNextUID()
 	{
 		auto console = spdlog::get("EnkiNet");
 		if (free_ids.empty())
 		{
-			console->info("ServerHost:\tno free ids, giving {}", next_uid);
+			console->info("ServerStandard:\tno free ids, giving {}", next_uid);
 			return next_uid++;
 		}
 		else
 		{
 			auto id = free_ids.front();
-			console->info("ServerHost:\tooh free ids, giving {}", id);
+			console->info("ServerStandard:\tooh free ids, giving {}", id);
 			free_ids.pop();
 			return id;
 		}

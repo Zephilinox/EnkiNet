@@ -8,6 +8,7 @@
 
 //SELF
 #include "EnkiNet/Networking/ServerHost.hpp"
+#include "EnkiNet/Networking/ServerStandard.hpp"
 #include "EnkiNet/Networking/ClientHost.hpp"
 #include "EnkiNet/Networking/ClientStandard.hpp"
 
@@ -54,6 +55,13 @@ namespace enki
 		static_cast<ClientHost*>(client.get())->server = server.get();
 	}
 
+	void NetworkManager::startServer()
+	{
+		assert(!server);
+		console->info("Starting Server");
+		server = std::make_unique<ServerStandard>(max_clients, channel_count, server_port);
+	}
+
 	void NetworkManager::startClient()
 	{
 		assert(!server);
@@ -83,6 +91,12 @@ namespace enki
 			client.reset(nullptr);
 			console->info("Client destroyed");
 		}
+	}
+
+	void NetworkManager::stopHost()
+	{
+		stopClient();
+		stopServer();
 	}
 
 	void NetworkManager::update()

@@ -38,9 +38,14 @@ namespace enki
 		virtual bool isListening() const = 0;
 		virtual const std::vector<ClientInfo*>& getConnectedClients() const = 0;
 
+		//Called by the Network Manager
 		void update();
+
+		//Push a packet to the queue for later emission
+		//thread-safe
 		void pushPacket(Packet&& p);
 
+		//Connect to this signal to be notified when a packet is received
 		Signal<Packet> on_packet_received;
 	
 	protected:

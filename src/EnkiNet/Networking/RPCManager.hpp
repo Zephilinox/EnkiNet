@@ -53,10 +53,6 @@ namespace enki
 		template <typename T, typename... Args>
 		void callUnsafe(std::string name, T* instance, Args... args);
 
-		//todo: unsafe global remote
-		//todo: unsafe entity local
-		//todo: unsafe entity remote
-
 		//global rpc
 		RPCType getRPCType(std::string name) const;
 
