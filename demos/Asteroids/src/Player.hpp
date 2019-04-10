@@ -26,8 +26,19 @@ public:
 	sf::Vector2f getPosition() const;
 	bool isInvincible() const;
 	int getLives() const;
+	sf::Color getColour() const;
+
+	void startInvincible();
+	void stopInvincible();
 
 private:
+	sf::Keyboard::Key up;
+	sf::Keyboard::Key down;
+	sf::Keyboard::Key left;
+	sf::Keyboard::Key right;
+	sf::Keyboard::Key shoot;
+	sf::Keyboard::Key slow;
+
 	CustomData* custom_data;
 	sf::RenderWindow* window;
 	sf::View view;
@@ -44,6 +55,6 @@ private:
 	enki::Timer flashing_timer;
 	float flashing_duration = 1.0f;
 
-	enki::Timer shootTimer;
-	float shootDelay = 0.1f;
+	enki::Timer shoot_timer;
+	float shoot_delay = 0.1f;
 };

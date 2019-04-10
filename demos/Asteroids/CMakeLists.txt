@@ -18,6 +18,15 @@ add_executable(Asteroids
 
 "src/Asteroid.hpp"
 "src/Asteroid.cpp"
+
+"src/Bullet.hpp"
+"src/Bullet.cpp"
+
+"src/CollisionManager.hpp"
+"src/CollisionManager.cpp"
+
+"src/PlayerText.hpp"
+"src/PlayerText.cpp"
 )
 
 include(Settings)

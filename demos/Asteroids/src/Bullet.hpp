@@ -8,10 +8,10 @@
 //SELF
 #include "CustomData.hpp"
 
-class Asteroid : public enki::Entity
+class Bullet : public enki::Entity
 {
 public:
-	Asteroid(enki::EntityInfo info, enki::GameData* data, CustomData* custom_data, sf::RenderWindow* window);
+	Bullet(enki::EntityInfo info, enki::GameData* data, CustomData* custom_data, sf::RenderWindow* window);
 
 	void onSpawn(enki::Packet& p) final;
 
@@ -24,26 +24,23 @@ public:
 	void deserializeOnTick(enki::Packet& p) final;
 	
 	void handleCollision();
-	void split();
+	sf::Vector2f getPosition() const;
+	float getRotation() const;
+	sf::Color getColour() const;
+	unsigned int getWarpCount() const;
 
 	bool isAlive() const;
-	bool canSplit() const;
-	sf::Vector2f getPosition() const;
-	float getRadius() const;
-	float getRotation() const;
 
 private:
-	void constructAsteroid(unsigned sides, float x, float y);
-	void createShape(unsigned sides);
-
-	sf::ConvexShape shape;
-
 	CustomData* custom_data;
 	sf::RenderWindow* window;
 
+	sf::Texture bullet_tex;
+	sf::Sprite bullet;
+
 	float speed = 300;
-	float radius = 10;
-	float rotation_speed = 200;
-	sf::Vector2f velocity = {1, 1};
+	sf::Vector2f velocity = { 1, 1 };
+
+	unsigned int warp_count = 0;
 	bool alive = true;
 };

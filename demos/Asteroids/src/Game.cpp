@@ -12,6 +12,9 @@
 //SELF
 #include "Player.hpp"
 #include "Asteroid.hpp"
+#include "Bullet.hpp"
+#include "CollisionManager.hpp"
+#include "PlayerText.hpp"
 #include "CustomData.hpp"
 
 Game::Game()
@@ -38,6 +41,14 @@ Game::Game()
 
 	scenegraph->registerEntity<Player>("Player", custom_data.get(), window.get());
 	scenegraph->registerEntity<Asteroid>("Asteroid", custom_data.get(), window.get());
+	scenegraph->registerEntity<Bullet>("Bullet", custom_data.get(), window.get());
+	scenegraph->registerEntity<CollisionManager>("CollisionManager", custom_data.get(), window.get());
+	scenegraph->registerEntity<PlayerText>("PlayerText");
+
+	scenegraph->rpc_man.add(enki::RPCType::RemoteAndLocal, "Player", "startInvincible", &Player::startInvincible);
+	scenegraph->rpc_man.add(enki::RPCType::RemoteAndLocal, "Player", "stopInvincible", &Player::stopInvincible);
+
+	scenegraph->registerEntityChildren("Player", enki::ChildEntityCreationInfo{"PlayerText", "PlayerText"});
 
 	run();
 }
@@ -94,14 +105,16 @@ void Game::update()
 	static bool networking = false;
 
 	if (network_manager->server &&
-		input_manager.isKeyPressed(sf::Keyboard::Key::F2))
+		(input_manager.isKeyPressed(sf::Keyboard::Key::F2) ||
+			asteroid_spawn_timer.getElapsedTime() > 1.0f))
 	{
 		enki::Packet p;
 		p << (std::rand() % 8) + 5
 			<< static_cast<float>(std::rand() % 1280)
 			<< static_cast<float>(std::rand() % 720)
 			<< static_cast<float>((std::rand() % 200) + 50);
-		scenegraph->createNetworkedEntity({ "Asteroid", "Asteroid"}, p);
+		scenegraph->createNetworkedEntity({ "Asteroid", "Asteroid" }, p);
+		asteroid_spawn_timer.restart();
 	}
 
 	if (!networking && custom_data->window_active)
@@ -112,6 +125,17 @@ void Game::update()
 			network_manager->startHost();
 			scenegraph->enableNetworking();
 			scenegraph->createNetworkedEntity({ "Player", "Player 1" });
+			scenegraph->createEntity({ "CollisionManager", "CollisionManager" });
+
+			for (int i = 0; i < 20; ++i)
+			{
+				enki::Packet p;
+				p << (std::rand() % 8) + 5
+					<< static_cast<float>(std::rand() % 1280)
+					<< static_cast<float>(std::rand() % 720)
+					<< static_cast<float>((std::rand() % 200) + 50);
+				scenegraph->createNetworkedEntity({ "Asteroid", "Asteroid" }, p);
+			}
 
 			mc1 = network_manager->server->on_packet_received.connect([this](enki::Packet p)
 			{
@@ -136,6 +160,7 @@ void Game::update()
 			networking = true;
 			network_manager->startClient();
 			scenegraph->enableNetworking();
+			scenegraph->createEntity({ "CollisionManager", "CollisionManager" });
 		}
 	}
 

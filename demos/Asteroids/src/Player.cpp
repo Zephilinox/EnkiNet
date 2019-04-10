@@ -12,7 +12,6 @@ Player::Player(enki::EntityInfo info, enki::GameData* data, CustomData* custom_d
 	, window(window)
 {
 	network_tick_rate = 1;
-	//game_data->scenegraph->rpc_man.add(enki::RPCType::RemoteAndLocal, "Player", "shoot", &Player::shoot);
 }
 
 void Player::onSpawn([[maybe_unused]]enki::Packet& p)
@@ -24,25 +23,51 @@ void Player::onSpawn([[maybe_unused]]enki::Packet& p)
 	}
 
 	ship.setTexture(ship_tex);
-	ship.setOrigin(ship_tex.getSize().x / 2,
-		ship_tex.getSize().y / 2);
-	ship.setPosition(1280 / 2, 720 / 2);
+	ship.setOrigin(
+		static_cast<float>(ship_tex.getSize().x / 2),
+		static_cast<float>(ship_tex.getSize().y / 2));
+	ship.setPosition(static_cast<float>(1280 / 2), static_cast<float>(720 / 2));
 
 	if (info.ownerID == 1)
 	{
 		ship.setColor(sf::Color(0, 100, 200)); //blue
+		up = sf::Keyboard::Key::W;
+		down = sf::Keyboard::Key::S;
+		left = sf::Keyboard::Key::A;
+		right = sf::Keyboard::Key::D;
+		slow = sf::Keyboard::Key::LShift;
+		shoot = sf::Keyboard::Key::F;
 	}
 	else if (info.ownerID == 2)
 	{
 		ship.setColor(sf::Color(200, 60, 60)); //red
+		//hardcoded for local control for demo
+		up = sf::Keyboard::Key::Up;
+		down = sf::Keyboard::Key::Down;
+		left = sf::Keyboard::Key::Left;
+		right = sf::Keyboard::Key::Right;
+		slow = sf::Keyboard::Key::Insert;
+		shoot = sf::Keyboard::Key::RControl;
 	}
 	else if (info.ownerID == 3)
 	{
 		ship.setColor(sf::Color(60, 200, 60)); //green
+		up = sf::Keyboard::Key::W;
+		down = sf::Keyboard::Key::S;
+		left = sf::Keyboard::Key::A;
+		right = sf::Keyboard::Key::D;
+		slow = sf::Keyboard::Key::LShift;
+		shoot = sf::Keyboard::Key::F;
 	}
 	else if (info.ownerID == 4)
 	{
 		ship.setColor(sf::Color(200, 160, 60)); //orange
+		up = sf::Keyboard::Key::W;
+		down = sf::Keyboard::Key::S;
+		left = sf::Keyboard::Key::A;
+		right = sf::Keyboard::Key::D;
+		slow = sf::Keyboard::Key::LShift;
+		shoot = sf::Keyboard::Key::F;
 	}
 
 	view = window->getDefaultView();
@@ -50,52 +75,42 @@ void Player::onSpawn([[maybe_unused]]enki::Packet& p)
 
 void Player::update(float dt)
 {
-	if (!isOwner() || !custom_data->window_active)
+	if (!isOwner())
 	{
 		return;
 	}
 
 	auto input_manager = custom_data->input_manager;
+		
+	float ship_rot_rads = ship.getRotation() * (3.1415f / 180.0f);
+	float ship_sin = std::sin(ship_rot_rads);
+	float ship_cos = std::cos(ship_rot_rads);
 
-	if (input_manager->isMouseButtonDown(sf::Mouse::Button::Left))
+	if (input_manager->isKeyDown(up))
 	{
-		if (shootTimer.getElapsedTime() > shootDelay)
-		{
-			sf::Vector2f pos = input_manager->getMouseWorldPos();
-			//game_data->scenegraph->rpc_man.call(&Player::shoot, "shoot", game_data->network_manager, this, pos.x, pos.y);
-			shootTimer.restart();
-		}
-	}
-	
-	float shipRotRads = ship.getRotation() * (3.1415 / 180.0f);
-	float shipSin = std::sin(shipRotRads);
-	float shipCos = std::cos(shipRotRads);
-
-	if (input_manager->isKeyDown(sf::Keyboard::Key::W))
-	{
-		velocity.x += speed * shipSin * dt;
-		velocity.y += -1 * speed * shipCos * dt;
+		velocity.x += speed * ship_sin * dt;
+		velocity.y += -1 * speed * ship_cos * dt;
 	}
 
-	if (input_manager->isKeyDown(sf::Keyboard::Key::S))
+	if (input_manager->isKeyDown(down))
 	{
-		velocity.x += -1 * speed * shipSin * dt;
-		velocity.y += speed * shipCos * dt;
+		velocity.x += -1 * speed * ship_sin * dt;
+		velocity.y += speed * ship_cos * dt;
 	}
 
-	if (input_manager->isKeyDown(sf::Keyboard::Key::A))
+	if (input_manager->isKeyDown(left))
 	{
 		ship.rotate(-200 * dt);
 	}
 
-	if (input_manager->isKeyDown(sf::Keyboard::Key::D))
+	if (input_manager->isKeyDown(right))
 	{
 		ship.rotate(200 * dt);
 	}
 
 	float length = std::sqrtf((velocity.x * velocity.x) + (velocity.y * velocity.y));
 
-	if (input_manager->isKeyDown(sf::Keyboard::Key::LShift))
+	if (input_manager->isKeyDown(slow))
 	{
 		if (length > 5 && velocity.x != 0 && velocity.y != 0)
 		{
@@ -143,19 +158,37 @@ void Player::update(float dt)
 		ship.setPosition(ship.getPosition().x, 0);
 	}
 
-	if (input_manager->isKeyDown(sf::Keyboard::Key::F1))
+	if (input_manager->isKeyDown(shoot) &&
+		shoot_timer.getElapsedTime() > shoot_delay)
 	{
-		handleCollision();
+		shoot_timer.restart();
+
+		enki::Packet p;
+		p << ship.getPosition().x
+			<< ship.getPosition().y
+			<< 300.0f
+			<< ship.getRotation() + float(std::rand() % 4)
+			<< ship.getColor().r
+			<< ship.getColor().g
+			<< ship.getColor().b;
+		game_data->scenegraph->createNetworkedEntity({ "Bullet", "Bullet" }, p);
+	}
+
+	if (flashing_timer.getElapsedTime() > flashing_duration)
+	{
+		game_data->scenegraph->rpc_man.call(&Player::stopInvincible, "stopInvincible", game_data->network_manager, this);
 	}
 }
 
 void Player::draw(sf::RenderWindow& window_) const
 {
-	window_.draw(ship);
-
-	if (was_damaged && flashing_timer.getElapsedTime() < flashing_duration)
+	if (!was_damaged)
 	{
-		int milli = flashing_timer.getElapsedTime<enki::Timer::milliseconds>();
+		window_.draw(ship);
+	}
+	else if (flashing_timer.getElapsedTime() < flashing_duration)
+	{
+		int milli = static_cast<int>(flashing_timer.getElapsedTime<enki::Timer::milliseconds>());
 		int percentage = 20;
 		int rem_milli = milli % 1000 % (percentage * 10); //ignore seconds and get a percentage of the remainder
 		if (rem_milli < percentage * 5)
@@ -195,13 +228,36 @@ int Player::getLives() const
 	return lives;
 }
 
+sf::Color Player::getColour() const
+{
+	return ship.getColor();
+}
+
+void Player::startInvincible()
+{
+	flashing_timer.restart();
+	was_damaged = true;
+}
+
+void Player::stopInvincible()
+{
+	was_damaged = false;
+}
+
 void Player::handleCollision()
 {
-	if (lives > 0)
+	if (!isOwner())
 	{
-		lives--;
+		return;
 	}
 
-	was_damaged = true;
-	flashing_timer.restart();
+	if (was_damaged == false)
+	{
+		if (lives > 0)
+		{
+			lives--;
+		}
+
+		game_data->scenegraph->rpc_man.call(&Player::startInvincible, "startInvincible", game_data->network_manager, this);
+	}
 }

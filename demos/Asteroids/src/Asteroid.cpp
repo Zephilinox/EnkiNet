@@ -12,52 +12,25 @@ Asteroid::Asteroid(enki::EntityInfo info, enki::GameData* data, CustomData* cust
 	, window(window)
 {
 	network_tick_rate = 1;
-	//game_data->scenegraph->rpc_man.add(enki::RPCType::RemoteAndLocal, "Asteroid", "shoot", &Asteroid::shoot);
 }
 
 void Asteroid::onSpawn([[maybe_unused]]enki::Packet& p)
 {
 	auto console = spdlog::get("console");
 
-	if (p.canDeserialize<int>())
+	if (p.canDeserialize<int, float, float, float>())
 	{
 		int sides = p.read<int>();
-
-		radius = (sides - 4) * 8;
 		float x = p.read<float>();
 		float y = p.read<float>();
-		shape.setPosition(x, y);
-		shape.setOutlineThickness(1.5f);
-		shape.setOutlineColor(sf::Color::Black);
 		speed = p.read<float>();
-		createShape(sides);
-
-		sf::Vector2f target_pos(
-			std::rand() % 1280,
-			std::rand() % 720);
-
-		sf::Vector2f target_dir = target_pos - shape.getPosition();
-		float length = std::sqrtf((target_dir.x * target_dir.x) + (target_dir.y * target_dir.y));
-		sf::Vector2f target_dir_norm;
-		if (length != 0)
-		{
-			target_dir_norm.x = target_dir.x / length;
-			target_dir_norm.y = target_dir.y / length;
-		}
-		velocity.x *= target_dir_norm.x * speed / sides;
-		velocity.y *= target_dir_norm.y * speed / sides;
-		rotation_speed = (std::rand() % int((speed * 2) / sides)) - speed / sides;
-	}
-	else
-	{
-		auto console = spdlog::get("console");
-		console->error("Failed to create asteroid");
+		constructAsteroid(sides, x, y);
 	}
 }
 
 void Asteroid::update(float dt)
 {
-	if (!isOwner() || !custom_data->window_active)
+	if (!isOwner())
 	{
 		return;
 	}
@@ -92,6 +65,22 @@ void Asteroid::update(float dt)
 void Asteroid::draw(sf::RenderWindow& window_) const
 {
 	window_.draw(shape);
+}
+
+void Asteroid::serializeOnConnection(enki::Packet& p)
+{
+	serializeOnTick(p);
+	p << shape.getPointCount() << speed;
+}
+
+void Asteroid::deserializeOnConnection(enki::Packet& p)
+{
+	deserializeOnTick(p);
+
+	unsigned sides;
+	p >> sides >> speed;
+
+	constructAsteroid(sides, shape.getPosition().x, shape.getPosition().y);
 }
 
 void Asteroid::serializeOnTick(enki::Packet& p)
@@ -134,6 +123,31 @@ float Asteroid::getRotation() const
 	return shape.getRotation();
 }
 
+void Asteroid::constructAsteroid(unsigned sides, float x, float y)
+{
+	radius = (sides - 4) * 8;
+	shape.setPosition(x, y);
+	shape.setOutlineThickness(1.5f);
+	shape.setOutlineColor(sf::Color::Black);
+	createShape(sides);
+
+	sf::Vector2f target_pos(
+		std::rand() % 1280,
+		std::rand() % 720);
+
+	sf::Vector2f target_dir = target_pos - shape.getPosition();
+	float length = std::sqrtf((target_dir.x * target_dir.x) + (target_dir.y * target_dir.y));
+	sf::Vector2f target_dir_norm;
+	if (length != 0)
+	{
+		target_dir_norm.x = target_dir.x / length;
+		target_dir_norm.y = target_dir.y / length;
+	}
+	velocity.x *= target_dir_norm.x * speed / sides;
+	velocity.y *= target_dir_norm.y * speed / sides;
+	rotation_speed = (std::rand() % int((speed * 2) / sides)) - speed / sides;
+}
+
 void Asteroid::createShape(unsigned sides)
 {
 	float total_angle = (sides - 2) * 180;
@@ -157,10 +171,15 @@ void Asteroid::createShape(unsigned sides)
 
 void Asteroid::handleCollision()
 {
+	if (!isOwner())
+	{
+		return;
+	}
+
 	if (alive)
 	{
 		alive = false;
-		colliding = true;
+		split();
 	}
 }
 
@@ -168,11 +187,20 @@ void Asteroid::split()
 {
 	if (canSplit())
 	{
-		enki::Packet p;
-		p << shape.getPointCount() - 2
-			<< shape.getPosition().x + (std::rand() % 20 - 10)
-			<< shape.getPosition().y + (std::rand() % 20 - 10)
-			<< speed + (std::rand() % 200 + 50);
-		game_data->scenegraph->createNetworkedEntity({"Asteroid", "Asteroid"}, p);
+		const auto newAsteroid = [&]()
+		{
+			enki::Packet p;
+			p << shape.getPointCount() - 2
+				<< shape.getPosition().x + (std::rand() % 20 - 10)
+				<< shape.getPosition().y + (std::rand() % 20 - 10)
+				<< speed + (std::rand() % 200 + 50);
+			game_data->scenegraph->createNetworkedEntity({ "Asteroid", "Asteroid" }, p);
+		};
+
+		newAsteroid();
+		newAsteroid();
 	}
+
+	alive = false;
+	game_data->scenegraph->deleteEntity(info.ID);
 }

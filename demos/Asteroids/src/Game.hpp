@@ -34,4 +34,5 @@ private:
 	InputManager input_manager;
 
 	enki::ManagedConnection mc1;
+	enki::Timer asteroid_spawn_timer;
 };
