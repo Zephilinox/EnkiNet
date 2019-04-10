@@ -2,3 +2,4 @@
 
 add_subdirectory("Pong")
 add_subdirectory("Shooter")
+add_subdirectory("Asteroids")
