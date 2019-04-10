@@ -35,6 +35,8 @@ cmake ..
 
 if generating a visual studio solution, remember to set up the start-up project.
 
+If CMake complains about not being able to find SFML when it's already installed, either run `cmake ..` again or make sure you've modified the SFML_DIR path and it's pointing to the correct SFML version (2.5.1, 32-bit)
+
 # Build with CMake
 ````
 cd build
@@ -47,15 +49,15 @@ cmake --build .
 
 then
 
-`cmake -D DEMOS=TRUE ..`
+`cmake -D DEMOS=ON ..`
 
 or
 
-`cmake -D TESTS=TRUR ..`
+`cmake -D TESTS=ON ..`
 
 or
 
-`cmake -D DEMOS=TRUE -D TESTS=TRUE ..`
+`cmake -D DEMOS=ON -D TESTS=ON ..`
 
 # Logging
 
@@ -67,4 +69,3 @@ In the sample below the logger is modified after being constructed by EnkiNet. E
 auto enki_logger = spdlog::get("EnkiNet");
 enki_logger->set_level(spdlog::level::err);
 ````
-

@@ -1,5 +1,8 @@
 ﻿cmake_minimum_required (VERSION 3.11)
 
+option(DEMOS "Build all demos" ON)
+option(TESTS "Build tests" ON)
+
 set (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 #Includes library and demos and stuff
