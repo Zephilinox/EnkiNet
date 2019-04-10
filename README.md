@@ -57,7 +57,7 @@ or
 
 `cmake -D DEMOS=TRUE -D TESTS=TRUE ..`
 
-#Logging
+# Logging
 
 EnkiNet uses SPDLOG for logging. In order to disable or limit which levels of logging are outputted, as well as change the output location, you need to create a logger with the name "EnkiNet" and modify it accordingly.
 
