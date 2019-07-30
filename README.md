@@ -1,15 +1,17 @@
 # EnkiNet
 My networking dissertation (2018/2019) for implementing a HLAPI integrated in to a 2D scenegraph framework.
 
-[Trello](https://trello.com/b/vID8EWtE/enkinet)
-
 Tested and builds on Windows using MSVC 15.2, or on Linux using either GCC 8.2 or Clang 8. (older versions might also work)
 
-# Make sure SFML is installed
+## Video
+https://www.youtube.com/watch?v=YaYw5OSId7s
+
+## Instructions
+### Make sure SFML is installed
 If on windows, modify SFML_DIR in /CMakeLists.txt to point to the SFML install (not source code) (2.5.1, 32-bit)
 If on linux, make sure to install libsfml-dev
 
-# Generate solution with CMake
+### Generate solution with CMake
 
 If on linux, choose between GCC or Clang
 
@@ -37,13 +39,13 @@ if generating a visual studio solution, remember to set up the start-up project.
 
 If CMake complains about not being able to find SFML when it's already installed, either run `cmake ..` again or make sure you've modified the SFML_DIR path and it's pointing to the correct SFML version (2.5.1, 32-bit)
 
-# Build with CMake
+### Build with CMake
 ````
 cd build
 cmake --build .
 ````
 
-# Demos and Tests
+### Demos and Tests
 
 `cd build`
 
@@ -59,7 +61,7 @@ or
 
 `cmake -D DEMOS=ON -D TESTS=ON ..`
 
-# Logging
+### Logging
 
 EnkiNet uses SPDLOG for logging. In order to disable or limit which levels of logging are outputted, as well as change the output location, you need to create a logger with the name "EnkiNet" and modify it accordingly.
 
