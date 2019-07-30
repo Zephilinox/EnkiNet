@@ -41,14 +41,14 @@ target_link_libraries(Pong EnkiNet)
 include_directories(${CMAKE_SOURCE_DIR}/src "src")
 
 #remove old resources
-file(REMOVE_RECURSE "${CMAKE_SOURCE_DIR}/bin/Pong/Debug/resources/")
-file(REMOVE_RECURSE "${CMAKE_SOURCE_DIR}/bin/Pong/Release/resources/")
+#file(REMOVE_RECURSE "${CMAKE_SOURCE_DIR}/bin/Pong/Debug/resources/")
+#file(REMOVE_RECURSE "${CMAKE_SOURCE_DIR}/bin/Pong/Release/resources/")
 
 #copy current ones
-file(COPY "${CMAKE_SOURCE_DIR}/demos/Pong/resources/"
-    DESTINATION "${CMAKE_SOURCE_DIR}/bin/Pong/Debug/resources/"
-)
+#file(COPY "${CMAKE_SOURCE_DIR}/demos/Pong/resources/"
+#    DESTINATION "${CMAKE_SOURCE_DIR}/bin/Pong/Debug/resources/"
+#)
 
-file(COPY "${CMAKE_SOURCE_DIR}/demos/Pong/resources/"
-    DESTINATION "${CMAKE_SOURCE_DIR}/bin/Pong/Release/resources/"
-)
+#file(COPY "${CMAKE_SOURCE_DIR}/demos/Pong/resources/"
+#    DESTINATION "${CMAKE_SOURCE_DIR}/bin/Pong/Release/resources/"
+#)

@@ -45,14 +45,14 @@ target_link_libraries(Shooter EnkiNet)
 target_include_directories(Shooter PRIVATE ${CMAKE_SOURCE_DIR}/demos/Shooter/src/)
 
 #remove old resources
-file(REMOVE_RECURSE "${CMAKE_SOURCE_DIR}/bin/Shooter/Debug/resources/")
-file(REMOVE_RECURSE "${CMAKE_SOURCE_DIR}/bin/Shooter/Release/resources/")
+#file(REMOVE_RECURSE "${CMAKE_SOURCE_DIR}/bin/Shooter/Debug/resources/")
+#file(REMOVE_RECURSE "${CMAKE_SOURCE_DIR}/bin/Shooter/Release/resources/")
 
 #copy current ones
-file(COPY "${CMAKE_SOURCE_DIR}/demos/Shooter/resources/"
-    DESTINATION "${CMAKE_SOURCE_DIR}/bin/Shooter/Debug/resources/"
-)
+#file(COPY "${CMAKE_SOURCE_DIR}/demos/Shooter/resources/"
+#    DESTINATION "${CMAKE_SOURCE_DIR}/bin/Shooter/Debug/resources/"
+#)
 
-file(COPY "${CMAKE_SOURCE_DIR}/demos/Shooter/resources/"
-    DESTINATION "${CMAKE_SOURCE_DIR}/bin/Shooter/Release/resources/"
-)
+#file(COPY "${CMAKE_SOURCE_DIR}/demos/Shooter/resources/"
+#    DESTINATION "${CMAKE_SOURCE_DIR}/bin/Shooter/Release/resources/"
+#)

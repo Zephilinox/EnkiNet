@@ -46,14 +46,14 @@ target_link_libraries(Asteroids EnkiNet)
 target_include_directories(Asteroids PRIVATE ${CMAKE_SOURCE_DIR}/demos/Asteroids/src/)
 
 #remove old resources
-file(REMOVE_RECURSE "${CMAKE_SOURCE_DIR}/bin/Asteroids/Debug/resources/")
-file(REMOVE_RECURSE "${CMAKE_SOURCE_DIR}/bin/Asteroids/Release/resources/")
+#file(REMOVE_RECURSE "${CMAKE_SOURCE_DIR}/bin/Asteroids/Debug/resources/")
+#file(REMOVE_RECURSE "${CMAKE_SOURCE_DIR}/bin/Asteroids/Release/resources/")
 
 #copy current ones
-file(COPY "${CMAKE_SOURCE_DIR}/demos/Asteroids/resources/"
-    DESTINATION "${CMAKE_SOURCE_DIR}/bin/Asteroids/Debug/resources/"
-)
+#file(COPY "${CMAKE_SOURCE_DIR}/demos/Asteroids/resources/"
+#    DESTINATION "${CMAKE_SOURCE_DIR}/bin/Asteroids/Debug/resources/"
+#)
 
-file(COPY "${CMAKE_SOURCE_DIR}/demos/Asteroids/resources/"
-    DESTINATION "${CMAKE_SOURCE_DIR}/bin/Asteroids/Release/resources/"
-)
+#file(COPY "${CMAKE_SOURCE_DIR}/demos/Asteroids/resources/"
+#    DESTINATION "${CMAKE_SOURCE_DIR}/bin/Asteroids/Release/resources/"
+#)
