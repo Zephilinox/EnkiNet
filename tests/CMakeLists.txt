@@ -1,4 +1,4 @@
-﻿cmake_minimum_required (VERSION 3.11)
+﻿cmake_minimum_required (VERSION 3.15)
 
 project(Tests)
 
@@ -10,7 +10,7 @@ add_executable(Tests
 "RPCTest.hpp"
 )
 
-include(Settings)
+include("../cmake/Settings.cmake")
 
 set_target_properties(
 	Tests PROPERTIES

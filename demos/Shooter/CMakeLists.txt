@@ -1,4 +1,4 @@
-﻿cmake_minimum_required (VERSION 3.11)
+﻿cmake_minimum_required (VERSION 3.15)
 
 project(Shooter)
 
@@ -28,7 +28,7 @@ add_executable(Shooter
 "src/HealthSpawner.cpp"
 )
 
-include(Settings)
+include("../../cmake/Settings.cmake")
 
 set_target_properties(
 	Shooter PROPERTIES

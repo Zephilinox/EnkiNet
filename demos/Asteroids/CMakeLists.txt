@@ -1,4 +1,4 @@
-﻿cmake_minimum_required (VERSION 3.11)
+﻿cmake_minimum_required (VERSION 3.15)
 
 project(Asteroids)
 
@@ -29,7 +29,7 @@ add_executable(Asteroids
 "src/PlayerText.cpp"
 )
 
-include(Settings)
+include("../../cmake/Settings.cmake")
 
 set_target_properties(
 	Asteroids PROPERTIES

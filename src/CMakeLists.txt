@@ -1,4 +1,4 @@
-﻿cmake_minimum_required (VERSION 3.11)
+﻿cmake_minimum_required (VERSION 3.15)
 
 project(EnkiNet)
 
@@ -44,7 +44,7 @@ set (EnkiNet_SRC
 	"EnkiNet/Scenegraph.cpp"
 )
 
-include(FilesystemSourceGroup)
+include("../cmake/FilesystemSourceGroup.cmake")
 SOURCE_GROUP_BY_FOLDER(EnkiNet)
 
 add_library (EnkiNet
@@ -52,7 +52,7 @@ add_library (EnkiNet
 	${EnkiNet_SRC}
 )
 
-include(Settings)
+include("../cmake/Settings.cmake")
 
 set_target_properties(
 	EnkiNet PROPERTIES

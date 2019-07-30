@@ -1,4 +1,4 @@
-﻿cmake_minimum_required (VERSION 3.11)
+﻿cmake_minimum_required (VERSION 3.15)
 
 project(Pong)
 
@@ -24,7 +24,7 @@ add_executable(Pong
 "src/Score.cpp"
 )
 
-include(Settings)
+include("../../cmake/Settings.cmake")
 
 set_target_properties(
 	Pong PROPERTIES
